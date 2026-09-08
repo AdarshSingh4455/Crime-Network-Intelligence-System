@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { HealthStatus, OverviewMetrics, NetworkData, NetworkNode, SuspiciousPattern, AnomalyDetail, TimelineEvent, EntityDetail } from '../types';
+import { HealthStatus, OverviewMetrics, NetworkData, NetworkNode, SuspiciousPattern, AnomalyDetail, TimelineEvent, EntityDetail, LocationItem, IntelligenceReport, SearchResponse } from '../types';
 
 const API_BASE = '/api';
 
@@ -51,13 +51,28 @@ export const api = {
     return res.data;
   },
 
-  getLocations: async (): Promise<any[]> => {
-    const res = await apiClient.get<any[]>('/locations');
+  getLocations: async (): Promise<LocationItem[]> => {
+    const res = await apiClient.get<LocationItem[]>('/locations');
     return res.data;
   },
 
-  getReports: async (): Promise<any> => {
-    const res = await apiClient.get<any>('/reports');
+  getLocationDetail: async (locationId: string): Promise<LocationItem> => {
+    const res = await apiClient.get<LocationItem>(`/locations/${encodeURIComponent(locationId)}`);
+    return res.data;
+  },
+
+  getReports: async (): Promise<IntelligenceReport> => {
+    const res = await apiClient.get<IntelligenceReport>('/reports');
+    return res.data;
+  },
+
+  getSearchResults: async (query: string): Promise<SearchResponse> => {
+    const res = await apiClient.get<SearchResponse>(`/search?q=${encodeURIComponent(query)}`);
+    return res.data;
+  },
+
+  search: async (query: string): Promise<SearchResponse> => {
+    const res = await apiClient.get<SearchResponse>(`/search?q=${encodeURIComponent(query)}`);
     return res.data;
   },
 };

@@ -17,7 +17,9 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Global Search Input Shell */}
       <div className="flex items-center gap-4 flex-1 max-w-xl">
         <button
+          type="button"
           onClick={onOpenSearch}
+          aria-label="Open Global Intelligence Search (Ctrl+K)"
           className="w-full flex items-center justify-between px-3.5 py-2 rounded-md bg-slate-50 border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-100/70 hover:border-slate-300 transition-all text-xs group"
         >
           <div className="flex items-center gap-2.5">
@@ -48,6 +50,8 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Notifications Icon */}
         <button
+          type="button"
+          aria-label="System Notifications"
           className="relative p-2 rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
           title="System Notifications"
         >

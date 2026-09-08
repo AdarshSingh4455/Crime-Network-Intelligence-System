@@ -92,9 +92,24 @@ def get_locations():
     return IntelligenceService.get_locations()
 
 
+@app.get("/api/locations/{location_id}")
+def get_location_detail(location_id: str):
+    locations = IntelligenceService.get_locations()
+    loc = next((l for l in locations if l["id"].lower() == location_id.lower()), None)
+    if not loc:
+        raise HTTPException(status_code=404, detail=f"Location '{location_id}' not found")
+    return loc
+
+
 @app.get("/api/reports")
 def get_reports():
     return IntelligenceService.get_reports()
+
+
+@app.get("/api/search")
+def search(q: str = ""):
+    return IntelligenceService.search(q)
+
 
 
 if __name__ == "__main__":

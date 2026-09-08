@@ -7,7 +7,9 @@ import { Overview } from './pages/Overview';
 import { Network } from './pages/Network';
 import { Entities } from './pages/Entities';
 import { Anomalies } from './pages/Anomalies';
-import { PlaceholderPage } from './pages/PlaceholderPage';
+import { Timeline } from './pages/Timeline';
+import { Locations } from './pages/Locations';
+import { Reports } from './pages/Reports';
 import { api } from './api/client';
 import { OverviewMetrics } from './types';
 
@@ -32,6 +34,17 @@ export const App: React.FC = () => {
     checkStatus();
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   return (
     <Router>
       <div className="flex h-screen w-screen overflow-hidden bg-[#F8FAFC] text-slate-900 font-sans">
@@ -39,6 +52,7 @@ export const App: React.FC = () => {
         <Sidebar
           anomalyCount={metrics?.suspicious_patterns_count || 25}
           entitiesCount={metrics?.total_entities || 15}
+          recordsCount={metrics?.total_records || 10}
         />
 
         {/* Main Application Container */}
@@ -57,36 +71,9 @@ export const App: React.FC = () => {
               <Route path="/network" element={<Network />} />
               <Route path="/entities" element={<Entities />} />
               <Route path="/anomalies" element={<Anomalies />} />
-              <Route
-                path="/timeline"
-                element={
-                  <PlaceholderPage
-                    title="Chronological Intelligence Timeline"
-                    subtitle="Time-sorted sequence of criminal case reports and dated suspicious events"
-                    sectionCode="TIMELINE"
-                  />
-                }
-              />
-              <Route
-                path="/locations"
-                element={
-                  <PlaceholderPage
-                    title="Location Intelligence Analysis"
-                    subtitle="Spatial entity associations, location-based case records, and high-activity hubs"
-                    sectionCode="LOCATIONS"
-                  />
-                }
-              />
-              <Route
-                path="/reports"
-                element={
-                  <PlaceholderPage
-                    title="Intelligence Reports & Summaries"
-                    subtitle="Structured analysis reports, community breakdowns, and critical bridge node assessments"
-                    sectionCode="REPORTS"
-                  />
-                }
-              />
+              <Route path="/timeline" element={<Timeline />} />
+              <Route path="/locations" element={<Locations />} />
+              <Route path="/reports" element={<Reports />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>

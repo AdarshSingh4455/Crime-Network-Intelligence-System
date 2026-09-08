@@ -290,6 +290,12 @@ export const Entities: React.FC = () => {
   useEffect(() => { loadEntities(); }, [loadEntities]);
 
   useEffect(() => {
+    if (paramId) {
+      setSelectedId(paramId);
+    }
+  }, [paramId]);
+
+  useEffect(() => {
     if (!selectedId) { setDetail(null); return; }
     setDetailLoading(true); setDetailError(null); setDetail(null);
     api.getEntityDetail(selectedId)
@@ -522,7 +528,7 @@ export const Entities: React.FC = () => {
             <EntityDetailPanel
               detail={detail}
               onClose={() => setSelectedId(null)}
-              onNavigateToNetwork={() => navigate("/network")}
+              onNavigateToNetwork={() => navigate(`/network?focus=${encodeURIComponent(detail.id)}`)}
               onSelectEntity={setSelectedId}
             />
           ) : null

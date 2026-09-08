@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api/client";
 import { SuspiciousPattern, AnomalyDetail, EntityType } from "../types";
 import {
@@ -93,11 +93,18 @@ export const Anomalies: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Detail panel state
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
+  const paramId = searchParams.get("id");
+  const [selectedId, setSelectedId] = useState<string | null>(paramId || null);
   const [detail, setDetail] = useState<AnomalyDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (paramId) {
+      setSelectedId(paramId);
+    }
+  }, [paramId]);
 
   // Filters & Search
   const [search, setSearch] = useState("");

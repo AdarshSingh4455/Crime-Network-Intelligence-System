@@ -25,8 +25,8 @@ export const Overview: React.FC = () => {
       // Single API call for Overview data
       const data = await api.getOverview();
       setMetrics(data);
-    } catch (err: any) {
-      setError(err.message || 'Failed to connect to FastAPI intelligence backend.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to connect to FastAPI intelligence backend.');
     } finally {
       setLoading(false);
     }
@@ -115,6 +115,19 @@ export const Overview: React.FC = () => {
           <RefreshCw className={`w-3.5 h-3.5 text-cyan-700 ${loading ? 'animate-spin' : ''}`} />
           <span>Refresh Data</span>
         </button>
+      </div>
+
+      {/* Investigative Notice Banner */}
+      <div className="px-4 py-2.5 rounded-lg bg-amber-50/70 border border-amber-200 flex items-center justify-between gap-3 text-xs text-amber-900">
+        <div className="flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+          <span>
+            <strong>Investigative Notice:</strong> Automated signals are investigative leads derived from co-occurrence and anomaly algorithms; human validation is required prior to operational action.
+          </span>
+        </div>
+        <span className="text-[10px] font-mono text-amber-700 uppercase shrink-0 hidden sm:inline font-semibold">
+          Active Case Corpus
+        </span>
       </div>
 
       {/* Operational Status Strip */}

@@ -19,9 +19,14 @@ import {
 interface SidebarProps {
   anomalyCount?: number;
   entitiesCount?: number;
+  recordsCount?: number;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ anomalyCount = 25, entitiesCount = 15 }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  anomalyCount = 25,
+  entitiesCount = 15,
+  recordsCount = 10,
+}) => {
   const mainNav = [
     { name: 'Overview', path: '/', icon: LayoutDashboard },
     { name: 'Network', path: '/network', icon: Share2, badge: 'Interactive' },
@@ -134,7 +139,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ anomalyCount = 25, entitiesCou
             </span>
             <div>
               <div className="text-[11px] font-semibold text-slate-800">Engine Connected</div>
-              <div className="text-[10px] font-mono text-slate-500">10 Records Ingested</div>
+              <div className="text-[10px] font-mono text-slate-500">{recordsCount} Records Ingested</div>
             </div>
           </div>
           <CheckCircle2 className="w-4 h-4 text-emerald-600" />

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import ForceGraph2D, { ForceGraphMethods, NodeObject, LinkObject } from "react-force-graph-2d";
 import { api } from "../api/client";
 import { NetworkData, NetworkNode, NetworkLink, EntityType } from "../types";
@@ -40,6 +40,7 @@ const resolveId = (endpoint: string | FGNode | undefined): string => {
 
 // ─── Network Component ────────────────────────────────────────────────────────
 export const Network: React.FC = () => {
+  const navigate = useNavigate();
   const graphRef = useRef<ForceGraphMethods<FGNode, FGLink>>(undefined!);
   const containerRef = useRef<HTMLDivElement>(null);
   const [graphDims, setGraphDims] = useState({ width: 800, height: 600 });
@@ -412,6 +413,7 @@ export const Network: React.FC = () => {
               const n = filteredGraphData.nodes.find(x => x.id === id);
               if (n) handleNodeClick(n);
             }}
+            onNavigateToEntity={(id: string) => navigate(`/entities?id=${encodeURIComponent(id)}`)}
           />
         ) : (
           <GraphHintPanel nodeCount={summary.num_nodes} edgeCount={summary.num_edges} />
@@ -452,9 +454,10 @@ interface DetailPanelProps {
   onExitFocus: () => void;
   onClose: () => void;
   onSelectEntity: (id: string) => void;
+  onNavigateToEntity: (id: string) => void;
 }
 
-const EntityDetailPanel: React.FC<DetailPanelProps> = ({ node, connectedEntities, focusMode, onEnterFocus, onExitFocus, onClose, onSelectEntity }) => {
+const EntityDetailPanel: React.FC<DetailPanelProps> = ({ node, connectedEntities, focusMode, onEnterFocus, onExitFocus, onClose, onSelectEntity, onNavigateToEntity }) => {
   const cfg = getEntityConfig(node.type);
   const Icon = cfg.icon;
   const metrics: Array<{ label: string; value: string; desc: string }> = [
@@ -506,7 +509,7 @@ const EntityDetailPanel: React.FC<DetailPanelProps> = ({ node, connectedEntities
             ))}
           </div>
         </div>
-        <div className="px-4 py-3 border-b border-slate-100 flex-shrink-0">
+        <div className="px-4 py-3 border-b border-slate-100 flex-shrink-0 space-y-2">
           {focusMode ? (
             <button onClick={onExitFocus} className="w-full py-2 text-sm font-medium border border-indigo-200 text-indigo-700 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors flex items-center justify-center gap-2">
               <X className="w-3.5 h-3.5" /> Exit Focus Mode
@@ -516,6 +519,12 @@ const EntityDetailPanel: React.FC<DetailPanelProps> = ({ node, connectedEntities
               <Maximize2 className="w-3.5 h-3.5" /> Focus Ego Network
             </button>
           )}
+          <button
+            onClick={() => onNavigateToEntity(node.id ?? "")}
+            className="w-full py-2 text-sm font-medium border border-slate-200 text-slate-700 bg-white rounded-lg hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+          >
+            <Users className="w-3.5 h-3.5 text-slate-500" /> Inspect in Entity Explorer
+          </button>
         </div>
         <div className="p-4">
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Connected Entities <span className="ml-1.5 text-slate-400 font-normal normal-case">({connectedEntities.length})</span></p>
