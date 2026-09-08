@@ -1,3 +1,8 @@
+@"
+node_modules/
+venv/
 .venv/
+.env
 __pycache__/
 *.pyc
+"@ | Set-Content .gitignore
