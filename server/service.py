@@ -11,6 +11,7 @@ import os
 import sys
 import json
 import re
+import uuid
 from datetime import datetime, timezone
 from typing import Dict, Any, List
 
@@ -35,6 +36,336 @@ from anomaly_detection import (
 DATA_PATH = os.path.join(BASE_DIR, "data", "sample_records.json")
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 
+
+
+class WorkflowStore:
+    """
+    Session Review Workspace Store (In-memory server-side state).
+    
+    IMPORTANT ARCHITECTURAL NOTICE:
+    Workflow states, review checklists, follow-up items, and investigation
+    session history are maintained in-memory for the active runtime session.
+    They are NOT persisted to enterprise storage.
+    """
+    _case_workflows: Dict[str, Dict[str, Any]] = {}
+    _session_activity: List[Dict[str, Any]] = []
+
+    VALID_WORKFLOW_STATUSES = {
+        "Review Required",
+        "In Review",
+        "Follow-up Required",
+        "Review Completed",
+    }
+
+    ALLOWED_CATEGORIES = {
+        "Source Cross-Check",
+        "Entity Review",
+        "Timeline Review",
+        "Location Review",
+        "Network Review",
+        "Anomaly Review",
+        "Additional Record Review",
+    }
+
+    DEFAULT_CHECKLIST = [
+        {
+            "id": "chk-1",
+            "label": "Review Primary Source Record & Narrative",
+            "description": "Inspect raw ingested text, provenance channel, timestamp, and reporting agency.",
+            "completed": False,
+            "completed_at": None,
+        },
+        {
+            "id": "chk-2",
+            "label": "Review Extracted Entities & Roles",
+            "description": "Examine extracted Persons, Organizations, Vehicles, Phones, and verify classifications.",
+            "completed": False,
+            "completed_at": None,
+        },
+        {
+            "id": "chk-3",
+            "label": "Review Correlated Anomaly Signals",
+            "description": "Evaluate automated detection signatures (burst activity, structuring, outlier activity).",
+            "completed": False,
+            "completed_at": None,
+        },
+        {
+            "id": "chk-4",
+            "label": "Review Chronological Event Timestamps",
+            "description": "Verify sequential consistency, interval spikes, and activity window across source timeline.",
+            "completed": False,
+            "completed_at": None,
+        },
+        {
+            "id": "chk-5",
+            "label": "Review Spatial Sites & Bridge Locations",
+            "description": "Inspect geographic sites, transit waypoints, and high-degree location nodes.",
+            "completed": False,
+            "completed_at": None,
+        },
+        {
+            "id": "chk-6",
+            "label": "Review Internal Co-occurrence Subgraph",
+            "description": "Analyze network topology, ego-network connections, and community memberships.",
+            "completed": False,
+            "completed_at": None,
+        },
+        {
+            "id": "chk-7",
+            "label": "Cross-Reference Related Cases",
+            "description": "Assess shared entities, co-occurring sites, and correlated investigative files.",
+            "completed": False,
+            "completed_at": None,
+        },
+        {
+            "id": "chk-8",
+            "label": "Verify Intelligence Provenance References",
+            "description": "Confirm extraction traceability back to raw evidence records before final determination.",
+            "completed": False,
+            "completed_at": None,
+        },
+    ]
+
+    @classmethod
+    def _now_iso(cls) -> str:
+        return datetime.now(timezone.utc).isoformat()
+
+    @classmethod
+    def initialize_case_if_needed(cls, case_id: str, case_data: Dict[str, Any]):
+        cid = case_id.upper()
+        if cid in cls._case_workflows:
+            return
+
+        workflow_status = "Review Required"
+        followups = []
+        fu_counter = 1
+
+        source_name = case_data.get("source_label") or case_data.get("source", "Primary Record")
+        followups.append({
+            "id": f"FU-{cid}-{fu_counter:02d}",
+            "case_id": cid,
+            "title": f"Source Cross-Check: Cross-reference ingested narrative against {source_name} logs",
+            "category": "Source Cross-Check",
+            "status": "Pending",
+            "related_target": case_data.get("source"),
+            "created_at": cls._now_iso(),
+            "completed_at": None,
+            "notes": "Verify dispatch transmission or source document reference ID."
+        })
+        fu_counter += 1
+
+        ents = case_data.get("entities", [])
+        if ents:
+            primary_ent = ents[0] if isinstance(ents[0], str) else ents[0].get("id", "")
+            followups.append({
+                "id": f"FU-{cid}-{fu_counter:02d}",
+                "case_id": cid,
+                "title": f"Entity Review: Verify role classification and identity references for {primary_ent}",
+                "category": "Entity Review",
+                "status": "Pending",
+                "related_target": primary_ent,
+                "created_at": cls._now_iso(),
+                "completed_at": None,
+                "notes": "Assess cross-registry mentions and confirmed identifiers."
+            })
+            fu_counter += 1
+
+        anoms = case_data.get("anomalies", [])
+        if anoms:
+            anom_pattern = anoms[0].get("pattern_label") or anoms[0].get("pattern", "Analytical Signal")
+            anom_id = anoms[0].get("id", "")
+            followups.append({
+                "id": f"FU-{cid}-{fu_counter:02d}",
+                "case_id": cid,
+                "title": f"Anomaly Review: Review detection signal parameters for {anom_pattern}",
+                "category": "Anomaly Review",
+                "status": "Pending",
+                "related_target": anom_id,
+                "created_at": cls._now_iso(),
+                "completed_at": None,
+                "notes": "Review statistical threshold and temporal window triggers."
+            })
+            fu_counter += 1
+
+        locs = case_data.get("locations", [])
+        if locs:
+            loc_id = locs[0] if isinstance(locs[0], str) else locs[0].get("id", "")
+            followups.append({
+                "id": f"FU-{cid}-{fu_counter:02d}",
+                "case_id": cid,
+                "title": f"Location Review: Review spatial co-occurrence history for {loc_id}",
+                "category": "Location Review",
+                "status": "Pending",
+                "related_target": loc_id,
+                "created_at": cls._now_iso(),
+                "completed_at": None,
+                "notes": "Check geographic convergence across adjacent incident reports."
+            })
+            fu_counter += 1
+
+        checklist_copy = [dict(item) for item in cls.DEFAULT_CHECKLIST]
+
+        cls._case_workflows[cid] = {
+            "case_id": cid,
+            "workflow_status": workflow_status,
+            "checklist": checklist_copy,
+            "followups": followups,
+            "created_at": cls._now_iso(),
+        }
+
+        cls.log_activity(
+            cid,
+            "Workflow Initialized",
+            f"Case {cid} registered in Session Review Workspace with {len(followups)} review tasks."
+        )
+
+    @classmethod
+    def log_activity(cls, case_id: str, action: str, details: str):
+        cid = case_id.upper()
+        event = {
+            "id": f"ACT-{uuid.uuid4().hex[:8].upper()}",
+            "case_id": cid,
+            "action": action,
+            "details": details,
+            "timestamp": cls._now_iso(),
+        }
+        cls._session_activity.append(event)
+        return event
+
+    @classmethod
+    def get_case_activity(cls, case_id: str) -> List[Dict[str, Any]]:
+        cid = case_id.upper()
+        return [e for e in cls._session_activity if e["case_id"] == cid or e["case_id"] == "ALL"]
+
+    @classmethod
+    def get_workflow(cls, case_id: str) -> Dict[str, Any] | None:
+        cid = case_id.upper()
+        wf = cls._case_workflows.get(cid)
+        if not wf:
+            return None
+        
+        checklist = wf["checklist"]
+        followups = wf["followups"]
+        reviewed_cnt = sum(1 for c in checklist if c["completed"])
+        pending_fu_cnt = sum(1 for f in followups if f["status"] != "Completed")
+
+        return {
+            "case_id": cid,
+            "workflow_status": wf["workflow_status"],
+            "checklist": checklist,
+            "followups": followups,
+            "activity_history": cls.get_case_activity(cid),
+            "checklist_reviewed_count": reviewed_cnt,
+            "checklist_total_count": len(checklist),
+            "pending_followups_count": pending_fu_cnt,
+        }
+
+    @classmethod
+    def update_workflow_status(cls, case_id: str, status: str) -> Dict[str, Any]:
+        cid = case_id.upper()
+        if status not in cls.VALID_WORKFLOW_STATUSES:
+            raise ValueError(f"Invalid workflow status '{status}'. Must be one of: {sorted(list(cls.VALID_WORKFLOW_STATUSES))}")
+        
+        wf = cls._case_workflows.get(cid)
+        if not wf:
+            raise KeyError(f"Case '{cid}' not found in workflow workspace")
+
+        old_status = wf["workflow_status"]
+        wf["workflow_status"] = status
+        cls.log_activity(
+            cid,
+            "Workflow Status Changed",
+            f"Review state changed from '{old_status}' to '{status}'"
+        )
+        return cls.get_workflow(cid)
+
+    @classmethod
+    def toggle_checklist_item(cls, case_id: str, item_id: str, completed: bool) -> Dict[str, Any]:
+        cid = case_id.upper()
+        wf = cls._case_workflows.get(cid)
+        if not wf:
+            raise KeyError(f"Case '{cid}' not found in workflow workspace")
+
+        target_item = next((i for i in wf["checklist"] if i["id"] == item_id), None)
+        if not target_item:
+            raise ValueError(f"Checklist item '{item_id}' not found in case '{cid}'")
+
+        target_item["completed"] = bool(completed)
+        target_item["completed_at"] = cls._now_iso() if completed else None
+
+        cls.log_activity(
+            cid,
+            "Checklist Item Updated",
+            f"{'Completed' if completed else 'Reopened'}: {target_item['label']}"
+        )
+        return cls.get_workflow(cid)
+
+    @classmethod
+    def add_followup(cls, case_id: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+        cid = case_id.upper()
+        wf = cls._case_workflows.get(cid)
+        if not wf:
+            raise KeyError(f"Case '{cid}' not found in workflow workspace")
+
+        category = payload.get("category", "").strip()
+        if category not in cls.ALLOWED_CATEGORIES:
+            raise ValueError(f"Invalid follow-up category '{category}'. Must be one of: {sorted(list(cls.ALLOWED_CATEGORIES))}")
+
+        title = payload.get("title", "").strip()
+        if not title:
+            raise ValueError("Follow-up title cannot be empty")
+
+        fu_id = f"FU-{cid}-{uuid.uuid4().hex[:6].upper()}"
+        item = {
+            "id": fu_id,
+            "case_id": cid,
+            "title": title,
+            "category": category,
+            "status": "Pending",
+            "related_target": payload.get("related_target") or None,
+            "created_at": cls._now_iso(),
+            "completed_at": None,
+            "notes": payload.get("notes") or "",
+        }
+        wf["followups"].append(item)
+
+        cls.log_activity(
+            cid,
+            "Follow-up Task Created",
+            f"Created follow-up item: [{category}] {title}"
+        )
+        return item
+
+    @classmethod
+    def update_followup(cls, case_id: str, followup_id: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+        cid = case_id.upper()
+        wf = cls._case_workflows.get(cid)
+        if not wf:
+            raise KeyError(f"Case '{cid}' not found in workflow workspace")
+
+        item = next((f for f in wf["followups"] if f["id"] == followup_id), None)
+        if not item:
+            raise KeyError(f"Follow-up '{followup_id}' not found in case '{cid}'")
+
+        if "status" in payload and payload["status"]:
+            new_status = payload["status"].strip()
+            if new_status not in {"Pending", "In Progress", "Completed"}:
+                raise ValueError(f"Invalid follow-up status '{new_status}'. Must be 'Pending', 'In Progress', or 'Completed'.")
+            item["status"] = new_status
+            if new_status == "Completed":
+                item["completed_at"] = cls._now_iso()
+            else:
+                item["completed_at"] = None
+
+        if "notes" in payload:
+            item["notes"] = payload["notes"]
+
+        cls.log_activity(
+            cid,
+            "Follow-up Task Updated",
+            f"Follow-up [{item['category']}] {item['title']} marked as '{item['status']}'"
+        )
+        return item
 
 class IntelligenceService:
     _cached_data: Dict[str, Any] | None = None
@@ -1202,22 +1533,31 @@ class IntelligenceService:
             ]
             kp_involved = [e for e in ents if node_lookup.get(e, {}).get("is_key_player")]
 
+            # Analytical priority strictly derived from intelligence signals
             has_burst_or_structuring = any(a["pattern"] in ("burst_activity", "structuring") for a in rec_anoms)
             if has_burst_or_structuring or len(kp_involved) >= 2 or len(rec_anoms) >= 2:
                 priority = "HIGH"
-                workflow_status = "Review Required"
             elif len(kp_involved) >= 1 or len(rec_anoms) >= 1:
                 priority = "MEDIUM"
-                workflow_status = "Intelligence Available"
             else:
                 priority = "STANDARD"
-                workflow_status = "Source Record Active"
 
             source_label = r["source"].replace("_", " ").title()
             short_title = cls.CASE_TITLES.get(rid, f"{source_label} Report {rid}")
 
             time_match = re.search(r"\b([01]?[0-9]|2[0-3]):[0-5][0-9]\b", r["text"])
             time_str = time_match.group(0) if time_match else None
+
+            # Initialize case in session workflow workspace if needed
+            WorkflowStore.initialize_case_if_needed(rid, {
+                "source_label": source_label,
+                "source": r["source"],
+                "entities": ents,
+                "anomalies": rec_anoms,
+                "locations": loc_names,
+            })
+            wf = WorkflowStore.get_workflow(rid)
+            current_workflow_status = wf["workflow_status"] if wf else "Review Required"
 
             cases_list.append({
                 "case_id": rid,
@@ -1230,7 +1570,7 @@ class IntelligenceService:
                 "date_range": {"start": r["date"], "end": r["date"]},
                 "summary": r["text"][:130].strip() + ("..." if len(r["text"]) > 130 else ""),
                 "full_text": r["text"],
-                "workflow_status": workflow_status,
+                "workflow_status": current_workflow_status,
                 "source_status": "Ingested Case Report",
                 "priority": priority,
                 "record_count": 1,
@@ -1254,7 +1594,9 @@ class IntelligenceService:
             "total_entities": data["summary"]["num_nodes"],
             "total_anomalies": len(data["suspicious_patterns"]),
             "review_required_count": sum(1 for c in cases_list if c["workflow_status"] == "Review Required"),
-            "intelligence_available_count": sum(1 for c in cases_list if c["workflow_status"] == "Intelligence Available"),
+            "in_review_count": sum(1 for c in cases_list if c["workflow_status"] == "In Review"),
+            "followup_required_count": sum(1 for c in cases_list if c["workflow_status"] == "Follow-up Required"),
+            "review_completed_count": sum(1 for c in cases_list if c["workflow_status"] == "Review Completed"),
             "date_coverage": {
                 "start": min(dates) if dates else "",
                 "end": max(dates) if dates else ""
@@ -1279,6 +1621,7 @@ class IntelligenceService:
         case_entity_names = [e["text"] for e in target_r.get("extracted_entities", [])]
         case_entity_set = set(case_entity_names)
         loc_names = [e["text"] for e in target_r.get("extracted_entities", []) if e["label"] == "LOCATION"]
+        non_loc_entities = [e["text"] for e in target_r.get("extracted_entities", []) if e["label"] != "LOCATION"]
 
         rec_anoms = [
             {
@@ -1300,13 +1643,21 @@ class IntelligenceService:
         has_burst_or_structuring = any(a["pattern"] in ("burst_activity", "structuring") for a in rec_anoms)
         if has_burst_or_structuring or len(kp_involved) >= 2 or len(rec_anoms) >= 2:
             priority = "HIGH"
-            workflow_status = "Review Required"
         elif len(kp_involved) >= 1 or len(rec_anoms) >= 1:
             priority = "MEDIUM"
-            workflow_status = "Intelligence Available"
         else:
             priority = "STANDARD"
-            workflow_status = "Source Record Active"
+
+        # Initialize session workflow workspace for this case
+        WorkflowStore.initialize_case_if_needed(rid, {
+            "source_label": source_label,
+            "source": target_r["source"],
+            "entities": case_entity_names,
+            "anomalies": rec_anoms,
+            "locations": loc_names,
+        })
+        wf = WorkflowStore.get_workflow(rid)
+        current_workflow_status = wf["workflow_status"] if wf else "Review Required"
 
         time_match = re.search(r"\b([01]?[0-9]|2[0-3]):[0-5][0-9]\b", target_r["text"])
         time_str = time_match.group(0) if time_match else None
@@ -1330,6 +1681,89 @@ class IntelligenceService:
                     "common_entities": sorted(list(common_ents)),
                 })
         related_records.sort(key=lambda x: x["date"])
+
+        # Derived Related Cases
+        # Strictly derived: Shared Entity, Shared Location, Shared Analytical Signal (exact anomaly instance)
+        target_non_loc_set = set(non_loc_entities)
+        target_loc_set = set(loc_names)
+        target_anom_ids = {
+            a["id"] for a in data["suspicious_patterns"]
+            if a.get("record_id") == rid or rid in a.get("records", [])
+        }
+
+        related_cases = []
+        for other_r in data["records"]:
+            oid = other_r["record_id"]
+            if oid == rid:
+                continue
+
+            o_non_loc = {e["text"] for e in other_r.get("extracted_entities", []) if e["label"] != "LOCATION"}
+            o_locs = {e["text"] for e in other_r.get("extracted_entities", []) if e["label"] == "LOCATION"}
+            o_anom_ids = {
+                a["id"] for a in data["suspicious_patterns"]
+                if a.get("record_id") == oid or oid in a.get("records", [])
+            }
+
+            shared_e = sorted(list(target_non_loc_set.intersection(o_non_loc)))
+            shared_l = sorted(list(target_loc_set.intersection(o_locs)))
+            shared_a_ids = sorted(list(target_anom_ids.intersection(o_anom_ids)))
+
+            shared_a = [
+                {
+                    "id": aid,
+                    "pattern": next((a["pattern"] for a in data["suspicious_patterns"] if a["id"] == aid), "signal"),
+                    "pattern_label": next((a["pattern"].replace("_", " ").title() for a in data["suspicious_patterns"] if a["id"] == aid), "Analytical Signal"),
+                }
+                for aid in shared_a_ids
+            ]
+
+            bases = []
+            if shared_e:
+                bases.append("Shared Entity")
+            if shared_l:
+                bases.append("Shared Location")
+            if shared_a:
+                bases.append("Shared Analytical Signal")
+
+            if bases:
+                o_ents = [e["text"] for e in other_r.get("extracted_entities", [])]
+                o_rec_anoms = [
+                    a for a in data["suspicious_patterns"]
+                    if a.get("record_id") == oid or (a.get("date") == other_r["date"] and a.get("entity") in o_ents)
+                ]
+                o_kp = [e for e in o_ents if node_lookup.get(e, {}).get("is_key_player")]
+                o_burst = any(a["pattern"] in ("burst_activity", "structuring") for a in o_rec_anoms)
+                if o_burst or len(o_kp) >= 2 or len(o_rec_anoms) >= 2:
+                    o_pri = "HIGH"
+                elif len(o_kp) >= 1 or len(o_rec_anoms) >= 1:
+                    o_pri = "MEDIUM"
+                else:
+                    o_pri = "STANDARD"
+
+                WorkflowStore.initialize_case_if_needed(oid, {
+                    "source_label": other_r["source"].replace("_", " ").title(),
+                    "source": other_r["source"],
+                    "entities": o_ents,
+                    "anomalies": o_rec_anoms,
+                    "locations": list(o_locs),
+                })
+                other_wf = WorkflowStore.get_workflow(oid)
+
+                related_cases.append({
+                    "case_id": oid,
+                    "title": f"{oid}: {cls.CASE_TITLES.get(oid, f'Report {oid}')}",
+                    "short_title": cls.CASE_TITLES.get(oid, f"Report {oid}"),
+                    "relationship_bases": bases,
+                    "shared_entities": shared_e,
+                    "shared_locations": shared_l,
+                    "shared_anomalies": shared_a,
+                    "summary": other_r["text"][:130].strip() + ("..." if len(other_r["text"]) > 130 else ""),
+                    "priority": o_pri,
+                    "workflow_status": other_wf["workflow_status"] if other_wf else "Review Required",
+                    "relevance_score": len(shared_e) * 3 + len(shared_l) * 2 + len(shared_a) * 4,
+                })
+
+        related_cases.sort(key=lambda x: x["relevance_score"], reverse=True)
 
         entity_cards = []
         for eid in case_entity_names:
@@ -1368,35 +1802,59 @@ class IntelligenceService:
         tl = cls.get_timeline()
         related_rids = {rr["record_id"] for rr in related_records}
         case_timeline = [
-            evt for evt in tl
-            if evt["record_id"] == rid or evt["record_id"] in related_rids
+            ev for ev in tl
+            if ev["record_id"] == rid or ev["record_id"] in related_rids
         ]
+        case_timeline.sort(key=lambda x: x["date"])
 
+        all_links = data["links"]
         internal_links = [
-            l for l in data["links"]
+            l for l in all_links
             if l["source"] in case_entity_set and l["target"] in case_entity_set
         ]
 
-        communities_represented = sorted(list({n["community"] for n in entity_cards if n["community"] > 0}))
+        communities_represented = sorted(list({
+            node_lookup[e]["community"]
+            for e in case_entity_names
+            if e in node_lookup and "community" in node_lookup[e]
+        }))
 
-        references = [
-            {
-                "ref_type": "Primary Case Report",
-                "identifier": rid,
-                "source_system": target_r["source"],
-                "source_label": source_label,
-                "date": target_r["date"],
-                "details": f"Raw intake text processed by RuleBasedNER ({len(case_entity_names)} entities extracted)"
-            }
-        ]
-        for a in rec_anoms:
+        # Intelligence References with full provenance and navigation metadata
+        references = []
+        references.append({
+            "ref_type": "Ingested Evidence Record",
+            "identifier": rid,
+            "source_system": source_label,
+            "source_label": "Primary Source Ingestion",
+            "date": target_r["date"],
+            "target_module": "/timeline",
+            "navigation_param": f"record_id={rid}",
+            "analytical_method": "JSON Source Extraction & Standardization",
+            "details": f"Original report text ({len(target_r['text'])} chars) ingested from {source_label} channel."
+        })
+        for ent in entity_cards:
             references.append({
-                "ref_type": "Analytical Signal",
-                "identifier": a["id"],
-                "source_system": "CNIS Anomaly Detection Engine",
-                "source_label": a["pattern_label"],
-                "date": a["date"] or target_r["date"],
-                "details": a["note"]
+                "ref_type": "Entity Extraction Lead",
+                "identifier": ent["id"],
+                "source_system": "Rule-Based NER Pipeline",
+                "source_label": f"{ent['type']} (Influence: {ent['influence_score']})",
+                "date": target_r["date"],
+                "target_module": "/entities",
+                "navigation_param": f"id={ent['id']}",
+                "analytical_method": "Regex & Keyword Entity Recognition",
+                "details": f"Extracted {ent['type']} entity co-occurring with {ent['degree']} network edges across communities."
+            })
+        for anom in rec_anoms:
+            references.append({
+                "ref_type": "Anomaly Detection Flag",
+                "identifier": anom["id"],
+                "source_system": "Analytical Anomaly Engine",
+                "source_label": anom["pattern_label"],
+                "date": anom.get("date", target_r["date"]),
+                "target_module": "/anomalies",
+                "navigation_param": f"id={anom['id']}",
+                "analytical_method": "Heuristic & Statistical Signal Detection",
+                "details": f"Flagged {anom['pattern_label']} signal linked to entity {anom.get('entity')}: {anom.get('note', '')}"
             })
         for loc in case_locations:
             references.append({
@@ -1405,8 +1863,14 @@ class IntelligenceService:
                 "source_system": "Location Intelligence Analysis",
                 "source_label": f"Activity Score: {loc['activity_score']}",
                 "date": target_r["date"],
-                "details": f"Operational node linking {loc['entity_count']} entities across {loc['record_count']} case records"
+                "target_module": "/locations",
+                "navigation_param": f"id={loc['id']}",
+                "analytical_method": "Spatial Co-occurrence Clustering",
+                "details": f"Operational node linking {loc['entity_count']} entities across {loc['record_count']} case records."
             })
+
+        # Activity history for this case
+        activity_history = WorkflowStore.get_case_activity(rid)
 
         return {
             "case_id": rid,
@@ -1416,7 +1880,7 @@ class IntelligenceService:
             "source_label": source_label,
             "date": target_r["date"],
             "time": time_str,
-            "workflow_status": workflow_status,
+            "workflow_status": current_workflow_status,
             "source_status": "Ingested Case Report",
             "priority": priority,
             "description": target_r["text"],
@@ -1427,6 +1891,7 @@ class IntelligenceService:
                 "locations": len(case_locations),
                 "key_players": len(kp_involved),
                 "internal_connections": len(internal_links),
+                "related_cases_count": len(related_cases),
             },
             "primary_record": {
                 "record_id": rid,
@@ -1439,6 +1904,7 @@ class IntelligenceService:
                 "anomaly_count": len(rec_anoms),
             },
             "related_records": related_records,
+            "related_cases": related_cases,
             "entities": entity_cards,
             "anomalies": rec_anoms,
             "locations": case_locations,
@@ -1451,7 +1917,48 @@ class IntelligenceService:
                 "communities": communities_represented,
             },
             "intelligence_references": references,
+            "workflow": wf,
+            "activity_history": activity_history,
             "disclaimer": "Case intelligence is derived from available source records and analytical signals. Investigative conclusions require authorized human review.",
+            "workflow_notice": "Session Review Workspace: Workflow state, checklists, and follow-ups are maintained for the active investigation session. Enterprise persistence requires database integration."
         }
 
+    @classmethod
+    def get_case_workflow(cls, case_id: str) -> Dict[str, Any] | None:
+        clean_id = case_id.strip().upper()
+        detail = cls.get_case_detail(clean_id)
+        if not detail:
+            return None
+        return WorkflowStore.get_workflow(clean_id)
 
+    @classmethod
+    def update_case_workflow(cls, case_id: str, status: str) -> Dict[str, Any] | None:
+        clean_id = case_id.strip().upper()
+        detail = cls.get_case_detail(clean_id)
+        if not detail:
+            return None
+        return WorkflowStore.update_workflow_status(clean_id, status)
+
+    @classmethod
+    def toggle_case_checklist(cls, case_id: str, item_id: str, completed: bool) -> Dict[str, Any] | None:
+        clean_id = case_id.strip().upper()
+        detail = cls.get_case_detail(clean_id)
+        if not detail:
+            return None
+        return WorkflowStore.toggle_checklist_item(clean_id, item_id, completed)
+
+    @classmethod
+    def add_case_followup(cls, case_id: str, payload: Dict[str, Any]) -> Dict[str, Any] | None:
+        clean_id = case_id.strip().upper()
+        detail = cls.get_case_detail(clean_id)
+        if not detail:
+            return None
+        return WorkflowStore.add_followup(clean_id, payload)
+
+    @classmethod
+    def update_case_followup(cls, case_id: str, followup_id: str, payload: Dict[str, Any]) -> Dict[str, Any] | None:
+        clean_id = case_id.strip().upper()
+        detail = cls.get_case_detail(clean_id)
+        if not detail:
+            return None
+        return WorkflowStore.update_followup(clean_id, followup_id, payload)

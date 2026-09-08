@@ -68,6 +68,7 @@ export interface SuspiciousPattern {
   date?: string;
   event_count?: number;
   pattern: string;
+  pattern_label?: string;
   note: string;
   type?: EntityType;
 }
@@ -441,6 +442,76 @@ export interface IngestResponse {
   sources_active: number;
 }
 
+export type CaseWorkflowStatus =
+  | 'Review Required'
+  | 'In Review'
+  | 'Follow-up Required'
+  | 'Review Completed';
+
+export interface ChecklistItem {
+  id: string;
+  label: string;
+  description: string;
+  completed: boolean;
+  completed_at?: string | null;
+}
+
+export type FollowUpCategory =
+  | 'Source Cross-Check'
+  | 'Entity Review'
+  | 'Timeline Review'
+  | 'Location Review'
+  | 'Network Review'
+  | 'Anomaly Review'
+  | 'Additional Record Review';
+
+export type FollowUpStatus = 'Pending' | 'In Progress' | 'Completed';
+
+export interface FollowUpItem {
+  id: string;
+  case_id: string;
+  title: string;
+  category: FollowUpCategory;
+  status: FollowUpStatus;
+  related_target?: string | null;
+  created_at: string;
+  completed_at?: string | null;
+  notes?: string;
+}
+
+export interface ActivityEvent {
+  id: string;
+  case_id: string;
+  action: string;
+  details: string;
+  timestamp: string;
+}
+
+export interface RelatedCaseItem {
+  case_id: string;
+  title: string;
+  short_title: string;
+  relationship_bases: string[];
+  shared_entities: string[];
+  shared_locations: string[];
+  shared_anomalies: Array<{ id: string; pattern: string; pattern_label: string }>;
+  summary: string;
+  priority: 'HIGH' | 'MEDIUM' | 'STANDARD';
+  workflow_status: CaseWorkflowStatus;
+  relevance_score?: number;
+}
+
+export interface CaseWorkflowState {
+  case_id: string;
+  workflow_status: CaseWorkflowStatus;
+  checklist: ChecklistItem[];
+  followups: FollowUpItem[];
+  activity_history: ActivityEvent[];
+  checklist_reviewed_count: number;
+  checklist_total_count: number;
+  pending_followups_count: number;
+}
+
 export interface CaseItem {
   case_id: string;
   title: string;
@@ -452,7 +523,7 @@ export interface CaseItem {
   date_range: { start: string; end: string };
   summary: string;
   full_text: string;
-  workflow_status: 'Review Required' | 'Intelligence Available' | 'Source Record Active';
+  workflow_status: CaseWorkflowStatus;
   source_status: string;
   priority: 'HIGH' | 'MEDIUM' | 'STANDARD';
   record_count: number;
@@ -486,6 +557,9 @@ export interface CaseIntelligenceReference {
   source_label: string;
   date: string;
   details: string;
+  target_module?: string;
+  navigation_param?: string;
+  analytical_method?: string;
 }
 
 export interface CaseDetail {
@@ -496,7 +570,7 @@ export interface CaseDetail {
   source_label: string;
   date: string;
   time?: string | null;
-  workflow_status: 'Review Required' | 'Intelligence Available' | 'Source Record Active';
+  workflow_status: CaseWorkflowStatus;
   source_status: string;
   priority: 'HIGH' | 'MEDIUM' | 'STANDARD';
   description: string;
@@ -507,9 +581,11 @@ export interface CaseDetail {
     locations: number;
     key_players: number;
     internal_connections: number;
+    related_cases_count?: number;
   };
   primary_record: CaseRecordReference;
   related_records: CaseRecordReference[];
+  related_cases: RelatedCaseItem[];
   entities: NetworkNode[];
   anomalies: SuspiciousPattern[];
   locations: LocationItem[];
@@ -522,7 +598,10 @@ export interface CaseDetail {
     communities: number[];
   };
   intelligence_references: CaseIntelligenceReference[];
+  workflow: CaseWorkflowState;
+  activity_history: ActivityEvent[];
   disclaimer: string;
+  workflow_notice: string;
 }
 
 export interface CasesResponse {
@@ -531,10 +610,9 @@ export interface CasesResponse {
   total_entities: number;
   total_anomalies: number;
   review_required_count: number;
-  intelligence_available_count: number;
+  in_review_count: number;
+  followup_required_count: number;
+  review_completed_count: number;
   date_coverage: { start: string; end: string };
   cases: CaseItem[];
 }
-
-
-

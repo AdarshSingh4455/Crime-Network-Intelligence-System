@@ -16,6 +16,11 @@ import {
   IngestResponse,
   CasesResponse,
   CaseDetail,
+  CaseWorkflowState,
+  CaseWorkflowStatus,
+  FollowUpItem,
+  FollowUpCategory,
+  FollowUpStatus,
 } from '../types';
 
 const API_BASE = '/api';
@@ -117,4 +122,29 @@ export const api = {
     const res = await apiClient.get<CaseDetail>(`/cases/${encodeURIComponent(caseId)}`);
     return res.data;
   },
+  getCaseWorkflow: async (caseId: string): Promise<CaseWorkflowState> => {
+    const res = await apiClient.get<CaseWorkflowState>(`/cases/${encodeURIComponent(caseId)}/workflow`);
+    return res.data;
+  },
+
+  updateCaseWorkflowStatus: async (caseId: string, status: CaseWorkflowStatus): Promise<CaseWorkflowState> => {
+    const res = await apiClient.patch<CaseWorkflowState>(`/cases/${encodeURIComponent(caseId)}/workflow`, { status });
+    return res.data;
+  },
+
+  toggleChecklistItem: async (caseId: string, itemId: string, completed: boolean): Promise<CaseWorkflowState> => {
+    const res = await apiClient.patch<CaseWorkflowState>(`/cases/${encodeURIComponent(caseId)}/checklist`, { item_id: itemId, completed });
+    return res.data;
+  },
+
+  addCaseFollowup: async (caseId: string, payload: { title: string; category: FollowUpCategory; related_target?: string; notes?: string }): Promise<FollowUpItem> => {
+    const res = await apiClient.post<FollowUpItem>(`/cases/${encodeURIComponent(caseId)}/followups`, payload);
+    return res.data;
+  },
+
+  updateCaseFollowup: async (caseId: string, followupId: string, payload: { status?: FollowUpStatus; notes?: string }): Promise<FollowUpItem> => {
+    const res = await apiClient.patch<FollowUpItem>(`/cases/${encodeURIComponent(caseId)}/followups/${encodeURIComponent(followupId)}`, payload);
+    return res.data;
+  },
 };
+

@@ -8,6 +8,8 @@ Exposes structured endpoints for the React dashboard.
 from __future__ import annotations
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
 from server.service import IntelligenceService
 
@@ -151,6 +153,82 @@ def get_case_detail(case_id: str):
         raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found in registered intelligence records")
     return detail
 
+
+
+
+class WorkflowStatusUpdate(BaseModel):
+    status: str
+
+
+class ChecklistItemUpdate(BaseModel):
+    item_id: str
+    completed: bool
+
+
+class FollowupCreate(BaseModel):
+    title: str
+    category: str
+    related_target: Optional[str] = None
+    notes: Optional[str] = None
+
+
+class FollowupUpdate(BaseModel):
+    status: Optional[str] = None
+    notes: Optional[str] = None
+
+
+@app.get("/api/cases/{case_id}/workflow")
+def get_case_workflow(case_id: str):
+    wf = IntelligenceService.get_case_workflow(case_id)
+    if not wf:
+        raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found in registered intelligence records")
+    return wf
+
+
+@app.patch("/api/cases/{case_id}/workflow")
+def update_case_workflow(case_id: str, payload: WorkflowStatusUpdate):
+    try:
+        wf = IntelligenceService.update_case_workflow(case_id, payload.status)
+        if not wf:
+            raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found in registered intelligence records")
+        return wf
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.patch("/api/cases/{case_id}/checklist")
+def update_checklist_item(case_id: str, payload: ChecklistItemUpdate):
+    try:
+        wf = IntelligenceService.toggle_case_checklist(case_id, payload.item_id, payload.completed)
+        if not wf:
+            raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found in registered intelligence records")
+        return wf
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/api/cases/{case_id}/followups")
+def create_followup(case_id: str, payload: FollowupCreate):
+    try:
+        fu = IntelligenceService.add_case_followup(case_id, payload.dict())
+        if not fu:
+            raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found in registered intelligence records")
+        return fu
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.patch("/api/cases/{case_id}/followups/{followup_id}")
+def update_followup(case_id: str, followup_id: str, payload: FollowupUpdate):
+    try:
+        fu = IntelligenceService.update_case_followup(case_id, followup_id, payload.dict(exclude_unset=True))
+        if not fu:
+            raise HTTPException(status_code=404, detail=f"Follow-up '{followup_id}' not found for case '{case_id}'")
+        return fu
+    except KeyError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 if __name__ == "__main__":
