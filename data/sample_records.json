@@ -1,0 +1,64 @@
+{
+  "case_reports": [
+    {
+      "record_id": "CR-1001",
+      "date": "2026-01-05",
+      "source": "police_case_management",
+      "text": "Suspect Ravi Malhotra met with Suresh Nair near Andheri Warehouse at 22:00. A white Toyota Innova bearing plate MH12AB1234 was seen at the location. Ravi Malhotra was contacted from phone number +91-9876543210."
+    },
+    {
+      "record_id": "CR-1002",
+      "date": "2026-01-08",
+      "source": "police_case_management",
+      "text": "Suresh Nair transferred funds to an account linked to Global Traders Pvt Ltd. Vehicle MH12AB1234 was again spotted outside Global Traders Pvt Ltd office in Andheri."
+    },
+    {
+      "record_id": "CR-1003",
+      "date": "2026-01-09",
+      "source": "call_detail_records",
+      "text": "Call log: +91-9876543210 called +91-9123456789 (registered to Suresh Nair) for 14 minutes at 23:10."
+    },
+    {
+      "record_id": "CR-1004",
+      "date": "2026-01-10",
+      "source": "financial_intelligence_unit",
+      "text": "Suspicious cash deposit of INR 950000 made by Suresh Nair at branch near Andheri. Structuring pattern flagged: deposit split into three transactions under reporting threshold."
+    },
+    {
+      "record_id": "CR-1005",
+      "date": "2026-01-12",
+      "source": "informant_tip",
+      "text": "Informant reports Ravi Malhotra coordinates a group including Suresh Nair, Ajay Kulkarni, and Deepak Shah. Ajay Kulkarni owns Global Traders Pvt Ltd. Deepak Shah supplies vehicles including Toyota Innova MH12AB1234."
+    },
+    {
+      "record_id": "CR-1006",
+      "date": "2026-01-15",
+      "source": "call_detail_records",
+      "text": "Call log: +91-9876543210 called +91-9988776655 (registered to Deepak Shah) for 3 minutes."
+    },
+    {
+      "record_id": "CR-1007",
+      "date": "2026-01-18",
+      "source": "police_case_management",
+      "text": "Ajay Kulkarni and Deepak Shah observed at Global Traders Pvt Ltd office at 19:30. Vehicle MH14CD5678 registered to Ajay Kulkarni parked outside."
+    },
+    {
+      "record_id": "CR-1008",
+      "date": "2026-01-20",
+      "source": "financial_intelligence_unit",
+      "text": "Global Traders Pvt Ltd account received wire transfer from Deepak Shah. Same day, a cash withdrawal was made by Ravi Malhotra at an ATM near Andheri Warehouse."
+    },
+    {
+      "record_id": "CR-1009",
+      "date": "2026-01-22",
+      "source": "call_detail_records",
+      "text": "Burst calling pattern detected: +91-9876543210 made 18 calls within 2 hours to +91-9123456789, +91-9988776655, and +91-9871234567 (unregistered)."
+    },
+    {
+      "record_id": "CR-1010",
+      "date": "2026-01-25",
+      "source": "informant_tip",
+      "text": "Unregistered number +91-9871234567 believed to belong to new associate Vikram Rao, recently seen with Ravi Malhotra at Andheri Warehouse."
+    }
+  ]
+}

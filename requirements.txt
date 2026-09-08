@@ -1,0 +1,12 @@
+networkx>=3.4
+pandas>=2.0
+scikit-learn>=1.3
+matplotlib>=3.8
+
+# Production upgrades (not required for the demo pipeline to run):
+# spacy>=3.7            # transformer-based NER for free-text reports
+# neo4j>=5.0             # graph database driver
+# fastapi>=0.110         # API layer for the investigator front-end
+# psycopg2-binary        # PostgreSQL/RMS integration
+# pyodbc                 # MS-SQL integration (many police RMS systems)
+# apache-airflow         # scheduling recurring ingestion jobs

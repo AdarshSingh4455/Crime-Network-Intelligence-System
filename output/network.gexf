@@ -1,0 +1,406 @@
+<?xml version='1.0' encoding='utf-8'?>
+<gexf xmlns="http://www.gexf.net/1.2draft" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd" version="1.2">
+  <meta lastmodifieddate="2026-09-08">
+    <creator>NetworkX 3.6.1</creator>
+  </meta>
+  <graph defaultedgetype="undirected" mode="static" name="">
+    <attributes mode="static" class="edge">
+      <attribute id="1" title="records" type="string" />
+      <attribute id="2" title="dates" type="string" />
+    </attributes>
+    <attributes mode="static" class="node">
+      <attribute id="0" title="type" type="string" />
+    </attributes>
+    <nodes>
+      <node id="Andheri Warehouse" label="Andheri Warehouse">
+        <attvalues>
+          <attvalue for="0" value="LOCATION" />
+        </attvalues>
+      </node>
+      <node id="Ravi Malhotra" label="Ravi Malhotra">
+        <attvalues>
+          <attvalue for="0" value="PERSON" />
+        </attvalues>
+      </node>
+      <node id="9876543210" label="9876543210">
+        <attvalues>
+          <attvalue for="0" value="PHONE" />
+        </attvalues>
+      </node>
+      <node id="MH12AB1234" label="MH12AB1234">
+        <attvalues>
+          <attvalue for="0" value="VEHICLE" />
+        </attvalues>
+      </node>
+      <node id="Suresh Nair" label="Suresh Nair">
+        <attvalues>
+          <attvalue for="0" value="PERSON" />
+        </attvalues>
+      </node>
+      <node id="Andheri" label="Andheri">
+        <attvalues>
+          <attvalue for="0" value="LOCATION" />
+        </attvalues>
+      </node>
+      <node id="Global Traders Pvt Ltd" label="Global Traders Pvt Ltd">
+        <attvalues>
+          <attvalue for="0" value="ORG" />
+        </attvalues>
+      </node>
+      <node id="9123456789" label="9123456789">
+        <attvalues>
+          <attvalue for="0" value="PHONE" />
+        </attvalues>
+      </node>
+      <node id="INR 950000" label="INR 950000">
+        <attvalues>
+          <attvalue for="0" value="MONEY" />
+        </attvalues>
+      </node>
+      <node id="Ajay Kulkarni" label="Ajay Kulkarni">
+        <attvalues>
+          <attvalue for="0" value="PERSON" />
+        </attvalues>
+      </node>
+      <node id="Deepak Shah" label="Deepak Shah">
+        <attvalues>
+          <attvalue for="0" value="PERSON" />
+        </attvalues>
+      </node>
+      <node id="9988776655" label="9988776655">
+        <attvalues>
+          <attvalue for="0" value="PHONE" />
+        </attvalues>
+      </node>
+      <node id="MH14CD5678" label="MH14CD5678">
+        <attvalues>
+          <attvalue for="0" value="VEHICLE" />
+        </attvalues>
+      </node>
+      <node id="9871234567" label="9871234567">
+        <attvalues>
+          <attvalue for="0" value="PHONE" />
+        </attvalues>
+      </node>
+      <node id="Vikram Rao" label="Vikram Rao">
+        <attvalues>
+          <attvalue for="0" value="PERSON" />
+        </attvalues>
+      </node>
+    </nodes>
+    <edges>
+      <edge source="Andheri Warehouse" target="Ravi Malhotra" id="0" weight="3">
+        <attvalues>
+          <attvalue for="1" value="CR-1001, CR-1008, CR-1010" />
+          <attvalue for="2" value="2026-01-05, 2026-01-20, 2026-01-25" />
+        </attvalues>
+      </edge>
+      <edge source="Andheri Warehouse" target="9876543210" id="1" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1001" />
+          <attvalue for="2" value="2026-01-05" />
+        </attvalues>
+      </edge>
+      <edge source="Andheri Warehouse" target="MH12AB1234" id="2" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1001" />
+          <attvalue for="2" value="2026-01-05" />
+        </attvalues>
+      </edge>
+      <edge source="Andheri Warehouse" target="Suresh Nair" id="3" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1001" />
+          <attvalue for="2" value="2026-01-05" />
+        </attvalues>
+      </edge>
+      <edge source="Andheri Warehouse" target="Andheri" id="4" weight="3">
+        <attvalues>
+          <attvalue for="1" value="CR-1001, CR-1008, CR-1010" />
+          <attvalue for="2" value="2026-01-05, 2026-01-20, 2026-01-25" />
+        </attvalues>
+      </edge>
+      <edge source="Andheri Warehouse" target="Global Traders Pvt Ltd" id="5" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1008" />
+          <attvalue for="2" value="2026-01-20" />
+        </attvalues>
+      </edge>
+      <edge source="Andheri Warehouse" target="Deepak Shah" id="6" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1008" />
+          <attvalue for="2" value="2026-01-20" />
+        </attvalues>
+      </edge>
+      <edge source="Andheri Warehouse" target="9871234567" id="7" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1010" />
+          <attvalue for="2" value="2026-01-25" />
+        </attvalues>
+      </edge>
+      <edge source="Andheri Warehouse" target="Vikram Rao" id="8" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1010" />
+          <attvalue for="2" value="2026-01-25" />
+        </attvalues>
+      </edge>
+      <edge source="Ravi Malhotra" target="9876543210" id="9" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1001" />
+          <attvalue for="2" value="2026-01-05" />
+        </attvalues>
+      </edge>
+      <edge source="Ravi Malhotra" target="MH12AB1234" id="10" weight="2">
+        <attvalues>
+          <attvalue for="1" value="CR-1001, CR-1005" />
+          <attvalue for="2" value="2026-01-05, 2026-01-12" />
+        </attvalues>
+      </edge>
+      <edge source="Ravi Malhotra" target="Suresh Nair" id="11" weight="2">
+        <attvalues>
+          <attvalue for="1" value="CR-1001, CR-1005" />
+          <attvalue for="2" value="2026-01-05, 2026-01-12" />
+        </attvalues>
+      </edge>
+      <edge source="Ravi Malhotra" target="Andheri" id="12" weight="3">
+        <attvalues>
+          <attvalue for="1" value="CR-1001, CR-1008, CR-1010" />
+          <attvalue for="2" value="2026-01-05, 2026-01-20, 2026-01-25" />
+        </attvalues>
+      </edge>
+      <edge source="Ravi Malhotra" target="Global Traders Pvt Ltd" id="13" weight="2">
+        <attvalues>
+          <attvalue for="1" value="CR-1005, CR-1008" />
+          <attvalue for="2" value="2026-01-12, 2026-01-20" />
+        </attvalues>
+      </edge>
+      <edge source="Ravi Malhotra" target="Ajay Kulkarni" id="14" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1005" />
+          <attvalue for="2" value="2026-01-12" />
+        </attvalues>
+      </edge>
+      <edge source="Ravi Malhotra" target="Deepak Shah" id="15" weight="2">
+        <attvalues>
+          <attvalue for="1" value="CR-1005, CR-1008" />
+          <attvalue for="2" value="2026-01-12, 2026-01-20" />
+        </attvalues>
+      </edge>
+      <edge source="Ravi Malhotra" target="9871234567" id="16" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1010" />
+          <attvalue for="2" value="2026-01-25" />
+        </attvalues>
+      </edge>
+      <edge source="Ravi Malhotra" target="Vikram Rao" id="17" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1010" />
+          <attvalue for="2" value="2026-01-25" />
+        </attvalues>
+      </edge>
+      <edge source="9876543210" target="MH12AB1234" id="18" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1001" />
+          <attvalue for="2" value="2026-01-05" />
+        </attvalues>
+      </edge>
+      <edge source="9876543210" target="Suresh Nair" id="19" weight="2">
+        <attvalues>
+          <attvalue for="1" value="CR-1001, CR-1003" />
+          <attvalue for="2" value="2026-01-05, 2026-01-09" />
+        </attvalues>
+      </edge>
+      <edge source="9876543210" target="Andheri" id="20" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1001" />
+          <attvalue for="2" value="2026-01-05" />
+        </attvalues>
+      </edge>
+      <edge source="9876543210" target="9123456789" id="21" weight="2">
+        <attvalues>
+          <attvalue for="1" value="CR-1003, CR-1009" />
+          <attvalue for="2" value="2026-01-09, 2026-01-22" />
+        </attvalues>
+      </edge>
+      <edge source="9876543210" target="Deepak Shah" id="22" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1006" />
+          <attvalue for="2" value="2026-01-15" />
+        </attvalues>
+      </edge>
+      <edge source="9876543210" target="9988776655" id="23" weight="2">
+        <attvalues>
+          <attvalue for="1" value="CR-1006, CR-1009" />
+          <attvalue for="2" value="2026-01-15, 2026-01-22" />
+        </attvalues>
+      </edge>
+      <edge source="9876543210" target="9871234567" id="24" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1009" />
+          <attvalue for="2" value="2026-01-22" />
+        </attvalues>
+      </edge>
+      <edge source="MH12AB1234" target="Suresh Nair" id="25" weight="3">
+        <attvalues>
+          <attvalue for="1" value="CR-1001, CR-1002, CR-1005" />
+          <attvalue for="2" value="2026-01-05, 2026-01-08, 2026-01-12" />
+        </attvalues>
+      </edge>
+      <edge source="MH12AB1234" target="Andheri" id="26" weight="2">
+        <attvalues>
+          <attvalue for="1" value="CR-1001, CR-1002" />
+          <attvalue for="2" value="2026-01-05, 2026-01-08" />
+        </attvalues>
+      </edge>
+      <edge source="MH12AB1234" target="Global Traders Pvt Ltd" id="27" weight="2">
+        <attvalues>
+          <attvalue for="1" value="CR-1002, CR-1005" />
+          <attvalue for="2" value="2026-01-08, 2026-01-12" />
+        </attvalues>
+      </edge>
+      <edge source="MH12AB1234" target="Ajay Kulkarni" id="28" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1005" />
+          <attvalue for="2" value="2026-01-12" />
+        </attvalues>
+      </edge>
+      <edge source="MH12AB1234" target="Deepak Shah" id="29" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1005" />
+          <attvalue for="2" value="2026-01-12" />
+        </attvalues>
+      </edge>
+      <edge source="Suresh Nair" target="Andheri" id="30" weight="3">
+        <attvalues>
+          <attvalue for="1" value="CR-1001, CR-1002, CR-1004" />
+          <attvalue for="2" value="2026-01-05, 2026-01-08, 2026-01-10" />
+        </attvalues>
+      </edge>
+      <edge source="Suresh Nair" target="Global Traders Pvt Ltd" id="31" weight="2">
+        <attvalues>
+          <attvalue for="1" value="CR-1002, CR-1005" />
+          <attvalue for="2" value="2026-01-08, 2026-01-12" />
+        </attvalues>
+      </edge>
+      <edge source="Suresh Nair" target="9123456789" id="32" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1003" />
+          <attvalue for="2" value="2026-01-09" />
+        </attvalues>
+      </edge>
+      <edge source="Suresh Nair" target="INR 950000" id="33" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1004" />
+          <attvalue for="2" value="2026-01-10" />
+        </attvalues>
+      </edge>
+      <edge source="Suresh Nair" target="Ajay Kulkarni" id="34" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1005" />
+          <attvalue for="2" value="2026-01-12" />
+        </attvalues>
+      </edge>
+      <edge source="Suresh Nair" target="Deepak Shah" id="35" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1005" />
+          <attvalue for="2" value="2026-01-12" />
+        </attvalues>
+      </edge>
+      <edge source="Andheri" target="Global Traders Pvt Ltd" id="36" weight="2">
+        <attvalues>
+          <attvalue for="1" value="CR-1002, CR-1008" />
+          <attvalue for="2" value="2026-01-08, 2026-01-20" />
+        </attvalues>
+      </edge>
+      <edge source="Andheri" target="INR 950000" id="37" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1004" />
+          <attvalue for="2" value="2026-01-10" />
+        </attvalues>
+      </edge>
+      <edge source="Andheri" target="Deepak Shah" id="38" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1008" />
+          <attvalue for="2" value="2026-01-20" />
+        </attvalues>
+      </edge>
+      <edge source="Andheri" target="9871234567" id="39" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1010" />
+          <attvalue for="2" value="2026-01-25" />
+        </attvalues>
+      </edge>
+      <edge source="Andheri" target="Vikram Rao" id="40" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1010" />
+          <attvalue for="2" value="2026-01-25" />
+        </attvalues>
+      </edge>
+      <edge source="Global Traders Pvt Ltd" target="Ajay Kulkarni" id="41" weight="2">
+        <attvalues>
+          <attvalue for="1" value="CR-1005, CR-1007" />
+          <attvalue for="2" value="2026-01-12, 2026-01-18" />
+        </attvalues>
+      </edge>
+      <edge source="Global Traders Pvt Ltd" target="Deepak Shah" id="42" weight="3">
+        <attvalues>
+          <attvalue for="1" value="CR-1005, CR-1007, CR-1008" />
+          <attvalue for="2" value="2026-01-12, 2026-01-18, 2026-01-20" />
+        </attvalues>
+      </edge>
+      <edge source="Global Traders Pvt Ltd" target="MH14CD5678" id="43" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1007" />
+          <attvalue for="2" value="2026-01-18" />
+        </attvalues>
+      </edge>
+      <edge source="9123456789" target="9871234567" id="44" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1009" />
+          <attvalue for="2" value="2026-01-22" />
+        </attvalues>
+      </edge>
+      <edge source="9123456789" target="9988776655" id="45" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1009" />
+          <attvalue for="2" value="2026-01-22" />
+        </attvalues>
+      </edge>
+      <edge source="Ajay Kulkarni" target="Deepak Shah" id="46" weight="2">
+        <attvalues>
+          <attvalue for="1" value="CR-1005, CR-1007" />
+          <attvalue for="2" value="2026-01-12, 2026-01-18" />
+        </attvalues>
+      </edge>
+      <edge source="Ajay Kulkarni" target="MH14CD5678" id="47" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1007" />
+          <attvalue for="2" value="2026-01-18" />
+        </attvalues>
+      </edge>
+      <edge source="Deepak Shah" target="9988776655" id="48" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1006" />
+          <attvalue for="2" value="2026-01-15" />
+        </attvalues>
+      </edge>
+      <edge source="Deepak Shah" target="MH14CD5678" id="49" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1007" />
+          <attvalue for="2" value="2026-01-18" />
+        </attvalues>
+      </edge>
+      <edge source="9988776655" target="9871234567" id="50" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1009" />
+          <attvalue for="2" value="2026-01-22" />
+        </attvalues>
+      </edge>
+      <edge source="9871234567" target="Vikram Rao" id="51" weight="1">
+        <attvalues>
+          <attvalue for="1" value="CR-1010" />
+          <attvalue for="2" value="2026-01-25" />
+        </attvalues>
+      </edge>
+    </edges>
+  </graph>
+</gexf>
