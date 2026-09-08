@@ -60,13 +60,22 @@ export interface NetworkData {
 }
 
 export interface SuspiciousPattern {
+  id?: string;
   entity?: string;
+  entity_type?: EntityType;
   record_id?: string;
   date?: string;
   event_count?: number;
   pattern: string;
   note: string;
   type?: EntityType;
+}
+
+export interface AnomalyDetail extends SuspiciousPattern {
+  id: string;
+  entity_details?: NetworkNode;
+  connected_entities?: ConnectedEntity[];
+  associated_records?: CaseRecord[];
 }
 
 export interface ConnectedEntity {

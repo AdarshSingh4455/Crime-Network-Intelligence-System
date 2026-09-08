@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api/client";
 import { NetworkNode, EntityDetail, SuspiciousPattern, ConnectedEntity } from "../types";
 import {
@@ -266,10 +266,12 @@ const EntityDetailPanel: React.FC<{
 
 export const Entities: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const paramId = searchParams.get("id");
   const [entities, setEntities] = useState<NetworkNode[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(paramId || null);
   const [detail, setDetail] = useState<EntityDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState<string | null>(null);

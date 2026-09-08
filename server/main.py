@@ -74,6 +74,14 @@ def get_anomalies():
     return IntelligenceService.get_anomalies()
 
 
+@app.get("/api/anomalies/{anomaly_id}")
+def get_anomaly_detail(anomaly_id: str):
+    detail = IntelligenceService.get_anomaly_detail(anomaly_id)
+    if not detail:
+        raise HTTPException(status_code=404, detail=f"Anomaly '{anomaly_id}' not found")
+    return detail
+
+
 @app.get("/api/timeline")
 def get_timeline():
     return IntelligenceService.get_timeline()

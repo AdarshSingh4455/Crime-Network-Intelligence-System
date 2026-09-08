@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import ForceGraph2D, { ForceGraphMethods, NodeObject, LinkObject } from "react-force-graph-2d";
 import { api } from "../api/client";
 import { NetworkData, NetworkNode, NetworkLink, EntityType } from "../types";
@@ -48,6 +49,8 @@ export const Network: React.FC = () => {
   const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState("");
   const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
+  const focusParam = searchParams.get("focus");
   const [selectedNode, setSelectedNode] = useState<FGNode | null>(null);
   const [focusMode, setFocusMode] = useState(false);
   const [focusNeighbors, setFocusNeighbors] = useState<Set<string>>(new Set());
@@ -86,6 +89,24 @@ export const Network: React.FC = () => {
     );
     return { nodes, links };
   }, [networkData, activeFilters]);
+
+  useEffect(() => {
+    if (focusParam && networkData) {
+      const match = networkData.nodes.find(n => n.id.toLowerCase() === focusParam.toLowerCase());
+      if (match) {
+        setSelectedNode(match as FGNode);
+        setHighlightedNodeId(match.id);
+        const timer = setTimeout(() => {
+          const fgNode = filteredGraphData.nodes.find(n => n.id === match.id) as (FGNode & { x?: number; y?: number }) | undefined;
+          if (fgNode?.x !== undefined && fgNode?.y !== undefined) {
+            graphRef.current?.centerAt(fgNode.x, fgNode.y, 600);
+            graphRef.current?.zoom(2.5, 600);
+          }
+        }, 500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [focusParam, networkData, filteredGraphData.nodes]);
 
   useEffect(() => {
     if (!focusMode || !selectedNode || !networkData) { setFocusNeighbors(new Set()); return; }

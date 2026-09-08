@@ -64,12 +64,25 @@ class IntelligenceService:
         bridges = critical_bridge_nodes(G)
 
         # 5. Anomaly detection
-        anomalies = (
+        raw_anomalies = (
             detect_burst_activity(edges)
             + detect_structuring(records)
             + detect_new_entity_spikes(extracted)
             + isolation_forest_outliers(centrality)
         )
+        anomalies = []
+        for idx, a in enumerate(raw_anomalies):
+            ent = a.get("entity")
+            ent_type = a.get("type")
+            if not ent_type and ent and G.has_node(ent):
+                ent_type = G.nodes[ent].get("type")
+            anom_dict = {
+                "id": f"ANOM-{idx+1:03d}",
+                **a,
+            }
+            if ent_type:
+                anom_dict["entity_type"] = ent_type
+            anomalies.append(anom_dict)
 
         # Build community lookup per node
         community_map = {}
@@ -231,6 +244,48 @@ class IntelligenceService:
     def get_anomalies(cls) -> List[Dict[str, Any]]:
         data = cls.get_data()
         return data["suspicious_patterns"]
+
+    @classmethod
+    def get_anomaly_detail(cls, anomaly_id: str) -> Dict[str, Any] | None:
+        data = cls.get_data()
+        target = next((
+            a for a in data["suspicious_patterns"]
+            if a.get("id", "").lower() == anomaly_id.lower()
+        ), None)
+        if not target:
+            return None
+
+        detail = dict(target)
+        ent_id = target.get("entity")
+        rec_id = target.get("record_id")
+        date = target.get("date")
+
+        # Entity context
+        if ent_id:
+            ent_node = next((n for n in data["nodes"] if n["id"].lower() == ent_id.lower()), None)
+            if ent_node:
+                detail["entity_details"] = ent_node
+            ent_detail = cls.get_entity_detail(ent_id)
+            if ent_detail:
+                detail["connected_entities"] = ent_detail.get("connected_entities", [])
+
+        # Record context
+        associated_records = []
+        if rec_id:
+            associated_records.extend([r for r in data["records"] if r["record_id"] == rec_id])
+        elif ent_id and date:
+            associated_records.extend([
+                r for r in data["records"]
+                if r["date"] == date and any(e["text"].lower() == ent_id.lower() for e in r.get("extracted_entities", []))
+            ])
+        elif ent_id:
+            associated_records.extend([
+                r for r in data["records"]
+                if any(e["text"].lower() == ent_id.lower() for e in r.get("extracted_entities", []))
+            ])
+
+        detail["associated_records"] = associated_records
+        return detail
 
     @classmethod
     def get_timeline(cls) -> List[Dict[str, Any]]:

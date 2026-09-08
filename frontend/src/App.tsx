@@ -6,6 +6,7 @@ import { GlobalSearchModal } from './components/common/GlobalSearchModal';
 import { Overview } from './pages/Overview';
 import { Network } from './pages/Network';
 import { Entities } from './pages/Entities';
+import { Anomalies } from './pages/Anomalies';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { api } from './api/client';
 import { OverviewMetrics } from './types';
@@ -55,16 +56,7 @@ export const App: React.FC = () => {
               <Route path="/" element={<Overview />} />
               <Route path="/network" element={<Network />} />
               <Route path="/entities" element={<Entities />} />
-              <Route
-                path="/anomalies"
-                element={
-                  <PlaceholderPage
-                    title="Anomaly & Pattern Center"
-                    subtitle="Investigative leads: burst calling signatures, financial structuring, and node spikes"
-                    sectionCode="ANOMALIES"
-                  />
-                }
-              />
+              <Route path="/anomalies" element={<Anomalies />} />
               <Route
                 path="/timeline"
                 element={
