@@ -3,6 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { GlobalSearchModal } from './components/common/GlobalSearchModal';
+import { Overview } from './pages/Overview';
+import { Network } from './pages/Network';
+import { Entities } from './pages/Entities';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 import { api } from './api/client';
 import { OverviewMetrics } from './types';
@@ -30,7 +33,7 @@ export const App: React.FC = () => {
 
   return (
     <Router>
-      <div className="flex h-screen w-screen overflow-hidden bg-[#07090E] text-slate-200">
+      <div className="flex h-screen w-screen overflow-hidden bg-[#F8FAFC] text-slate-900 font-sans">
         {/* Sidebar Navigation Shell */}
         <Sidebar
           anomalyCount={metrics?.suspicious_patterns_count || 25}
@@ -42,43 +45,16 @@ export const App: React.FC = () => {
           {/* Top Header Shell */}
           <Header
             onOpenSearch={() => setIsSearchOpen(true)}
-            systemStatus={isConnected ? 'ACTIVE INVESTIGATION' : 'OFFLINE'}
+            systemStatus={isConnected ? 'Active Investigation Mode' : 'Offline'}
             isBackendConnected={isConnected}
           />
 
           {/* Page Viewport */}
-          <main className="flex-1 overflow-y-auto bg-[#07090E]">
+          <main className="flex-1 overflow-y-auto bg-[#F8FAFC]">
             <Routes>
-              <Route
-                path="/"
-                element={
-                  <PlaceholderPage
-                    title="Overview Dashboard"
-                    subtitle="High-level operational intelligence metrics, entity distribution, and key player rankings"
-                    sectionCode="OVERVIEW"
-                  />
-                }
-              />
-              <Route
-                path="/network"
-                element={
-                  <PlaceholderPage
-                    title="Network Investigation Platform"
-                    subtitle="Interactive link-chart graph visualization, node centrality, and ego network subgraphs"
-                    sectionCode="NETWORK"
-                  />
-                }
-              />
-              <Route
-                path="/entities"
-                element={
-                  <PlaceholderPage
-                    title="Entity Intelligence Explorer"
-                    subtitle="Filterable entity registry with degree, betweenness, PageRank, and community assignments"
-                    sectionCode="ENTITIES"
-                  />
-                }
-              />
+              <Route path="/" element={<Overview />} />
+              <Route path="/network" element={<Network />} />
+              <Route path="/entities" element={<Entities />} />
               <Route
                 path="/anomalies"
                 element={

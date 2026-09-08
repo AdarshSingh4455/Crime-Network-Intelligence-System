@@ -20,6 +20,7 @@ export interface OverviewMetrics {
     degree: number;
     betweenness: number;
   }>;
+  recent_activity?: SuspiciousPattern[];
   status: string;
 }
 
@@ -66,6 +67,19 @@ export interface SuspiciousPattern {
   pattern: string;
   note: string;
   type?: EntityType;
+}
+
+export interface ConnectedEntity {
+  entity: string;
+  weight: number;
+  records: string[];
+  dates: string[];
+}
+
+export interface EntityDetail extends NetworkNode {
+  connected_entities: ConnectedEntity[];
+  associated_records: CaseRecord[];
+  detected_anomalies: SuspiciousPattern[];
 }
 
 export interface CaseRecord {

@@ -152,7 +152,7 @@ class IntelligenceService:
             p_type = p.get("pattern", "unknown")
             pattern_counts[p_type] = pattern_counts.get(p_type, 0) + 1
 
-        sources = list({r["source"] for r in data["records"]})
+        sources = sorted(list({r["source"] for r in data["records"]}))
 
         return {
             "total_records": data["total_records"],
@@ -168,6 +168,7 @@ class IntelligenceService:
             "density": data["summary"]["density"],
             "pattern_counts": pattern_counts,
             "top_key_players": data["key_players"][:5],
+            "recent_activity": data["suspicious_patterns"][:10],
             "status": data["status"],
         }
 

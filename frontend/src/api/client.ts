@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { HealthStatus, OverviewMetrics, NetworkData, NetworkNode, SuspiciousPattern, TimelineEvent } from '../types';
+import { HealthStatus, OverviewMetrics, NetworkData, NetworkNode, SuspiciousPattern, TimelineEvent, EntityDetail } from '../types';
 
 const API_BASE = '/api';
 
@@ -28,6 +28,11 @@ export const api = {
 
   getEntities: async (): Promise<NetworkNode[]> => {
     const res = await apiClient.get<NetworkNode[]>('/entities');
+    return res.data;
+  },
+
+  getEntityDetail: async (entityId: string): Promise<EntityDetail> => {
+    const res = await apiClient.get<EntityDetail>(`/entities/${encodeURIComponent(entityId)}`);
     return res.data;
   },
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, X, Users, AlertTriangle, FileText, ArrowRight } from 'lucide-react';
+import { Search, X, Users, ArrowRight } from 'lucide-react';
 
 interface GlobalSearchModalProps {
   isOpen: boolean;
@@ -19,9 +19,6 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
         if (isOpen) onClose();
-        else {
-          // Open search modal
-        }
       }
       if (e.key === 'Escape' && isOpen) {
         onClose();
@@ -52,22 +49,22 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
     : sampleEntities;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
-      <div className="w-full max-w-2xl bg-[#0E121B] border border-slate-700/80 rounded-xl shadow-2xl overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-slate-900/40 backdrop-blur-xs animate-fadeIn">
+      <div className="w-full max-w-2xl bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden flex flex-col">
         {/* Search Header */}
-        <div className="p-4 border-b border-slate-800 flex items-center gap-3">
-          <Search className="w-5 h-5 text-cyan-400" />
+        <div className="p-4 border-b border-slate-200 flex items-center gap-3 bg-slate-50/50">
+          <Search className="w-5 h-5 text-cyan-700" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Type entity name, phone number, vehicle plate, or record ID..."
-            className="flex-1 bg-transparent border-none text-slate-100 text-sm focus:outline-none placeholder-slate-500 font-sans"
+            className="flex-1 bg-transparent border-none text-slate-900 text-sm focus:outline-none placeholder-slate-400 font-sans"
             autoFocus
           />
           <button
             onClick={onClose}
-            className="p-1 rounded text-slate-500 hover:text-slate-300 hover:bg-slate-800"
+            className="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-200/60"
           >
             <X className="w-5 h-5" />
           </button>
@@ -75,7 +72,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
 
         {/* Results Body */}
         <div className="max-h-96 overflow-y-auto p-3 space-y-1">
-          <div className="px-3 py-1 text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+          <div className="px-3 py-1 text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">
             Entities & Intelligence Mentions ({filtered.length})
           </div>
           {filtered.length === 0 ? (
@@ -90,31 +87,31 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                   if (onSelectEntity) onSelectEntity(item.id);
                   onClose();
                 }}
-                className="flex items-center justify-between p-3 rounded-lg hover:bg-slate-800/70 border border-transparent hover:border-slate-700/60 cursor-pointer group transition-all"
+                className="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-200 cursor-pointer group transition-all"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-300 group-hover:text-cyan-400 group-hover:border-cyan-500/40">
+                  <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 group-hover:text-cyan-700 group-hover:bg-cyan-50">
                     <Users className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-xs font-semibold text-slate-200 group-hover:text-cyan-300">
+                    <div className="text-xs font-semibold text-slate-900 group-hover:text-cyan-800">
                       {item.id}
                     </div>
-                    <div className="text-[10px] font-mono text-slate-400 flex items-center gap-2">
+                    <div className="text-[10px] font-mono text-slate-500 flex items-center gap-2">
                       <span>TYPE: {item.type}</span>
                       <span>•</span>
                       <span>{item.role}</span>
                     </div>
                   </div>
                 </div>
-                <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all" />
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-cyan-700 group-hover:translate-x-1 transition-all" />
               </div>
             ))
           )}
         </div>
 
         {/* Footer */}
-        <div className="p-3 border-t border-slate-800/80 bg-[#07090E] flex items-center justify-between text-[11px] text-slate-500 font-mono">
+        <div className="p-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-[11px] text-slate-500 font-mono">
           <div>CNIS Global Intelligence Search</div>
           <div>Press ESC to close</div>
         </div>
