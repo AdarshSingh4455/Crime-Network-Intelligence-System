@@ -10,6 +10,8 @@ import { Anomalies } from './pages/Anomalies';
 import { Timeline } from './pages/Timeline';
 import { Locations } from './pages/Locations';
 import { Reports } from './pages/Reports';
+import { Sources } from './pages/Sources';
+import { Cases } from './pages/Cases';
 import { api } from './api/client';
 import { OverviewMetrics } from './types';
 
@@ -74,6 +76,8 @@ export const App: React.FC = () => {
               <Route path="/timeline" element={<Timeline />} />
               <Route path="/locations" element={<Locations />} />
               <Route path="/reports" element={<Reports />} />
+              <Route path="/sources" element={<Sources />} />
+              <Route path="/cases" element={<Cases />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>

@@ -1,5 +1,22 @@
 import axios from 'axios';
-import { HealthStatus, OverviewMetrics, NetworkData, NetworkNode, SuspiciousPattern, AnomalyDetail, TimelineEvent, EntityDetail, LocationItem, IntelligenceReport, SearchResponse } from '../types';
+import {
+  HealthStatus,
+  OverviewMetrics,
+  NetworkData,
+  NetworkNode,
+  SuspiciousPattern,
+  AnomalyDetail,
+  TimelineEvent,
+  EntityDetail,
+  LocationItem,
+  IntelligenceReport,
+  SearchResponse,
+  SourcesResponse,
+  SourceDetail,
+  IngestResponse,
+  CasesResponse,
+  CaseDetail,
+} from '../types';
 
 const API_BASE = '/api';
 
@@ -73,6 +90,31 @@ export const api = {
 
   search: async (query: string): Promise<SearchResponse> => {
     const res = await apiClient.get<SearchResponse>(`/search?q=${encodeURIComponent(query)}`);
+    return res.data;
+  },
+
+  getSources: async (): Promise<SourcesResponse> => {
+    const res = await apiClient.get<SourcesResponse>('/sources');
+    return res.data;
+  },
+
+  getSourceDetail: async (sourceId: string): Promise<SourceDetail> => {
+    const res = await apiClient.get<SourceDetail>(`/sources/${encodeURIComponent(sourceId)}`);
+    return res.data;
+  },
+
+  triggerIngestion: async (): Promise<IngestResponse> => {
+    const res = await apiClient.post<IngestResponse>('/ingest', {});
+    return res.data;
+  },
+
+  getCases: async (): Promise<CasesResponse> => {
+    const res = await apiClient.get<CasesResponse>('/cases');
+    return res.data;
+  },
+
+  getCaseDetail: async (caseId: string): Promise<CaseDetail> => {
+    const res = await apiClient.get<CaseDetail>(`/cases/${encodeURIComponent(caseId)}`);
     return res.data;
   },
 };

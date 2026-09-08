@@ -38,12 +38,15 @@ OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 
 class IntelligenceService:
     _cached_data: Dict[str, Any] | None = None
+    _last_ingestion_time: str = datetime.now(timezone.utc).isoformat()
 
     @classmethod
     def get_data(cls, force_reload: bool = False) -> Dict[str, Any]:
         """Loads and executes the intelligence engine once per session."""
         if cls._cached_data is not None and not force_reload:
             return cls._cached_data
+
+        cls._last_ingestion_time = datetime.now(timezone.utc).isoformat()
 
         # 1. Ingestion
         manager = IngestionManager()
@@ -171,6 +174,7 @@ class IntelligenceService:
 
         return {
             "total_records": data["total_records"],
+            "total_cases": data["total_records"],
             "total_entities": data["summary"]["num_nodes"],
             "total_relationships": data["summary"]["num_edges"],
             "suspicious_patterns_count": len(data["suspicious_patterns"]),
@@ -823,14 +827,631 @@ class IntelligenceService:
         matched_locations.sort(key=lambda x: (x[0], x[1]["activity_score"]), reverse=True)
         locations_res = [l[1] for l in matched_locations]
 
-        total_count = len(entities_res) + len(records_res) + len(anomalies_res) + len(locations_res)
+        # 5. CASES
+        cases_data = cls.get_cases()
+        matched_cases = []
+        for c in cases_data["cases"]:
+            cid = c["case_id"].lower()
+            ctitle = c["title"].lower()
+            csource = c["source"].lower()
+            csummary = c.get("summary", "").lower()
+            ctext = c.get("full_text", "").lower()
+
+            score = 0
+            if cid == q_lower:
+                score = 100
+            elif cid.startswith(q_lower):
+                score = 85
+            elif q_lower in cid:
+                score = 75
+            elif q_lower in ctitle:
+                score = 70
+            elif any(q_lower == e.lower() or q_lower in e.lower() for e in c.get("entities", [])):
+                score = 65
+            elif any(q_lower == l.lower() or q_lower in l.lower() for l in c.get("locations", [])):
+                score = 60
+            elif q_lower in csource:
+                score = 50
+            elif q_lower in csummary or q_lower in ctext:
+                score = 40
+
+            if score > 0:
+                matched_cases.append((score, {
+                    "case_id": c["case_id"],
+                    "title": c["title"],
+                    "short_title": c["short_title"],
+                    "source": c["source"],
+                    "source_label": c["source_label"],
+                    "date": c["date"],
+                    "workflow_status": c["workflow_status"],
+                    "priority": c["priority"],
+                    "entity_count": c["entity_count"],
+                    "anomaly_count": c["anomaly_count"],
+                    "snippet": c.get("summary", ""),
+                    "source_module": "Case Management Workspace"
+                }))
+
+        matched_cases.sort(key=lambda x: x[0], reverse=True)
+        cases_res = [c[1] for c in matched_cases]
+
+        total_count = len(cases_res) + len(entities_res) + len(records_res) + len(anomalies_res) + len(locations_res)
 
         return {
             "query": clean_q,
             "total_results": total_count,
+            "cases": cases_res,
             "entities": entities_res,
             "records": records_res,
             "anomalies": anomalies_res,
             "locations": locations_res,
         }
+
+    SOURCE_CONFIGS: Dict[str, Dict[str, Any]] = {
+        "police_case_management": {
+            "name": "Police Case Management (CCTNS / RMS)",
+            "short_name": "Police Case Mgmt",
+            "category": "Law Enforcement RMS",
+            "connector_type": "JSON Case Export Connector (JSONFileConnector)",
+            "description": "Official law enforcement case diaries, First Information Reports (FIR), and incident observation logs documenting physical surveillance, suspect encounters, and registered vehicles.",
+            "production_connector": {
+                "name": "CCTNS Relational Database Adapter",
+                "class_name": "SQLConnector",
+                "protocol": "ODBC / JDBC Direct Database Adapter (DB-API 2.0)",
+                "schema_standard": "CCTNS / Police RMS Relational Schema",
+                "ingestion_frequency": "Continuous Change Data Capture (CDC) / Hourly Poll",
+                "security_level": "Restricted Law Enforcement Intranet (VPN / mTLS)",
+                "readiness": "Production Specification Available in src/ingestion.py",
+            },
+        },
+        "call_detail_records": {
+            "name": "Call Detail Records (CDR Telecom)",
+            "short_name": "Telecom CDR",
+            "category": "Telecommunications Intelligence",
+            "connector_type": "Telecom CDR Ingestion Connector (JSONFileConnector / CSVConnector)",
+            "description": "Telecommunication carrier call logs, duration timestamps, frequency patterns, and subscriber-linked mobile identities identifying coordination frequency and burst calling activity.",
+            "production_connector": {
+                "name": "Telecom Mediation SFTP Connector",
+                "class_name": "CSVConnector",
+                "protocol": "SFTP Batch Push / Secure Mediation Gateway",
+                "schema_standard": "ETSI / 3GPP CDR Telecom Billing Format (CSV/ASN.1)",
+                "ingestion_frequency": "Batch push per call-window or lawful intercept feed",
+                "security_level": "Telecom Regulatory Compliance (Lawful Interception Section 5(2))",
+                "readiness": "Production Specification Available in src/ingestion.py",
+            },
+        },
+        "financial_intelligence_unit": {
+            "name": "Financial Intelligence Unit (FIU / STR)",
+            "short_name": "Financial FIU",
+            "category": "Banking & Suspicious Transactions",
+            "connector_type": "Financial Transaction Ingestion Connector (JSONFileConnector)",
+            "description": "Banking transaction flags, cash deposit thresholds, wire transfers, and Suspicious Transaction Reports (STR) signaling potential structuring and syndicate money movement.",
+            "production_connector": {
+                "name": "FIU-IND FINnet Secure API Gateway",
+                "class_name": "RESTWebhookConnector",
+                "protocol": "FIU FINnet 2.0 XML / REST Webhook API",
+                "schema_standard": "goAML / FinCEN SAR/STR XML Specification",
+                "ingestion_frequency": "Near-real-time push upon AML threshold trigger",
+                "security_level": "PML Act Banking Secrecy Protocols",
+                "readiness": "Enterprise Gateway Specification Planned",
+            },
+        },
+        "informant_tip": {
+            "name": "Human Source / Informant Intelligence (HUMINT)",
+            "short_name": "HUMINT Tips",
+            "category": "Confidential Human Source",
+            "connector_type": "Field Intelligence Narrative Connector (JSONFileConnector)",
+            "description": "Confidential human source intelligence debriefs, operative observations, organizational hierarchy revelations, and unverified syndicate associate leads.",
+            "production_connector": {
+                "name": "Confidential HUMINT Enclave Intake",
+                "class_name": "SecurePortalConnector",
+                "protocol": "Encrypted Web Intake Enclave / Air-gapped Field Terminal",
+                "schema_standard": "Graded Intelligence Assessment Standard (5x5x5 Matrix)",
+                "ingestion_frequency": "Ad-hoc human intelligence filing",
+                "security_level": "Strictly Confidential / Handler Eyes-Only",
+                "readiness": "Enterprise Security Protocol Planned",
+            },
+        },
+    }
+
+    PLANNED_CONNECTORS: List[Dict[str, Any]] = [
+        {
+            "id": "anpr_cctv_feed",
+            "name": "Automated Number Plate Recognition (ANPR / CCTV)",
+            "category": "Surveillance & Sensors",
+            "connector_class": "CSVConnector / RTSP Streaming Agent",
+            "status": "Architecture Defined in src/ingestion.py",
+            "description": "Optical character recognition feeds from toll plazas and municipal surveillance tracking vehicle registration movements.",
+            "supported_format": "CSV batch dumps or edge optical sensor events",
+        },
+        {
+            "id": "osint_scraper",
+            "name": "Open-Source Intelligence (OSINT Scraper)",
+            "category": "Public Feeds & News",
+            "connector_class": "ScraperConnector (REST / Feed Parser)",
+            "status": "Architecture Defined in src/ingestion.py",
+            "description": "Public domain criminal registries, corporate gazettes, and court record feeds for external cross-verification.",
+            "supported_format": "JSON / RSS / REST API",
+        },
+        {
+            "id": "watchlist_registry",
+            "name": "Prior Conviction & Watchlist Registry",
+            "category": "National Criminal Database",
+            "connector_class": "SQLConnector",
+            "status": "Production Interface Ready in src/ingestion.py",
+            "description": "Centralized criminal history index and national wanted person records integrated via relational database adapter.",
+            "supported_format": "ODBC / JDBC SQL Schema",
+        },
+    ]
+
+    @classmethod
+    def get_sources(cls) -> Dict[str, Any]:
+        data = cls.get_data()
+        sources_list = []
+        node_lookup = {n["id"]: n for n in data["nodes"]}
+
+        for source_id, config in cls.SOURCE_CONFIGS.items():
+            records = [r for r in data["records"] if r["source"] == source_id]
+            rec_ids = {r["record_id"] for r in records}
+            dates = [r["date"] for r in records if r.get("date")]
+            date_range = {"start": min(dates) if dates else "", "end": max(dates) if dates else ""}
+
+            ent_map = {}
+            for r in records:
+                for e in r.get("extracted_entities", []):
+                    ent_map[e["text"]] = e["label"]
+
+            unique_entities = sorted(list(ent_map.keys()))
+            type_counts: Dict[str, int] = {}
+            for etype in ent_map.values():
+                type_counts[etype] = type_counts.get(etype, 0) + 1
+
+            source_nodes = [node_lookup[eid] for eid in unique_entities if eid in node_lookup]
+            source_nodes.sort(key=lambda n: (n.get("influence_score", 0), n.get("degree", 0)), reverse=True)
+            top_entity_names = [n["id"] for n in source_nodes[:4]]
+
+            correlated_anomalies = [
+                a for a in data["suspicious_patterns"]
+                if a.get("record_id") in rec_ids or a.get("entity") in ent_map
+            ]
+
+            source_locations = [
+                eid for eid, etype in ent_map.items() if etype == "LOCATION"
+            ]
+
+            sources_list.append({
+                "id": source_id,
+                "name": config["name"],
+                "short_name": config["short_name"],
+                "category": config["category"],
+                "connector_type": config["connector_type"],
+                "description": config["description"],
+                "status": "Active (Ingested)",
+                "availability": "Available in Prototype Dataset",
+                "record_count": len(records),
+                "entity_count": len(unique_entities),
+                "anomaly_count": len(correlated_anomalies),
+                "location_count": len(source_locations),
+                "date_range": date_range,
+                "entity_types": type_counts,
+                "sample_entities": top_entity_names,
+                "locations": source_locations,
+                "production_connector": config["production_connector"],
+            })
+
+        return {
+            "total_sources": len(sources_list),
+            "total_records_ingested": data["total_records"],
+            "total_entities_extracted": data["summary"]["num_nodes"],
+            "total_relationships_built": data["summary"]["num_edges"],
+            "total_anomalies_detected": len(data["suspicious_patterns"]),
+            "last_ingested_at": getattr(cls, "_last_ingestion_time", datetime.now(timezone.utc).isoformat()),
+            "ingestion_pipeline": {
+                "engine_version": "CNIS 2.0 Ingestion Pipeline",
+                "connector_class": "JSONFileConnector (Unified BaseConnector Interface)",
+                "entity_extraction_backend": "RuleBasedNER (Regex & Gazetteers)",
+                "graph_builder": "Co-occurrence Graph Builder (NetworkX Graph Engine)",
+                "dataset_path": "data/sample_records.json",
+                "status": "OPERATIONAL",
+            },
+            "sources": sources_list,
+            "planned_connectors": cls.PLANNED_CONNECTORS,
+        }
+
+    @classmethod
+    def get_source_detail(cls, source_id: str) -> Dict[str, Any] | None:
+        clean_id = source_id.strip().lower()
+        if clean_id not in cls.SOURCE_CONFIGS:
+            return None
+
+        data = cls.get_data()
+        config = cls.SOURCE_CONFIGS[clean_id]
+        records = [r for r in data["records"] if r["source"] == clean_id]
+        rec_ids = {r["record_id"] for r in records}
+        dates = [r["date"] for r in records if r.get("date")]
+        date_range = {"start": min(dates) if dates else "", "end": max(dates) if dates else ""}
+
+        node_lookup = {n["id"]: n for n in data["nodes"]}
+
+        ent_map = {}
+        for r in records:
+            for e in r.get("extracted_entities", []):
+                ent_map[e["text"]] = e["label"]
+
+        unique_entities = sorted(list(ent_map.keys()))
+        type_counts: Dict[str, int] = {}
+        for etype in ent_map.values():
+            type_counts[etype] = type_counts.get(etype, 0) + 1
+
+        entity_cards = []
+        for eid in unique_entities:
+            n = node_lookup.get(eid)
+            if n:
+                entity_cards.append({
+                    "id": n["id"],
+                    "type": n["type"],
+                    "degree": n["degree"],
+                    "betweenness": n["betweenness"],
+                    "influence_score": n["influence_score"],
+                    "community": n["community"],
+                    "is_key_player": n["is_key_player"],
+                    "is_bridge_node": n["is_bridge_node"],
+                    "anomaly_count": n["anomaly_count"],
+                })
+            else:
+                entity_cards.append({
+                    "id": eid,
+                    "type": ent_map.get(eid, "UNKNOWN"),
+                    "degree": 0,
+                    "betweenness": 0.0,
+                    "influence_score": 0.0,
+                    "community": 0,
+                    "is_key_player": False,
+                    "is_bridge_node": False,
+                    "anomaly_count": 0,
+                })
+        entity_cards.sort(key=lambda x: (x["influence_score"], x["degree"]), reverse=True)
+
+        record_cards = []
+        for r in records:
+            r_anoms = [a for a in data["suspicious_patterns"] if a.get("record_id") == r["record_id"]]
+            record_cards.append({
+                "record_id": r["record_id"],
+                "date": r["date"],
+                "source": r["source"],
+                "text": r["text"],
+                "extracted_entities": r.get("extracted_entities", []),
+                "anomaly_count": len(r_anoms),
+            })
+        record_cards.sort(key=lambda x: x["date"])
+
+        correlated_anomalies = [
+            {
+                "id": a["id"],
+                "pattern": a["pattern"],
+                "pattern_label": a["pattern"].replace("_", " ").title(),
+                "entity": a.get("entity"),
+                "entity_type": a.get("entity_type"),
+                "date": a.get("date"),
+                "record_id": a.get("record_id"),
+                "note": a.get("note", ""),
+            }
+            for a in data["suspicious_patterns"]
+            if a.get("record_id") in rec_ids or a.get("entity") in ent_map
+        ]
+
+        locs = cls.get_locations()
+        source_locations = [
+            l for l in locs if l["id"] in ent_map or any(r["record_id"] in [rec["record_id"] for rec in l.get("records", [])] for r in records)
+        ]
+
+        return {
+            "id": clean_id,
+            "name": config["name"],
+            "short_name": config["short_name"],
+            "category": config["category"],
+            "connector_type": config["connector_type"],
+            "description": config["description"],
+            "status": "Active (Ingested)",
+            "availability": "Available in Prototype Dataset",
+            "record_count": len(records),
+            "entity_count": len(unique_entities),
+            "anomaly_count": len(correlated_anomalies),
+            "location_count": len(source_locations),
+            "date_range": date_range,
+            "entity_types": type_counts,
+            "records": record_cards,
+            "entities": entity_cards,
+            "anomalies": correlated_anomalies,
+            "locations": source_locations,
+            "production_connector": config["production_connector"],
+            "ingestion_spec": {
+                "connector_class": "JSONFileConnector",
+                "pipeline_source": "src/ingestion.py",
+                "base_interface": "BaseConnector.fetch() -> Iterable[Record]",
+                "target_schema": ["record_id", "date", "source", "text"],
+                "normalization": "Normalized into Record dataclass before entity extraction",
+            },
+        }
+
+    CASE_TITLES: Dict[str, str] = {
+        "CR-1001": "Surveillance Observation: Andheri Warehouse Sighting",
+        "CR-1002": "Fund Transfer & Corporate Facility Sighting",
+        "CR-1003": "Telecom Intercept: Primary Suspect Toll Call",
+        "CR-1004": "Financial Intelligence: Cash Deposit Structuring Flag",
+        "CR-1005": "Confidential HUMINT: Syndicate Coordination Debrief",
+        "CR-1006": "Telecom Intercept: Secondary Logistics Contact",
+        "CR-1007": "Physical Surveillance: Executive Office Observation",
+        "CR-1008": "Financial Intelligence: Wire Transfer & ATM Withdrawal",
+        "CR-1009": "Telecom Analysis: Coordination Burst Calling Pattern",
+        "CR-1010": "Confidential HUMINT: Associate Field Identification Lead",
+    }
+
+    @classmethod
+    def get_cases(cls) -> Dict[str, Any]:
+        data = cls.get_data()
+        node_lookup = {n["id"]: n for n in data["nodes"]}
+
+        cases_list = []
+        for r in data["records"]:
+            rid = r["record_id"]
+            ents = [e["text"] for e in r.get("extracted_entities", [])]
+            loc_names = [e["text"] for e in r.get("extracted_entities", []) if e["label"] == "LOCATION"]
+            rec_anoms = [
+                a for a in data["suspicious_patterns"]
+                if a.get("record_id") == rid or (a.get("date") == r["date"] and a.get("entity") in ents)
+            ]
+            kp_involved = [e for e in ents if node_lookup.get(e, {}).get("is_key_player")]
+
+            has_burst_or_structuring = any(a["pattern"] in ("burst_activity", "structuring") for a in rec_anoms)
+            if has_burst_or_structuring or len(kp_involved) >= 2 or len(rec_anoms) >= 2:
+                priority = "HIGH"
+                workflow_status = "Review Required"
+            elif len(kp_involved) >= 1 or len(rec_anoms) >= 1:
+                priority = "MEDIUM"
+                workflow_status = "Intelligence Available"
+            else:
+                priority = "STANDARD"
+                workflow_status = "Source Record Active"
+
+            source_label = r["source"].replace("_", " ").title()
+            short_title = cls.CASE_TITLES.get(rid, f"{source_label} Report {rid}")
+
+            time_match = re.search(r"\b([01]?[0-9]|2[0-3]):[0-5][0-9]\b", r["text"])
+            time_str = time_match.group(0) if time_match else None
+
+            cases_list.append({
+                "case_id": rid,
+                "title": f"{rid}: {short_title}",
+                "short_title": short_title,
+                "source": r["source"],
+                "source_label": source_label,
+                "date": r["date"],
+                "time": time_str,
+                "date_range": {"start": r["date"], "end": r["date"]},
+                "summary": r["text"][:130].strip() + ("..." if len(r["text"]) > 130 else ""),
+                "full_text": r["text"],
+                "workflow_status": workflow_status,
+                "source_status": "Ingested Case Report",
+                "priority": priority,
+                "record_count": 1,
+                "entity_count": len(ents),
+                "anomaly_count": len(rec_anoms),
+                "location_count": len(loc_names),
+                "key_player_count": len(kp_involved),
+                "entities": ents,
+                "locations": loc_names,
+                "key_players": kp_involved,
+                "has_anomalies": len(rec_anoms) > 0,
+            })
+
+        # Default sort by date descending
+        cases_list.sort(key=lambda x: x["date"], reverse=True)
+        dates = [c["date"] for c in cases_list if c.get("date")]
+
+        return {
+            "total_cases": len(cases_list),
+            "total_records": len(data["records"]),
+            "total_entities": data["summary"]["num_nodes"],
+            "total_anomalies": len(data["suspicious_patterns"]),
+            "review_required_count": sum(1 for c in cases_list if c["workflow_status"] == "Review Required"),
+            "intelligence_available_count": sum(1 for c in cases_list if c["workflow_status"] == "Intelligence Available"),
+            "date_coverage": {
+                "start": min(dates) if dates else "",
+                "end": max(dates) if dates else ""
+            },
+            "cases": cases_list,
+        }
+
+    @classmethod
+    def get_case_detail(cls, case_id: str) -> Dict[str, Any] | None:
+        clean_id = case_id.strip().upper()
+        data = cls.get_data()
+        node_lookup = {n["id"]: n for n in data["nodes"]}
+
+        target_r = next((r for r in data["records"] if r["record_id"].upper() == clean_id), None)
+        if not target_r:
+            return None
+
+        rid = target_r["record_id"]
+        source_label = target_r["source"].replace("_", " ").title()
+        short_title = cls.CASE_TITLES.get(rid, f"{source_label} Report {rid}")
+
+        case_entity_names = [e["text"] for e in target_r.get("extracted_entities", [])]
+        case_entity_set = set(case_entity_names)
+        loc_names = [e["text"] for e in target_r.get("extracted_entities", []) if e["label"] == "LOCATION"]
+
+        rec_anoms = [
+            {
+                "id": a["id"],
+                "pattern": a["pattern"],
+                "pattern_label": a["pattern"].replace("_", " ").title(),
+                "entity": a.get("entity"),
+                "entity_type": a.get("entity_type"),
+                "date": a.get("date"),
+                "record_id": a.get("record_id"),
+                "note": a.get("note", ""),
+            }
+            for a in data["suspicious_patterns"]
+            if a.get("record_id") == rid or (a.get("date") == target_r["date"] and a.get("entity") in case_entity_set)
+        ]
+
+        kp_involved = [e for e in case_entity_names if node_lookup.get(e, {}).get("is_key_player")]
+
+        has_burst_or_structuring = any(a["pattern"] in ("burst_activity", "structuring") for a in rec_anoms)
+        if has_burst_or_structuring or len(kp_involved) >= 2 or len(rec_anoms) >= 2:
+            priority = "HIGH"
+            workflow_status = "Review Required"
+        elif len(kp_involved) >= 1 or len(rec_anoms) >= 1:
+            priority = "MEDIUM"
+            workflow_status = "Intelligence Available"
+        else:
+            priority = "STANDARD"
+            workflow_status = "Source Record Active"
+
+        time_match = re.search(r"\b([01]?[0-9]|2[0-3]):[0-5][0-9]\b", target_r["text"])
+        time_str = time_match.group(0) if time_match else None
+
+        # Cross-referencing records (share 2+ entities or co-occurring)
+        related_records = []
+        for r in data["records"]:
+            if r["record_id"] == rid:
+                continue
+            r_ents = {e["text"] for e in r.get("extracted_entities", [])}
+            common_ents = case_entity_set.intersection(r_ents)
+            if len(common_ents) >= 2 or (len(common_ents) >= 1 and any(ce in kp_involved for ce in common_ents)):
+                related_records.append({
+                    "record_id": r["record_id"],
+                    "source": r["source"],
+                    "source_label": r["source"].replace("_", " ").title(),
+                    "date": r["date"],
+                    "text": r["text"],
+                    "extracted_entities": r.get("extracted_entities", []),
+                    "relationship_note": f"Shares {len(common_ents)} entity references ({', '.join(sorted(list(common_ents))[:3])})",
+                    "common_entities": sorted(list(common_ents)),
+                })
+        related_records.sort(key=lambda x: x["date"])
+
+        entity_cards = []
+        for eid in case_entity_names:
+            n = node_lookup.get(eid)
+            if n:
+                entity_cards.append({
+                    "id": n["id"],
+                    "type": n["type"],
+                    "degree": n["degree"],
+                    "betweenness": n["betweenness"],
+                    "influence_score": n["influence_score"],
+                    "community": n["community"],
+                    "is_key_player": n["is_key_player"],
+                    "is_bridge_node": n["is_bridge_node"],
+                    "anomaly_count": n["anomaly_count"],
+                })
+            else:
+                entity_cards.append({
+                    "id": eid,
+                    "type": "UNKNOWN",
+                    "degree": 0,
+                    "betweenness": 0.0,
+                    "influence_score": 0.0,
+                    "community": 0,
+                    "is_key_player": False,
+                    "is_bridge_node": False,
+                    "anomaly_count": 0,
+                })
+        entity_cards.sort(key=lambda x: (x["influence_score"], x["degree"]), reverse=True)
+
+        locs = cls.get_locations()
+        case_locations = [
+            l for l in locs if l["id"] in case_entity_set
+        ]
+
+        tl = cls.get_timeline()
+        related_rids = {rr["record_id"] for rr in related_records}
+        case_timeline = [
+            evt for evt in tl
+            if evt["record_id"] == rid or evt["record_id"] in related_rids
+        ]
+
+        internal_links = [
+            l for l in data["links"]
+            if l["source"] in case_entity_set and l["target"] in case_entity_set
+        ]
+
+        communities_represented = sorted(list({n["community"] for n in entity_cards if n["community"] > 0}))
+
+        references = [
+            {
+                "ref_type": "Primary Case Report",
+                "identifier": rid,
+                "source_system": target_r["source"],
+                "source_label": source_label,
+                "date": target_r["date"],
+                "details": f"Raw intake text processed by RuleBasedNER ({len(case_entity_names)} entities extracted)"
+            }
+        ]
+        for a in rec_anoms:
+            references.append({
+                "ref_type": "Analytical Signal",
+                "identifier": a["id"],
+                "source_system": "CNIS Anomaly Detection Engine",
+                "source_label": a["pattern_label"],
+                "date": a["date"] or target_r["date"],
+                "details": a["note"]
+            })
+        for loc in case_locations:
+            references.append({
+                "ref_type": "Geographic Site",
+                "identifier": loc["id"],
+                "source_system": "Location Intelligence Analysis",
+                "source_label": f"Activity Score: {loc['activity_score']}",
+                "date": target_r["date"],
+                "details": f"Operational node linking {loc['entity_count']} entities across {loc['record_count']} case records"
+            })
+
+        return {
+            "case_id": rid,
+            "title": f"{rid}: {short_title}",
+            "short_title": short_title,
+            "source": target_r["source"],
+            "source_label": source_label,
+            "date": target_r["date"],
+            "time": time_str,
+            "workflow_status": workflow_status,
+            "source_status": "Ingested Case Report",
+            "priority": priority,
+            "description": target_r["text"],
+            "metrics": {
+                "records": 1 + len(related_records),
+                "entities": len(case_entity_names),
+                "anomalies": len(rec_anoms),
+                "locations": len(case_locations),
+                "key_players": len(kp_involved),
+                "internal_connections": len(internal_links),
+            },
+            "primary_record": {
+                "record_id": rid,
+                "source": target_r["source"],
+                "source_label": source_label,
+                "date": target_r["date"],
+                "text": target_r["text"],
+                "extracted_entities": target_r.get("extracted_entities", []),
+                "location_references": loc_names,
+                "anomaly_count": len(rec_anoms),
+            },
+            "related_records": related_records,
+            "entities": entity_cards,
+            "anomalies": rec_anoms,
+            "locations": case_locations,
+            "timeline_events": case_timeline,
+            "network_context": {
+                "case_entities": case_entity_names,
+                "links": internal_links,
+                "key_players": kp_involved,
+                "bridge_nodes": [n["id"] for n in entity_cards if n["is_bridge_node"]],
+                "communities": communities_represented,
+            },
+            "intelligence_references": references,
+            "disclaimer": "Case intelligence is derived from available source records and analytical signals. Investigative conclusions require authorized human review.",
+        }
+
 

@@ -7,13 +7,14 @@ import {
   SearchRecordResult,
   SearchAnomalyResult,
   SearchLocationResult,
+  SearchCaseResult,
   EntityType,
 } from "../../types";
 import {
   Search, X, Users, Phone, Car, MapPin, Building2, DollarSign,
   Circle, FileText, AlertTriangle, Zap, ShieldAlert, Activity,
   ChevronRight, ArrowRight, CornerDownLeft, ExternalLink, Shield,
-  Star, Share2, Compass, Clock, RefreshCw, Cpu, Layers, Tag
+  Star, Share2, Compass, Clock, RefreshCw, Cpu, Layers, Tag, Briefcase
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -62,7 +63,7 @@ const PATTERN_CONFIG: Record<string, PatternCfg> = {
 const getPatternCfg = (p: string): PatternCfg =>
   PATTERN_CONFIG[p] ?? { label: p.replace(/_/g, " "), color: "#475569", bg: "#F1F5F9", icon: AlertTriangle };
 
-type ResultCategory = "all" | "entities" | "records" | "anomalies" | "locations";
+type ResultCategory = "all" | "cases" | "entities" | "records" | "anomalies" | "locations";
 
 export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   isOpen,
@@ -145,6 +146,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
           setResults({
             query: debouncedQuery,
             total_results: 0,
+            cases: [],
             entities: [],
             records: [],
             anomalies: [],
@@ -163,11 +165,14 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   const flattenedItems = useMemo(() => {
     if (!results) return [];
     const items: Array<{
-      type: "entity" | "record" | "anomaly" | "location";
+      type: "case" | "entity" | "record" | "anomaly" | "location";
       id: string;
       data: any;
     }> = [];
 
+    if (activeCategory === "all" || activeCategory === "cases") {
+      (results.cases || []).forEach((c) => items.push({ type: "case", id: c.case_id, data: c }));
+    }
     if (activeCategory === "all" || activeCategory === "entities") {
       results.entities.forEach((e) => items.push({ type: "entity", id: e.id, data: e }));
     }
@@ -212,7 +217,9 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   // Execute primary item action
   const executeItemAction = useCallback((item: { type: string; id: string; data: any }) => {
     onClose();
-    if (item.type === "entity") {
+    if (item.type === "case") {
+      navigate(`/cases?id=${encodeURIComponent(item.id)}`);
+    } else if (item.type === "entity") {
       if (onSelectEntity) {
         onSelectEntity(item.id);
       }
@@ -234,7 +241,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
     { label: "+91-9876543210", type: "PHONE", category: "Phone" },
     { label: "MH12AB1234", type: "VEHICLE", category: "Vehicle" },
     { label: "Andheri", type: "LOCATION", category: "Location" },
-    { label: "CR-1001", type: "CASE", category: "Case Record" },
+    { label: "CR-1001", type: "CASE", category: "Case File" },
     { label: "ANOM-001", type: "ANOMALY", category: "Anomaly" },
     { label: "structuring", type: "PATTERN", category: "Pattern" },
     { label: "Global Traders", type: "ORG", category: "Organization" },
@@ -243,12 +250,14 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   // Quick module access
   const quickModules = [
     { name: "Overview Dashboard", path: "/", icon: Compass, desc: "High-level metrics & topology" },
+    { name: "Case Management", path: "/cases", icon: Briefcase, desc: "10 active investigation dossiers" },
     { name: "Interactive Network", path: "/network", icon: Share2, desc: "Force-directed graph view" },
     { name: "Entity Explorer", path: "/entities", icon: Users, desc: "15 indexed entities & registry" },
     { name: "Anomaly Center", path: "/anomalies", icon: AlertTriangle, desc: "25 detected pattern signals" },
     { name: "Timeline Analysis", path: "/timeline", icon: Clock, desc: "Chronological event logs" },
     { name: "Location Analysis", path: "/locations", icon: MapPin, desc: "Spatial nexus & bridge hubs" },
     { name: "Intelligence Reports", path: "/reports", icon: FileText, desc: "Synthesized case briefings" },
+    { name: "Data Sources", path: "/sources", icon: Layers, desc: "Ingestion & provenance center" },
   ];
 
   let runningIndex = -1;
@@ -319,6 +328,19 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
             >
               All ({results.total_results})
             </button>
+            {results.cases && results.cases.length > 0 && (
+              <button
+                onClick={() => { setActiveCategory("cases"); setSelectedIndex(0); }}
+                className={`px-2.5 py-1 rounded-full font-medium transition-colors flex items-center gap-1 ${
+                  activeCategory === "cases"
+                    ? "bg-cyan-700 text-white"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                <Briefcase className="w-3 h-3" />
+                Cases ({results.cases.length})
+              </button>
+            )}
             {results.entities.length > 0 && (
               <button
                 onClick={() => { setActiveCategory("entities"); setSelectedIndex(0); }}
@@ -342,7 +364,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                 }`}
               >
                 <FileText className="w-3 h-3" />
-                Cases ({results.records.length})
+                Records ({results.records.length})
               </button>
             )}
             {results.anomalies.length > 0 && (
@@ -487,6 +509,90 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
           {/* STATE 4: Search Results Groups */}
           {debouncedQuery && !loading && results && results.total_results > 0 && (
             <div className="space-y-5 pt-1">
+              {/* ─── GROUP 0: CASES ─── */}
+              {(activeCategory === "all" || activeCategory === "cases") && results.cases && results.cases.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-[11px] font-bold uppercase tracking-wider text-cyan-800 flex items-center gap-1.5">
+                      <Briefcase className="w-3.5 h-3.5 text-cyan-700" />
+                      Investigation Cases ({results.cases.length})
+                    </h4>
+                    <span className="text-[10px] font-mono text-slate-400">Case Management Dossiers</span>
+                  </div>
+                  <div className="space-y-1.5">
+                    {results.cases.map((c) => {
+                      runningIndex++;
+                      const thisIdx = runningIndex;
+                      const isSelected = selectedIndex === thisIdx;
+
+                      return (
+                        <div
+                          key={c.case_id}
+                          data-index={thisIdx}
+                          onClick={() => executeItemAction({ type: "case", id: c.case_id, data: c })}
+                          className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                            isSelected
+                              ? "bg-cyan-50/50 border-cyan-300 ring-1 ring-cyan-400 shadow-xs"
+                              : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/70"
+                          }`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-9 h-9 rounded-xl bg-cyan-50 border border-cyan-200 text-cyan-700 flex items-center justify-center flex-shrink-0">
+                              <Briefcase className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-xs font-bold text-slate-900 font-mono">
+                                  {c.case_id}
+                                </span>
+                                <span className="text-xs font-semibold text-slate-800 truncate">
+                                  {c.short_title}
+                                </span>
+                                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                                  c.priority === "HIGH"
+                                    ? "bg-rose-50 text-rose-700 border-rose-200"
+                                    : c.priority === "MEDIUM"
+                                    ? "bg-amber-50 text-amber-700 border-amber-200"
+                                    : "bg-blue-50 text-blue-700 border-blue-200"
+                                }`}>
+                                  {c.priority}
+                                </span>
+                                <span className="text-[10px] font-mono text-slate-500">
+                                  {c.date}
+                                </span>
+                              </div>
+                              <p className="text-xs text-slate-600 mt-1 line-clamp-1 italic font-serif">
+                                "{c.snippet}"
+                              </p>
+                              <div className="text-[10px] text-slate-400 font-mono mt-0.5 flex items-center gap-2">
+                                <span>{c.entity_count} entities</span>
+                                <span>•</span>
+                                <span>{c.anomaly_count} signals</span>
+                                <span>•</span>
+                                <span className="text-slate-500">{c.workflow_status}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                executeItemAction({ type: "case", id: c.case_id, data: c });
+                              }}
+                              className="px-2.5 py-1 text-[10px] font-medium text-white bg-cyan-700 hover:bg-cyan-800 rounded-md transition-colors inline-flex items-center gap-1 flex-shrink-0"
+                            >
+                              Case File
+                              <ChevronRight className="w-3 h-3" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* ─── GROUP 1: ENTITIES ─── */}
               {(activeCategory === "all" || activeCategory === "entities") && results.entities.length > 0 && (
                 <div>

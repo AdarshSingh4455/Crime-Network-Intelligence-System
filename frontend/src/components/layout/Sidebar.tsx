@@ -38,9 +38,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   const secondaryNav = [
-    { name: 'Data Sources', path: '/sources', icon: Database, disabled: true },
-    { name: 'Cases', path: '/cases', icon: Briefcase, disabled: true },
-    { name: 'Settings', path: '/settings', icon: Settings, disabled: true },
+    { name: 'Data Sources', path: '/sources', icon: Database, disabled: false, badge: '4 Active' },
+    { name: 'Cases', path: '/cases', icon: Briefcase, disabled: false, badge: '10 Cases' },
+    { name: 'Settings', path: '/settings', icon: Settings, disabled: true, badge: 'Phase 3C' },
   ];
 
   return (
@@ -109,6 +109,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <nav className="space-y-1">
             {secondaryNav.map((item) => {
               const Icon = item.icon;
+              if (!item.disabled) {
+                return (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    className={({ isActive }) =>
+                      `group flex items-center justify-between px-3 py-2 rounded-md text-xs font-medium transition-all duration-150 ${
+                        isActive
+                          ? 'bg-cyan-50 text-cyan-900 font-semibold border-l-2 border-cyan-600 shadow-2xs'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                      }`
+                    }
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon className="w-4 h-4 text-slate-500 group-hover:text-cyan-700 transition-colors" />
+                      <span>{item.name}</span>
+                    </div>
+                    {item.badge && (
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border bg-emerald-50 text-emerald-800 border-emerald-200 font-medium">
+                        {item.badge}
+                      </span>
+                    )}
+                  </NavLink>
+                );
+              }
               return (
                 <div
                   key={item.name}
@@ -120,7 +145,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <span>{item.name}</span>
                   </div>
                   <span className="text-[9px] font-mono uppercase bg-slate-200/70 text-slate-500 px-1.5 py-0.5 rounded border border-slate-300">
-                    Phase 3
+                    {item.badge || 'Phase 3'}
                   </span>
                 </div>
               );

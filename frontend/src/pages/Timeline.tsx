@@ -6,7 +6,7 @@ import {
   Clock, Calendar, Search, X, RefreshCw, ExternalLink, Share2,
   Users, Phone, Car, MapPin, Building2, DollarSign, Circle,
   AlertTriangle, ShieldAlert, Zap, Activity, ArrowUpDown,
-  Filter, FileText, CheckCircle2, ChevronRight, Hash, Eye, Tag
+  Filter, FileText, CheckCircle2, ChevronRight, Hash, Eye, Tag, Briefcase
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -554,6 +554,16 @@ export const Timeline: React.FC = () => {
 
                           {/* Quick Action Buttons */}
                           <div className="flex items-center gap-2">
+                            {event.record_id && (
+                              <button
+                                onClick={() => navigate(`/cases?id=${encodeURIComponent(event.record_id)}`)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-cyan-800 bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 rounded-lg transition-colors"
+                                title={`Open Case Dossier ${event.record_id}`}
+                              >
+                                <Briefcase className="w-3 h-3 text-cyan-700" />
+                                Case File
+                              </button>
+                            )}
                             {primaryEntity && (
                               <>
                                 <button

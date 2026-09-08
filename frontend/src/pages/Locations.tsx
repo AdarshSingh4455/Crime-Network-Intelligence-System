@@ -6,7 +6,7 @@ import {
   MapPin, Search, X, RefreshCw, ExternalLink, Share2, Users,
   Phone, Car, Building2, DollarSign, Circle, AlertTriangle,
   Shield, Activity, FileText, ArrowRight, Eye, ChevronRight,
-  TrendingUp, Layers, CheckCircle2, Clock
+  TrendingUp, Layers, CheckCircle2, Clock, Briefcase
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -556,6 +556,7 @@ const LocationDetailDrawer: React.FC<LocationDetailDrawerProps> = ({
   onNavigateTimeline,
   onNavigateAnomalies,
 }) => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"entities" | "records" | "anomalies">("entities");
 
   return (
@@ -726,9 +727,19 @@ const LocationDetailDrawer: React.FC<LocationDetailDrawerProps> = ({
               {location.records.map(rec => (
                 <div key={rec.record_id} className="p-3 rounded-xl border border-slate-200 bg-slate-50/60 space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold text-cyan-800 bg-cyan-100/70 px-1.5 py-0.2 rounded">
-                      {rec.record_id}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono text-xs font-bold text-cyan-800 bg-cyan-100/70 px-1.5 py-0.2 rounded">
+                        {rec.record_id}
+                      </span>
+                      <button
+                        onClick={() => navigate(`/cases?id=${encodeURIComponent(rec.record_id)}`)}
+                        className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium text-cyan-800 bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 rounded transition-colors"
+                        title={`Open Case Dossier ${rec.record_id}`}
+                      >
+                        <Briefcase className="w-2.5 h-2.5 text-cyan-700" />
+                        Case File
+                      </button>
+                    </div>
                     <span className="text-[10px] text-slate-400 font-mono">{rec.date}</span>
                   </div>
                   <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">

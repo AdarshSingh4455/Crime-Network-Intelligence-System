@@ -2,6 +2,7 @@ export type EntityType = 'PERSON' | 'ORG' | 'LOCATION' | 'VEHICLE' | 'PHONE' | '
 
 export interface OverviewMetrics {
   total_records: number;
+  total_cases?: number;
   total_entities: number;
   total_relationships: number;
   suspicious_patterns_count: number;
@@ -308,12 +309,232 @@ export interface SearchLocationResult {
   source_module: string;
 }
 
+export interface SearchCaseResult {
+  case_id: string;
+  title: string;
+  short_title: string;
+  source: string;
+  source_label: string;
+  date: string;
+  workflow_status: string;
+  priority: 'HIGH' | 'MEDIUM' | 'STANDARD';
+  entity_count: number;
+  anomaly_count: number;
+  snippet: string;
+  source_module: string;
+}
+
 export interface SearchResponse {
   query: string;
   total_results: number;
+  cases?: SearchCaseResult[];
   entities: SearchEntityResult[];
   records: SearchRecordResult[];
   anomalies: SearchAnomalyResult[];
   locations: SearchLocationResult[];
 }
+
+export interface ProductionConnector {
+  name: string;
+  class_name: string;
+  protocol: string;
+  schema_standard: string;
+  ingestion_frequency: string;
+  security_level: string;
+  readiness: string;
+}
+
+export interface PlannedConnector {
+  id: string;
+  name: string;
+  category: string;
+  connector_class: string;
+  status: string;
+  description: string;
+  supported_format: string;
+}
+
+export interface SourceItem {
+  id: string;
+  name: string;
+  short_name: string;
+  category: string;
+  connector_type: string;
+  description: string;
+  status: string;
+  availability: string;
+  record_count: number;
+  entity_count: number;
+  anomaly_count: number;
+  location_count: number;
+  date_range: { start: string; end: string };
+  entity_types: Record<string, number>;
+  sample_entities: string[];
+  locations: string[];
+  production_connector: ProductionConnector;
+}
+
+export interface SourceRecordItem {
+  record_id: string;
+  date: string;
+  source: string;
+  text: string;
+  extracted_entities: Array<{ text: string; label: EntityType }>;
+  anomaly_count: number;
+}
+
+export interface SourceEntityItem {
+  id: string;
+  type: EntityType;
+  degree: number;
+  betweenness: number;
+  influence_score: number;
+  community: number;
+  is_key_player: boolean;
+  is_bridge_node: boolean;
+  anomaly_count: number;
+}
+
+export interface SourceDetail extends Omit<SourceItem, 'locations'> {
+  records: SourceRecordItem[];
+  entities: SourceEntityItem[];
+  anomalies: SuspiciousPattern[];
+  locations: LocationItem[];
+  ingestion_spec: {
+    connector_class: string;
+    pipeline_source: string;
+    base_interface: string;
+    target_schema: string[];
+    normalization: string;
+  };
+}
+
+export interface IngestionPipelineInfo {
+  engine_version: string;
+  connector_class: string;
+  entity_extraction_backend: string;
+  graph_builder: string;
+  dataset_path: string;
+  status: string;
+}
+
+export interface SourcesResponse {
+  total_sources: number;
+  total_records_ingested: number;
+  total_entities_extracted: number;
+  total_relationships_built: number;
+  total_anomalies_detected: number;
+  last_ingested_at: string;
+  ingestion_pipeline: IngestionPipelineInfo;
+  sources: SourceItem[];
+  planned_connectors: PlannedConnector[];
+}
+
+export interface IngestResponse {
+  status: string;
+  message: string;
+  reloaded_at: string;
+  records_ingested: number;
+  entities_extracted: number;
+  relationships_built: number;
+  anomalies_detected: number;
+  sources_active: number;
+}
+
+export interface CaseItem {
+  case_id: string;
+  title: string;
+  short_title: string;
+  source: string;
+  source_label: string;
+  date: string;
+  time?: string | null;
+  date_range: { start: string; end: string };
+  summary: string;
+  full_text: string;
+  workflow_status: 'Review Required' | 'Intelligence Available' | 'Source Record Active';
+  source_status: string;
+  priority: 'HIGH' | 'MEDIUM' | 'STANDARD';
+  record_count: number;
+  entity_count: number;
+  anomaly_count: number;
+  location_count: number;
+  key_player_count: number;
+  entities: string[];
+  locations: string[];
+  key_players: string[];
+  has_anomalies: boolean;
+}
+
+export interface CaseRecordReference {
+  record_id: string;
+  source: string;
+  source_label: string;
+  date: string;
+  text: string;
+  extracted_entities: Array<{ text: string; label: EntityType }>;
+  relationship_note?: string;
+  common_entities?: string[];
+  location_references?: string[];
+  anomaly_count?: number;
+}
+
+export interface CaseIntelligenceReference {
+  ref_type: string;
+  identifier: string;
+  source_system: string;
+  source_label: string;
+  date: string;
+  details: string;
+}
+
+export interface CaseDetail {
+  case_id: string;
+  title: string;
+  short_title: string;
+  source: string;
+  source_label: string;
+  date: string;
+  time?: string | null;
+  workflow_status: 'Review Required' | 'Intelligence Available' | 'Source Record Active';
+  source_status: string;
+  priority: 'HIGH' | 'MEDIUM' | 'STANDARD';
+  description: string;
+  metrics: {
+    records: number;
+    entities: number;
+    anomalies: number;
+    locations: number;
+    key_players: number;
+    internal_connections: number;
+  };
+  primary_record: CaseRecordReference;
+  related_records: CaseRecordReference[];
+  entities: NetworkNode[];
+  anomalies: SuspiciousPattern[];
+  locations: LocationItem[];
+  timeline_events: TimelineEvent[];
+  network_context: {
+    case_entities: string[];
+    links: NetworkLink[];
+    key_players: string[];
+    bridge_nodes: string[];
+    communities: number[];
+  };
+  intelligence_references: CaseIntelligenceReference[];
+  disclaimer: string;
+}
+
+export interface CasesResponse {
+  total_cases: number;
+  total_records: number;
+  total_entities: number;
+  total_anomalies: number;
+  review_required_count: number;
+  intelligence_available_count: number;
+  date_coverage: { start: string; end: string };
+  cases: CaseItem[];
+}
+
+
 

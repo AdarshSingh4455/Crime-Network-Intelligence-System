@@ -111,6 +111,47 @@ def search(q: str = ""):
     return IntelligenceService.search(q)
 
 
+@app.get("/api/sources")
+def get_sources():
+    return IntelligenceService.get_sources()
+
+
+@app.get("/api/sources/{source_id}")
+def get_source_detail(source_id: str):
+    detail = IntelligenceService.get_source_detail(source_id)
+    if not detail:
+        raise HTTPException(status_code=404, detail=f"Source '{source_id}' not found in registered connectors")
+    return detail
+
+
+@app.post("/api/ingest")
+def trigger_ingest():
+    """Safely triggers intelligence pipeline re-ingestion and cache refresh."""
+    data = IntelligenceService.get_data(force_reload=True)
+    return {
+        "status": "success",
+        "message": "Intelligence pipeline re-executed successfully. Ingestion cache flushed and rebuilt.",
+        "reloaded_at": getattr(IntelligenceService, "_last_ingestion_time", None),
+        "records_ingested": data["total_records"],
+        "entities_extracted": data["summary"]["num_nodes"],
+        "relationships_built": data["summary"]["num_edges"],
+        "anomalies_detected": len(data["suspicious_patterns"]),
+        "sources_active": 4,
+    }
+
+@app.get("/api/cases")
+def get_cases():
+    return IntelligenceService.get_cases()
+
+
+@app.get("/api/cases/{case_id}")
+def get_case_detail(case_id: str):
+    detail = IntelligenceService.get_case_detail(case_id)
+    if not detail:
+        raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found in registered intelligence records")
+    return detail
+
+
 
 if __name__ == "__main__":
     import uvicorn

@@ -6,7 +6,7 @@ import {
   AlertTriangle, Search, X, RefreshCw, ExternalLink, Users, Phone,
   Car, MapPin, Building2, DollarSign, Circle, ChevronUp, ChevronDown,
   ChevronsUpDown, FileText, Share2, Activity, Zap, ShieldAlert,
-  ArrowRight, CheckCircle2, Info, Eye
+  ArrowRight, CheckCircle2, Info, Eye, Briefcase
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -495,9 +495,17 @@ export const Anomalies: React.FC = () => {
                             {a.event_count} events
                           </span>
                         ) : a.record_id ? (
-                          <span className="font-mono text-cyan-700 bg-cyan-50 px-1.5 py-0.5 rounded text-[11px] font-medium">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/cases?id=${encodeURIComponent(a.record_id!)}`);
+                            }}
+                            className="font-mono text-cyan-700 bg-cyan-50 hover:bg-cyan-100 hover:text-cyan-900 px-1.5 py-0.5 rounded text-[11px] font-medium inline-flex items-center gap-1 transition-colors"
+                            title={`Open Case Dossier ${a.record_id}`}
+                          >
+                            <Briefcase className="w-2.5 h-2.5" />
                             {a.record_id}
-                          </span>
+                          </button>
                         ) : (
                           <span className="text-slate-400">Graph metric</span>
                         )}
@@ -655,6 +663,7 @@ const AnomalyDetailView: React.FC<AnomalyDetailViewProps> = ({
   onNavigateEntity,
   onNavigateNetwork,
 }) => {
+  const navigate = useNavigate();
   const pcfg = getPatternCfg(detail.pattern);
   const PIcon = pcfg.icon;
   const ecfg = getEntityCfg(detail.entity_type);
@@ -810,9 +819,19 @@ const AnomalyDetailView: React.FC<AnomalyDetailViewProps> = ({
               {detail.associated_records.map(rec => (
                 <div key={rec.record_id} className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold text-cyan-800 bg-cyan-100/70 px-1.5 py-0.2 rounded">
-                      {rec.record_id}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono text-xs font-bold text-cyan-800 bg-cyan-100/70 px-1.5 py-0.2 rounded">
+                        {rec.record_id}
+                      </span>
+                      <button
+                        onClick={() => navigate(`/cases?id=${encodeURIComponent(rec.record_id)}`)}
+                        className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium text-cyan-800 bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 rounded transition-colors"
+                        title={`Open Case Dossier ${rec.record_id}`}
+                      >
+                        <Briefcase className="w-2.5 h-2.5 text-cyan-700" />
+                        Case File
+                      </button>
+                    </div>
                     <span className="text-[10px] text-slate-400 font-mono">{rec.date}</span>
                   </div>
                   <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">

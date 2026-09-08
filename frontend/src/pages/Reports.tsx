@@ -7,7 +7,7 @@ import {
   Calendar, Activity, RefreshCw, ExternalLink, ArrowRight,
   TrendingUp, CheckCircle2, Info, ChevronRight, Layers,
   Zap, DollarSign, ShieldAlert, Clock, Eye, AlertCircle,
-  HelpCircle, ChevronDown, ChevronUp, Phone, Car, Building2, Circle
+  HelpCircle, ChevronDown, ChevronUp, Phone, Car, Building2, Circle, Briefcase
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -324,10 +324,11 @@ export const Reports: React.FC = () => {
                       {f.evidence.map(rec => (
                         <button
                           key={rec}
-                          onClick={() => navigate(`/timeline?record_id=${encodeURIComponent(rec)}`)}
-                          className="font-mono text-[11px] font-medium bg-cyan-50 text-cyan-800 border border-cyan-200 px-2 py-0.5 rounded hover:bg-cyan-100 transition-colors"
-                          title="Open in Timeline"
+                          onClick={() => navigate(`/cases?id=${encodeURIComponent(rec)}`)}
+                          className="font-mono text-[11px] font-medium bg-cyan-50 text-cyan-800 border border-cyan-200 px-2 py-0.5 rounded hover:bg-cyan-100 transition-colors inline-flex items-center gap-1"
+                          title="Open Case Dossier"
                         >
+                          <Briefcase className="w-2.5 h-2.5 text-cyan-700" />
                           {rec}
                         </button>
                       ))}
@@ -431,9 +432,11 @@ export const Reports: React.FC = () => {
                       {lead.supporting_records.map(rec => (
                         <button
                           key={rec}
-                          onClick={() => navigate(`/timeline?record_id=${encodeURIComponent(rec)}`)}
-                          className="font-mono text-[11px] font-medium bg-cyan-50 text-cyan-800 px-2 py-0.5 rounded border border-cyan-200 hover:bg-cyan-100"
+                          onClick={() => navigate(`/cases?id=${encodeURIComponent(rec)}`)}
+                          className="font-mono text-[11px] font-medium bg-cyan-50 text-cyan-800 px-2 py-0.5 rounded border border-cyan-200 hover:bg-cyan-100 inline-flex items-center gap-1"
+                          title="Open Case Dossier"
                         >
+                          <Briefcase className="w-2.5 h-2.5 text-cyan-700" />
                           {rec}
                         </button>
                       ))}

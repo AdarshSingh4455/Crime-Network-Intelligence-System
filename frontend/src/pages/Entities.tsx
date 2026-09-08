@@ -5,7 +5,7 @@ import { NetworkNode, EntityDetail, SuspiciousPattern, ConnectedEntity } from ".
 import {
   Search, X, Users, Phone, Car, MapPin, Building2, DollarSign,
   Circle, AlertTriangle, Shield, Star, ChevronUp, ChevronDown,
-  ChevronsUpDown, ExternalLink, Share2, FileText, ChevronRight, Info,
+  ChevronsUpDown, ExternalLink, Share2, FileText, ChevronRight, Info, Briefcase
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -138,6 +138,7 @@ const AnomaliesTab: React.FC<{ anomalies: SuspiciousPattern[] }> = ({ anomalies 
 };
 
 const RecordsTab: React.FC<{ records: Array<{ record_id: string; source: string; date: string; text: string }> }> = ({ records }) => {
+  const navigate = useNavigate();
   const [expanded, setExpanded] = useState<string | null>(null);
   if (records.length === 0) return <p className="text-xs text-slate-400 italic">No associated case records.</p>;
   return (
@@ -159,8 +160,21 @@ const RecordsTab: React.FC<{ records: Array<{ record_id: string; source: string;
             </div>
           </button>
           {expanded === r.record_id && (
-            <div className="px-3 pb-3 pt-1 border-t border-slate-100 bg-slate-50">
+            <div className="px-3 pb-3 pt-1 border-t border-slate-100 bg-slate-50 space-y-2">
               <p className="text-xs text-slate-600 leading-relaxed">{r.text}</p>
+              <div className="flex justify-end pt-1">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/cases?id=${encodeURIComponent(r.record_id)}`);
+                  }}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium text-cyan-800 bg-cyan-100/70 hover:bg-cyan-200/70 rounded transition-colors"
+                  title={`Open Case Dossier ${r.record_id}`}
+                >
+                  <Briefcase className="w-3 h-3 text-cyan-700" />
+                  Open Case Dossier
+                </button>
+              </div>
             </div>
           )}
         </div>
