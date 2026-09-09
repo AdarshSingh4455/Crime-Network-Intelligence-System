@@ -1,0 +1,25 @@
+{
+  "fixture_set": "reingest_idempotency",
+  "description": "Tests for idempotency when re-ingesting datasets across server restarts or pipeline executions. Robustness category R.",
+  "fixtures": [
+    {
+      "fixture_id": "TEST-R-001",
+      "category": "reingestion_idempotency",
+      "robustness_category": "R",
+      "input_condition": "Ingesting the same baseline or test record set twice in separate pipeline runs",
+      "source_records": [
+        {
+          "record_id": "TEST-R-001a",
+          "date": "2026-01-12",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Subject Alpha observed at Test Location A with phone +91-9876543210."
+        }
+      ],
+      "expected_behavior": "Re-ingestion must yield identical node and edge counts if cache is intact; without persistent deduplication storage, re-running can cause state drifts.",
+      "expected_outcome": "IDEMPOTENT_AT_RUNTIME_CACHE",
+      "rationale": "Pipeline uses in-memory deduplication during collection. Cache invalidation followed by re-run resets and rebuilds cleanly.",
+      "known_weakness": true,
+      "weakness_description": "Ingestion idempotency is maintained at the runtime cache layer. If force_reload=True is triggered concurrently or storage is bypassed, persistent entity deduplication is not guaranteed."
+    }
+  ]
+}

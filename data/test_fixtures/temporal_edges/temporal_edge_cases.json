@@ -1,0 +1,31 @@
+{
+  "fixture_set": "temporal_edge_cases",
+  "description": "Tests for handling extreme dates, future timestamps, leap days, and chronologically reversed records. Robustness category M.",
+  "fixtures": [
+    {
+      "fixture_id": "TEST-M-001",
+      "category": "temporal_edge_cases",
+      "robustness_category": "M",
+      "input_condition": "Records with out-of-order dates, past epoch dates, and future timestamps",
+      "source_records": [
+        {
+          "record_id": "TEST-M-001a",
+          "date": "1999-12-31",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Historic log: Ravi Malhotra observed at Andheri Warehouse."
+        },
+        {
+          "record_id": "TEST-M-001b",
+          "date": "2030-01-01",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Erroneous future timestamp: Ravi Malhotra observed."
+        }
+      ],
+      "expected_behavior": "Ingestion pipeline ingests dates as ISO strings without crashing; sorting in timeline handles arbitrary strings gracefully.",
+      "expected_outcome": "SAFE_DATE_PARSING",
+      "rationale": "Pipeline treats dates as lexicographical strings. Does not crash on future or historical dates.",
+      "known_weakness": false,
+      "weakness_description": null
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "fixture_set": "disconnected_graph",
+  "description": "Tests for handling disconnected network graph components and isolated single-node entities. Robustness category P.",
+  "fixtures": [
+    {
+      "fixture_id": "TEST-P-001",
+      "category": "disconnected_graph",
+      "robustness_category": "P",
+      "input_condition": "Records containing two completely disjoint subgraphs and an isolated entity",
+      "source_records": [
+        {
+          "record_id": "TEST-P-001a",
+          "date": "2026-01-20",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Group 1: Ravi Malhotra met Suresh Nair."
+        },
+        {
+          "record_id": "TEST-P-001b",
+          "date": "2026-01-20",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Group 2: Ajay Kulkarni met Deepak Shah."
+        }
+      ],
+      "expected_behavior": "Graph algorithms must handle multiple connected components without throwing convergence or reachability exceptions.",
+      "expected_outcome": "ROBUST_DISCONNECTED_HANDLING",
+      "rationale": "Shortest path raises NetworkXNoPath safely; centrality metrics compute independently per connected component.",
+      "known_weakness": false,
+      "weakness_description": null
+    }
+  ]
+}

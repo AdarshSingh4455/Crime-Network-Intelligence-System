@@ -1,0 +1,82 @@
+{
+  "fixture_set": "unicode_special_chars",
+  "description": "Tests for Unicode and special character handling. Robustness category T.",
+  "fixtures": [
+    {
+      "fixture_id": "TEST-T-001",
+      "category": "devanagari_text",
+      "robustness_category": "T",
+      "input_condition": "Record text in Devanagari (Hindi) script",
+      "source_records": [
+        {
+          "record_id": "TEST-T-001",
+          "date": "2026-12-01",
+          "source": "test_fixture",
+          "text": "परीक्षण संदेश: विषय अल्फा को परीक्षण स्थान अ में देखा गया।"
+        }
+      ],
+      "expected_behavior": "Python regex engine handles Unicode text. No crash. Gazetteer names (ASCII) do not match Devanagari text. PHONE_RE and VEHICLE_PLATE_RE do not match. Zero entities extracted.",
+      "expected_outcome": "GRACEFUL_ZERO_ENTITIES",
+      "rationale": "Python's re module handles Unicode strings natively. Regex patterns with [A-Z] don't match Devanagari characters. The pipeline processes the record without crash.",
+      "known_weakness": false,
+      "weakness_description": null
+    },
+    {
+      "fixture_id": "TEST-T-002",
+      "category": "arabic_text",
+      "robustness_category": "T",
+      "input_condition": "Record text in Arabic script",
+      "source_records": [
+        {
+          "record_id": "TEST-T-002",
+          "date": "2026-12-02",
+          "source": "test_fixture",
+          "text": "اختبار الرسالة: تم رصد الموضوع ألفا في موقع الاختبار أ."
+        }
+      ],
+      "expected_behavior": "Pipeline handles Arabic text without crash. No entities extracted (gazetteer and regex patterns are for ASCII/Latin characters).",
+      "expected_outcome": "GRACEFUL_ZERO_ENTITIES",
+      "rationale": "Python regex handles Arabic Unicode without special handling. [A-Z] ASCII character class does not match Arabic letters.",
+      "known_weakness": false,
+      "weakness_description": null
+    },
+    {
+      "fixture_id": "TEST-T-003",
+      "category": "special_chars_in_text",
+      "robustness_category": "T",
+      "input_condition": "Record text with SQL injection-style and special characters",
+      "source_records": [
+        {
+          "record_id": "TEST-T-003",
+          "date": "2026-12-03",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Subject <script>alert('xss')</script> observed at 'Test Location'; DROP TABLE records;--"
+        }
+      ],
+      "expected_behavior": "Pipeline processes text as plain string. No SQL executed (pipeline uses no SQL on this text). No XSS executed (no HTML rendering in pipeline). Regex matching applied to raw string without issue.",
+      "expected_outcome": "GRACEFUL_SPECIAL_CHARS",
+      "rationale": "The Python pipeline treats text as plain strings throughout. No eval() or SQL interpolation is performed on record text. The regex engine handles these characters safely.",
+      "known_weakness": false,
+      "weakness_description": null
+    },
+    {
+      "fixture_id": "TEST-T-004",
+      "category": "mixed_script_with_entities",
+      "robustness_category": "T",
+      "input_condition": "Mixed Latin and Devanagari text with a valid phone number embedded",
+      "source_records": [
+        {
+          "record_id": "TEST-T-004",
+          "date": "2026-12-04",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: विषय अल्फा contacted via +91-9400000055. Ravi Malhotra also present."
+        }
+      ],
+      "expected_behavior": "Pipeline extracts PHONE entity '9400000055' and PERSON entity 'Ravi Malhotra' from the Latin portions. Devanagari text is ignored by all patterns.",
+      "expected_outcome": "PARTIAL_EXTRACTION",
+      "rationale": "Regex patterns operate on the full Unicode string but only match ASCII patterns. Latin substrings containing valid entities are correctly extracted.",
+      "known_weakness": false,
+      "weakness_description": null
+    }
+  ]
+}

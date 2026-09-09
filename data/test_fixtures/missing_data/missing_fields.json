@@ -1,0 +1,63 @@
+{
+  "fixture_set": "missing_fields",
+  "description": "Tests for records with missing or empty required fields. Robustness category G.",
+  "fixtures": [
+    {
+      "fixture_id": "TEST-G-001",
+      "category": "missing_text_field",
+      "robustness_category": "G",
+      "input_condition": "Record with empty text field (empty string)",
+      "source_records": [
+        {
+          "record_id": "TEST-G-001",
+          "date": "2026-07-01",
+          "source": "test_fixture",
+          "text": ""
+        }
+      ],
+      "expected_behavior": "Pipeline processes record without crash. Zero entities extracted from empty text. Record appears in ingested record count.",
+      "expected_outcome": "GRACEFUL_EMPTY",
+      "rationale": "RuleBasedNER returns empty list for empty text. Extract_entities handles the empty case without exception.",
+      "known_weakness": false,
+      "weakness_description": null
+    },
+    {
+      "fixture_id": "TEST-G-002",
+      "category": "missing_date_field",
+      "robustness_category": "G",
+      "input_condition": "Record with missing date field (empty string date)",
+      "source_records": [
+        {
+          "record_id": "TEST-G-002",
+          "date": "",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Subject Theta observed at Test Location E."
+        }
+      ],
+      "expected_behavior": "Pipeline processes record without crash. Empty date propagates to edges. Co-occurrence edge has date='' which does not cause anomaly detection to fail.",
+      "expected_outcome": "GRACEFUL_EMPTY_DATE",
+      "rationale": "The pipeline passes date as a string field. Empty string is valid for the dataclass and does not cause a crash. Anomaly detection may skip this record in temporal analysis.",
+      "known_weakness": false,
+      "weakness_description": null
+    },
+    {
+      "fixture_id": "TEST-G-003",
+      "category": "missing_source_field",
+      "robustness_category": "G",
+      "input_condition": "Record with missing source field (defaults to 'unknown')",
+      "source_records": [
+        {
+          "record_id": "TEST-G-003",
+          "date": "2026-07-05",
+          "source": "",
+          "text": "TEST FIXTURE: Subject Iota observed at Test Location F with vehicle TF02BB0002."
+        }
+      ],
+      "expected_behavior": "JSONFileConnector defaults source to 'unknown' if key missing. Empty source string passes through. Does not cause crash.",
+      "expected_outcome": "GRACEFUL_EMPTY_SOURCE",
+      "rationale": "JSONFileConnector uses row.get('source', 'unknown'). Empty string source is valid at the Record dataclass level.",
+      "known_weakness": false,
+      "weakness_description": null
+    }
+  ]
+}

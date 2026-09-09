@@ -1,0 +1,58 @@
+{
+  "fixture_set": "search_robustness",
+  "description": "Tests for search functionality with edge-case queries. Robustness category Q.",
+  "fixtures": [
+    {
+      "fixture_id": "TEST-Q-001",
+      "category": "empty_search_query",
+      "robustness_category": "Q",
+      "input_condition": "Search with empty string query",
+      "search_query": "",
+      "source_records": [],
+      "expected_behavior": "API endpoint /api/search?q= returns valid response without crash. Empty query matches all or returns empty.",
+      "expected_outcome": "GRACEFUL_EMPTY_QUERY",
+      "rationale": "The search function must handle empty string input without raising an exception.",
+      "known_weakness": false,
+      "weakness_description": null
+    },
+    {
+      "fixture_id": "TEST-Q-002",
+      "category": "special_chars_search",
+      "robustness_category": "Q",
+      "input_condition": "Search query with SQL injection-style characters",
+      "search_query": "'; DROP TABLE records;--",
+      "source_records": [],
+      "expected_behavior": "API endpoint handles special characters without crash. No SQL injection possible (pipeline is not SQL-backed for search). Returns valid response.",
+      "expected_outcome": "GRACEFUL_SPECIAL_CHARS",
+      "rationale": "Search operates on in-memory Python data structures. No SQL interpolation. Special characters in query are treated as plain strings.",
+      "known_weakness": false,
+      "weakness_description": null
+    },
+    {
+      "fixture_id": "TEST-Q-003",
+      "category": "unicode_search",
+      "robustness_category": "Q",
+      "input_condition": "Search query in Devanagari script",
+      "search_query": "\u0930\u0935\u093f \u092e\u0932\u0939\u094b\u0924\u094d\u0930\u093e",
+      "source_records": [],
+      "expected_behavior": "API endpoint accepts Unicode query parameter. Python string comparison handles Unicode. No crash. Returns empty results (no Devanagari entities in baseline data).",
+      "expected_outcome": "GRACEFUL_UNICODE_QUERY",
+      "rationale": "FastAPI handles Unicode URL parameters via URL encoding. Python string contains/lower() work on Unicode strings.",
+      "known_weakness": false,
+      "weakness_description": null
+    },
+    {
+      "fixture_id": "TEST-Q-004",
+      "category": "very_long_search_query",
+      "robustness_category": "Q",
+      "input_condition": "Search query of 1000+ characters",
+      "search_query": "TEST FIXTURE LONG QUERY AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "source_records": [],
+      "expected_behavior": "API handles very long query string without crash or timeout. Python string operations are O(n) on query length. Returns valid response.",
+      "expected_outcome": "GRACEFUL_LONG_QUERY",
+      "rationale": "No query length limits are enforced. Python string operations handle long strings. FastAPI does not enforce URL length limits by default.",
+      "known_weakness": false,
+      "weakness_description": null
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "fixture_set": "conflicting_observations",
+  "description": "Tests for records with conflicting information about the same entity. Robustness category I.",
+  "fixtures": [
+    {
+      "fixture_id": "TEST-I-001",
+      "category": "conflicting_observations",
+      "robustness_category": "I",
+      "input_condition": "Two records about the same person (Ravi Malhotra) with contradictory location details",
+      "source_records": [
+        {
+          "record_id": "TEST-I-001a",
+          "date": "2026-09-01",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Ravi Malhotra was observed at Andheri Warehouse on 2026-09-01 at 14:00."
+        },
+        {
+          "record_id": "TEST-I-001b",
+          "date": "2026-09-01",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Ravi Malhotra was simultaneously reported at Test Location H on 2026-09-01 at 14:00."
+        }
+      ],
+      "expected_behavior": "Both records ingested. Both analytical signals returned. Pipeline does NOT adjudicate conflicts — both observations are preserved for investigator review.",
+      "expected_outcome": "BOTH_SIGNALS_PRESERVED",
+      "rationale": "The CNIS pipeline is a signal-aggregation system, not a conflict-resolution engine. Conflicting observations represent real-world reporting discrepancies. Investigators must apply judgment. The system surfaces all analytical signals and requires investigator review.",
+      "known_weakness": false,
+      "weakness_description": null
+    },
+    {
+      "fixture_id": "TEST-I-002",
+      "category": "conflicting_observations_identity",
+      "robustness_category": "I",
+      "input_condition": "Two records attributing the same vehicle to different subjects",
+      "source_records": [
+        {
+          "record_id": "TEST-I-002a",
+          "date": "2026-09-05",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Vehicle TF03CC0003 observed with Ravi Malhotra at Test Point Z."
+        },
+        {
+          "record_id": "TEST-I-002b",
+          "date": "2026-09-06",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Vehicle TF03CC0003 reported as associated with Suresh Nair at Test Point W."
+        }
+      ],
+      "expected_behavior": "Vehicle TF03CC0003 gains edges to both Ravi Malhotra and Suresh Nair. The conflict (two different subjects associated with same vehicle) is surfaced as an analytical signal requiring investigator review — it is not automatically resolved.",
+      "expected_outcome": "MULTIPLE_ASSOCIATIONS_SURFACED",
+      "rationale": "Co-occurrence edges record all observed associations. The graph correctly shows TF03CC0003 linked to both entities, which is a valid investigative finding — the vehicle may have been used by both, or a reporting error exists.",
+      "known_weakness": false,
+      "weakness_description": null
+    }
+  ]
+}

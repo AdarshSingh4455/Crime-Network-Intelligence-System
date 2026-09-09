@@ -1,0 +1,31 @@
+{
+  "fixture_set": "vehicle_variations",
+  "description": "Tests for vehicle license plate variations, casing, and spacing. Robustness category D.",
+  "fixtures": [
+    {
+      "fixture_id": "TEST-D-001",
+      "category": "vehicle_plate_variations",
+      "robustness_category": "D",
+      "input_condition": "Vehicle plate representations in uppercase, lowercase, and hyphens",
+      "source_records": [
+        {
+          "record_id": "TEST-D-001a",
+          "date": "2026-01-15",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Vehicle MH12AB1234 was observed at location."
+        },
+        {
+          "record_id": "TEST-D-001b",
+          "date": "2026-01-15",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Lowercase vehicle mh12ab1234 or hyphenated MH-12-AB-1234 observed."
+        }
+      ],
+      "expected_behavior": "Uppercase contiguous plates match regex; lowercase or hyphenated formats fail without case-insensitive preprocessing.",
+      "expected_outcome": "KNOWN_WEAKNESS_CASE_SENSITIVE",
+      "rationale": "VEHICLE_PLATE_RE matches [A-Z]{2}\\d{2}[A-Z]{1,2}\\d{3,4} strictly uppercase without hyphens.",
+      "known_weakness": true,
+      "weakness_description": "Vehicle plate extraction regex is strictly uppercase and does not match lowercase or hyphen-separated plate numbers."
+    }
+  ]
+}

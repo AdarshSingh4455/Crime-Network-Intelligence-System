@@ -1,0 +1,31 @@
+{
+  "fixture_set": "burst_false_positives",
+  "description": "Tests for anomaly detection thresholds differentiating routine communications from genuine burst events. Robustness category N.",
+  "fixtures": [
+    {
+      "fixture_id": "TEST-N-001",
+      "category": "burst_false_positives",
+      "robustness_category": "N",
+      "input_condition": "A routine single call log versus a burst communication pattern of 18 calls within two hours",
+      "source_records": [
+        {
+          "record_id": "TEST-N-001a",
+          "date": "2026-01-22",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Routine communication: +91-9876543210 called +91-9123456789 once for 2 minutes."
+        },
+        {
+          "record_id": "TEST-N-001b",
+          "date": "2026-01-22",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Burst calling pattern detected: +91-9876543210 made 18 calls within 2 hours."
+        }
+      ],
+      "expected_behavior": "Anomaly detector triggers high-frequency burst alert only on textual indicator or statistical event count surpassing threshold >= 5.",
+      "expected_outcome": "SELECTIVE_BURST_DETECTION",
+      "rationale": "Regex search on 'burst' or call frequency threshold filters routine single interactions.",
+      "known_weakness": false,
+      "weakness_description": null
+    }
+  ]
+}

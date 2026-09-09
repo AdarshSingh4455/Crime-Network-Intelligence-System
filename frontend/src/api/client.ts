@@ -26,6 +26,8 @@ import {
   ResetSessionResponse,
   InvestigationResponse,
   InvestigationPathResponse,
+  FixtureCatalogue,
+  DataQualityResults,
 } from '../types';
 
 const API_BASE = '/api';
@@ -182,6 +184,18 @@ export const api = {
     const res = await apiClient.get<InvestigationPathResponse>(
       `/investigation/path?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`
     );
+    return res.data;
+  },
+
+  // ─── Phase 3F: Data Quality & Robustness Testing ───────────────────────────
+
+  getFixtureCatalogue: async (): Promise<FixtureCatalogue> => {
+    const res = await apiClient.get<FixtureCatalogue>('/data-quality/catalogue');
+    return res.data;
+  },
+
+  getDataQualityResults: async (): Promise<DataQualityResults> => {
+    const res = await apiClient.get<DataQualityResults>('/data-quality/results');
     return res.data;
   },
 };

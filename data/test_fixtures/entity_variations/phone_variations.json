@@ -1,0 +1,31 @@
+{
+  "fixture_set": "phone_variations",
+  "description": "Tests for phone number normalization, whitespace, prefixes, and punctuation variations. Robustness category C.",
+  "fixtures": [
+    {
+      "fixture_id": "TEST-C-001",
+      "category": "phone_format_variations",
+      "robustness_category": "C",
+      "input_condition": "Records containing phone numbers with international prefix, national prefix, dashes, spaces, and no delimiters",
+      "source_records": [
+        {
+          "record_id": "TEST-C-001a",
+          "date": "2026-01-14",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Contacted via +91-9876543210 and also 919876543210 and 09876543210."
+        },
+        {
+          "record_id": "TEST-C-001b",
+          "date": "2026-01-14",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Alternative formatting +91 9876543210 vs segmented 98 765 432 10."
+        }
+      ],
+      "expected_behavior": "Standard Indian phone formats normalized to last 10 digits; internal multiple spaces may not match regex without specialized preprocessing.",
+      "expected_outcome": "NORMALIZED_10_DIGITS",
+      "rationale": "PHONE_RE matches digits with standard punctuation and normalizes to 10 digits via regex sub.",
+      "known_weakness": true,
+      "weakness_description": "Numbers containing multiple internal spaces (e.g. '98 000 000 99') are not recognized by PHONE_RE. Requires investigator review."
+    }
+  ]
+}

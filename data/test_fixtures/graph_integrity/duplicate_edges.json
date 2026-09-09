@@ -1,0 +1,31 @@
+{
+  "fixture_set": "duplicate_edges",
+  "description": "Tests for duplicate edges and multi-edge co-occurrence weight aggregation. Robustness category J.",
+  "fixtures": [
+    {
+      "fixture_id": "TEST-J-001",
+      "category": "duplicate_edges",
+      "robustness_category": "J",
+      "input_condition": "Multiple distinct records containing identical entity pairs",
+      "source_records": [
+        {
+          "record_id": "TEST-J-001a",
+          "date": "2026-01-16",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Ravi Malhotra met Suresh Nair near Andheri Warehouse."
+        },
+        {
+          "record_id": "TEST-J-001b",
+          "date": "2026-01-17",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Ravi Malhotra met Suresh Nair again near Andheri Warehouse."
+        }
+      ],
+      "expected_behavior": "Graph builder aggregates co-occurrences by incrementing edge weight rather than inserting duplicate parallel edges in simple graph.",
+      "expected_outcome": "WEIGHT_INCREMENTED",
+      "rationale": "NetworkX undirected graph merges parallel edges and increments weight attribute.",
+      "known_weakness": false,
+      "weakness_description": null
+    }
+  ]
+}

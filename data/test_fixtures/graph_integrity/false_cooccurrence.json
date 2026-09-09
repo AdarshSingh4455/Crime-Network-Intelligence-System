@@ -1,0 +1,25 @@
+{
+  "fixture_set": "false_cooccurrence",
+  "description": "Tests for false co-occurrence relationships created solely by proximity in police blotters or multi-case summaries. Robustness category L.",
+  "fixtures": [
+    {
+      "fixture_id": "TEST-L-001",
+      "category": "false_cooccurrence",
+      "robustness_category": "L",
+      "input_condition": "A single police incident report containing two completely unrelated incidents in different paragraphs",
+      "source_records": [
+        {
+          "record_id": "TEST-L-001a",
+          "date": "2026-01-19",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Incident 1: Ravi Malhotra parked near Andheri. Incident 2: Unrelated party Vikram Rao spotted in separate case."
+        }
+      ],
+      "expected_behavior": "Simple record-level co-occurrence creates a spurious link between Ravi Malhotra and Vikram Rao despite lack of substantive relationship.",
+      "expected_outcome": "KNOWN_WEAKNESS_SPURIOUS_LINK",
+      "rationale": "Without sentence-level or dependency-parse relationship extraction, all entities in a record are linked.",
+      "known_weakness": true,
+      "weakness_description": "Co-occurrence linking binds all entities appearing in the same record regardless of whether the text establishes a semantic association. Requires NLP dependency parsing."
+    }
+  ]
+}

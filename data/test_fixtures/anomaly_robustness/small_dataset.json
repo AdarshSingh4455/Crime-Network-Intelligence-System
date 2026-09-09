@@ -1,0 +1,49 @@
+{
+  "fixture_set": "small_dataset",
+  "description": "Tests for IsolationForest behavior on very small datasets. Robustness category O.",
+  "fixtures": [
+    {
+      "fixture_id": "TEST-O-001",
+      "category": "tiny_dataset_isolation_forest",
+      "robustness_category": "O",
+      "input_condition": "Dataset with only 2 records total (minimum possible non-trivial dataset)",
+      "source_records": [
+        {
+          "record_id": "TEST-O-001a",
+          "date": "2026-11-01",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Ravi Malhotra observed at Andheri Warehouse."
+        },
+        {
+          "record_id": "TEST-O-001b",
+          "date": "2026-11-02",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Suresh Nair observed at Andheri Warehouse."
+        }
+      ],
+      "expected_behavior": "IsolationForest may raise ValueError or produce degenerate results on 2-record datasets. The pipeline should handle this gracefully with a try/except or min-size check.",
+      "expected_outcome": "KNOWN_WEAKNESS_SMALL_DATASET",
+      "rationale": "IsolationForest requires sufficient data diversity to establish a meaningful anomaly boundary. sklearn's IsolationForest may raise an error or mark all points as anomalies on datasets with 2 records.",
+      "known_weakness": true,
+      "weakness_description": "IsolationForest may crash or produce degenerate results on datasets with fewer than ~10 records. The anomaly detection module should enforce a minimum dataset size and return a warning rather than crashing. The production threshold should be documented and enforced with a graceful fallback."
+    },
+    {
+      "fixture_id": "TEST-O-002",
+      "category": "single_date_all_records",
+      "robustness_category": "O",
+      "input_condition": "All records on the same date — no variance in daily counts",
+      "source_records": [
+        {"record_id": "TEST-O-002a", "date": "2026-12-01", "source": "test_fixture", "text": "TEST FIXTURE: Subject observed at Test Location HH."},
+        {"record_id": "TEST-O-002b", "date": "2026-12-01", "source": "test_fixture", "text": "TEST FIXTURE: Subject observed at Test Location II."},
+        {"record_id": "TEST-O-002c", "date": "2026-12-01", "source": "test_fixture", "text": "TEST FIXTURE: Subject observed at Test Location JJ."},
+        {"record_id": "TEST-O-002d", "date": "2026-12-01", "source": "test_fixture", "text": "TEST FIXTURE: Subject observed at Test Location KK."},
+        {"record_id": "TEST-O-002e", "date": "2026-12-01", "source": "test_fixture", "text": "TEST FIXTURE: Subject observed at Test Location LL."}
+      ],
+      "expected_behavior": "All records on same date. Daily count vector has only one unique value. IsolationForest has zero variance to work with. May return all anomalous, none anomalous, or crash.",
+      "expected_outcome": "KNOWN_WEAKNESS_ZERO_VARIANCE",
+      "rationale": "Zero variance in the feature vector causes IsolationForest to behave unpredictably. The expected behavior is non-deterministic without specific sklearn version constraints.",
+      "known_weakness": true,
+      "weakness_description": "IsolationForest on a zero-variance feature vector (all records on same date) produces undefined behavior. The anomaly detection module must handle this case explicitly and return a documented warning."
+    }
+  ]
+}

@@ -15,6 +15,7 @@ import {
   ChevronRight,
   CheckCircle2,
   Compass,
+  FlaskConical,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -42,6 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { name: 'Investigation', path: '/investigation', icon: Compass, disabled: false, badge: 'Workspace' },
     { name: 'Cases', path: '/cases', icon: Briefcase, disabled: false, badge: '10 Cases' },
     { name: 'Data Sources', path: '/sources', icon: Database, disabled: false, badge: '4 Active' },
+    { name: 'Data Quality', path: '/data-quality', icon: FlaskConical, disabled: false, badge: 'Phase 3F' },
     { name: 'Settings', path: '/settings', icon: Settings, disabled: false, badge: 'Config' },
   ];
 

@@ -270,6 +270,32 @@ def get_investigation_path(start: str, end: str):
     return IntelligenceService.compute_path_analysis(start, end)
 
 
+# ─── Phase 3F: Data Quality & Adversarial Robustness ─────────────────────────
+
+@app.get("/api/data-quality/catalogue")
+def get_data_quality_catalogue():
+    """Returns the comprehensive fixture catalogue organized by 20 robustness categories (A–T)."""
+    from server.data_quality import DataQualityService
+    return DataQualityService.get_fixture_catalogue()
+
+
+@app.get("/api/data-quality/results")
+def get_data_quality_results():
+    """Executes the 28 robustness tests against isolated pipeline fixtures and returns report."""
+    from server.data_quality import DataQualityService
+    return DataQualityService.run_robustness_tests()
+
+
+@app.get("/api/data-quality/results/{test_id}")
+def get_data_quality_result_detail(test_id: str):
+    """Returns detailed evaluation and diagnostics for a single robustness test."""
+    from server.data_quality import DataQualityService
+    result = DataQualityService.get_test_result(test_id)
+    if not result:
+        raise HTTPException(status_code=404, detail=f"Robustness test '{test_id}' not found")
+    return result
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("server.main:app", host="127.0.0.1", port=8000, reload=True)

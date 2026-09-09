@@ -1,0 +1,25 @@
+{
+  "fixture_set": "self_loops",
+  "description": "Tests for avoidance of self-loops when an entity is mentioned repeatedly in a single record. Robustness category K.",
+  "fixtures": [
+    {
+      "fixture_id": "TEST-K-001",
+      "category": "self_loops",
+      "robustness_category": "K",
+      "input_condition": "A single entity mentioned multiple times within the same record text without other entities",
+      "source_records": [
+        {
+          "record_id": "TEST-K-001a",
+          "date": "2026-01-18",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Ravi Malhotra called Ravi Malhotra on another device."
+        }
+      ],
+      "expected_behavior": "Graph builder must not create a self-loop (an edge where source == target).",
+      "expected_outcome": "NO_SELF_LOOPS",
+      "rationale": "Combinations(entities, 2) over de-duplicated entity sets within a record prevents self-pairings.",
+      "known_weakness": false,
+      "weakness_description": null
+    }
+  ]
+}

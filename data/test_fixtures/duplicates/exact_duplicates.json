@@ -1,0 +1,31 @@
+{
+  "fixture_set": "exact_duplicates",
+  "description": "Tests for handling exact duplicate records in ingestion pipeline. Robustness category A.",
+  "fixtures": [
+    {
+      "fixture_id": "TEST-A-001",
+      "category": "exact_duplicate",
+      "robustness_category": "A",
+      "input_condition": "Two records with identical content and same record_id ingested in sequence",
+      "source_records": [
+        {
+          "record_id": "TEST-A-001a",
+          "date": "2026-01-05",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Subject Alpha met with Subject Beta near Test Location A at 22:00."
+        },
+        {
+          "record_id": "TEST-A-001a",
+          "date": "2026-01-05",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Subject Alpha met with Subject Beta near Test Location A at 22:00."
+        }
+      ],
+      "expected_behavior": "Duplicate record must not create additional intelligence entities or relationships",
+      "expected_outcome": "DEDUPLICATED",
+      "rationale": "Ingestion pipeline de-duplicates by record_id in memory during a single collection run.",
+      "known_weakness": false,
+      "weakness_description": null
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "fixture_set": "near_duplicates",
+  "description": "Tests for handling near-duplicate records with slightly modified text or timestamps. Robustness category B.",
+  "fixtures": [
+    {
+      "fixture_id": "TEST-B-001",
+      "category": "near_duplicate",
+      "robustness_category": "B",
+      "input_condition": "Two records with different record_ids but near-identical text describing the same event",
+      "source_records": [
+        {
+          "record_id": "TEST-B-001a",
+          "date": "2026-01-10",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Ravi Malhotra observed at Andheri Warehouse at 22:00."
+        },
+        {
+          "record_id": "TEST-B-001b",
+          "date": "2026-01-10",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Ravi Malhotra observed near Andheri Warehouse around 22:00."
+        }
+      ],
+      "expected_behavior": "Both records are currently ingested as distinct records since record_ids differ, leading to inflated co-occurrence weight.",
+      "expected_outcome": "KNOWN_WEAKNESS_INFLATED_WEIGHT",
+      "rationale": "Without semantic text similarity or MinHash deduplication, near-duplicate text under distinct record IDs creates multiple records.",
+      "known_weakness": true,
+      "weakness_description": "No fuzzy or semantic deduplication is implemented. Near-duplicate records under different IDs inflate edge co-occurrence weights."
+    }
+  ]
+}

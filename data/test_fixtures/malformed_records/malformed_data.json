@@ -1,0 +1,65 @@
+{
+  "fixture_set": "malformed_data",
+  "description": "Tests for structurally malformed records. Robustness category H.",
+  "fixtures": [
+    {
+      "fixture_id": "TEST-H-001",
+      "category": "missing_record_id",
+      "robustness_category": "H",
+      "input_condition": "Record with no record_id field",
+      "source_records": [
+        {
+          "date": "2026-11-01",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Subject observed at Test Location AA. No record ID present."
+        }
+      ],
+      "expected_behavior": "JSONFileConnector uses row['record_id'] which raises KeyError. Or if using .get(), record_id would be None. The pipeline may fail or assign None as record_id.",
+      "expected_outcome": "EXCEPTION_OR_NONE_ID",
+      "rationale": "JSONFileConnector accesses row['record_id'] directly without .get() fallback. Missing record_id raises KeyError in the connector.",
+      "known_weakness": true,
+      "weakness_description": "Records missing the record_id field cause a KeyError in JSONFileConnector.fetch() because it uses direct dict access (row['record_id']). A production system must validate required fields before ingestion and assign a deterministic ID (hash of content + source + date) to records missing an ID."
+    },
+    {
+      "fixture_id": "TEST-H-002",
+      "category": "extra_unknown_fields",
+      "robustness_category": "H",
+      "input_condition": "Record with extra unknown fields not in the schema",
+      "source_records": [
+        {
+          "record_id": "TEST-H-002",
+          "date": "2026-11-02",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Subject Eta observed at Test Location BB.",
+          "extra_field_alpha": "UNEXPECTED_VALUE",
+          "extra_field_beta": 12345,
+          "nested_unknown": {"key": "value"}
+        }
+      ],
+      "expected_behavior": "Pipeline ignores unknown fields. JSONFileConnector only reads record_id, source, date, text. Extra fields are silently discarded.",
+      "expected_outcome": "EXTRA_FIELDS_IGNORED",
+      "rationale": "JSONFileConnector uses explicit key access for known fields only. Unknown keys in the row dict are never accessed.",
+      "known_weakness": false,
+      "weakness_description": null
+    },
+    {
+      "fixture_id": "TEST-H-003",
+      "category": "numeric_record_id",
+      "robustness_category": "H",
+      "input_condition": "Record with numeric (integer) record_id instead of string",
+      "source_records": [
+        {
+          "record_id": 9001,
+          "date": "2026-11-03",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Subject Theta observed at Test Location CC."
+        }
+      ],
+      "expected_behavior": "record_id is passed directly as integer to Record dataclass. Deduplication set comparison works (int 9001 vs int 9001 is equal). Record is ingested with integer ID.",
+      "expected_outcome": "INGESTED_WITH_INT_ID",
+      "rationale": "Python set membership check works for integers. The Record dataclass does not enforce string type for record_id. Numeric IDs pass through without error.",
+      "known_weakness": false,
+      "weakness_description": null
+    }
+  ]
+}

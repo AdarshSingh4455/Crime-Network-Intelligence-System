@@ -1,0 +1,44 @@
+{
+  "fixture_set": "null_values",
+  "description": "Tests for null/None entity field values. Robustness category S.",
+  "fixtures": [
+    {
+      "fixture_id": "TEST-S-001",
+      "category": "null_text",
+      "robustness_category": "S",
+      "input_condition": "Record where text field is null (JSON null)",
+      "source_records": [
+        {
+          "record_id": "TEST-S-001",
+          "date": "2026-08-01",
+          "source": "test_fixture",
+          "text": null
+        }
+      ],
+      "expected_behavior": "JSONFileConnector calls row.get('text', '') so null text becomes empty string. Pipeline processes without crash.",
+      "expected_outcome": "GRACEFUL_NULL",
+      "rationale": "row.get('text', '') treats a missing key as empty string but does NOT convert JSON null to empty string — it would return None. NER backend must handle None text gracefully.",
+      "known_weakness": true,
+      "weakness_description": "If 'text' field is JSON null (not missing key), row.get('text', '') returns None, not empty string. RuleBasedNER.extract() then calls str.finditer on None, raising AttributeError. The pipeline does not explicitly guard against null text. A production system must coerce None text to empty string before NER."
+    },
+    {
+      "fixture_id": "TEST-S-002",
+      "category": "null_date",
+      "robustness_category": "S",
+      "input_condition": "Record where date field is null (JSON null)",
+      "source_records": [
+        {
+          "record_id": "TEST-S-002",
+          "date": null,
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Subject Kappa observed at Test Location G."
+        }
+      ],
+      "expected_behavior": "row.get('date', '') returns None for JSON null. Record.date is None. Co-occurrence edges get date=None, which may cause string operations to fail in analysis modules.",
+      "expected_outcome": "KNOWN_WEAKNESS_NULL_DATE",
+      "rationale": "Null dates propagate through the pipeline as None, potentially causing TypeError in date-based string operations or comparisons.",
+      "known_weakness": true,
+      "weakness_description": "Null date values (JSON null) are not coerced to empty string by the ingestion layer. This can cause TypeError in downstream temporal analysis modules that assume date is always a string. Requires investigator review."
+    }
+  ]
+}

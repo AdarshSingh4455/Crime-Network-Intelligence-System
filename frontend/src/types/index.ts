@@ -904,3 +904,92 @@ export interface InvestigationPathResponse {
   message: string;
 }
 
+// ─── Phase 3F: Data Quality & Robustness Testing ─────────────────────────────
+
+export type RobustnessTestStatus = 'PASS' | 'FAIL' | 'KNOWN_WEAKNESS' | 'WARNING' | 'ERROR';
+export type RobustnessCategory =
+  | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J'
+  | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T';
+
+export interface FixtureRecord {
+  record_id: string;
+  date: string;
+  source: string;
+  text: string;
+}
+
+export interface RobustnessFixture {
+  fixture_id: string;
+  category: string;
+  robustness_category: RobustnessCategory;
+  input_condition: string;
+  source_records: FixtureRecord[];
+  expected_behavior: string;
+  expected_outcome: string;
+  rationale: string;
+  known_weakness: boolean;
+  weakness_description: string | null;
+}
+
+export interface FixtureCategoryGroup {
+  category_label: string;
+  robustness_category: RobustnessCategory;
+  fixture_count: number;
+  fixtures: RobustnessFixture[];
+  has_known_weakness: boolean;
+}
+
+export interface FixtureCatalogue {
+  total_fixtures: number;
+  categories_covered: number;
+  category_ids_covered: RobustnessCategory[];
+  categories: FixtureCategoryGroup[];
+  generated_at: string;
+}
+
+export interface RobustnessTestDetail {
+  fixture_id?: string;
+  entities_found?: number;
+  edges_found?: number;
+  regex_match?: boolean;
+  matches?: string[];
+  no_match_variants?: string[];
+  pipeline_result?: Record<string, unknown>;
+  error?: string;
+  notes?: string;
+  [key: string]: unknown;
+}
+
+export interface RobustnessTestResult {
+  test_id: string;
+  test_name: string;
+  category: string;
+  status: RobustnessTestStatus;
+  description: string;
+  observed_behavior: string;
+  expected_behavior: string;
+  weakness_documented: boolean;
+  weakness_description?: string | null;
+  detail: RobustnessTestDetail;
+}
+
+export interface DataQualityResults {
+  total_tests: number;
+  passed: number;
+  failed: number;
+  known_weaknesses: number;
+  warnings: number;
+  errors: number;
+  overall_status: 'HEALTHY' | 'WEAKNESSES_DOCUMENTED' | 'NEEDS_ATTENTION';
+  baseline_intact: boolean;
+  baseline_summary: {
+    records: number;
+    entities: number;
+    relationships: number;
+    anomalies: number;
+    cases: number;
+  };
+  test_results: RobustnessTestResult[];
+  completed_at: string;
+  disclaimer: string;
+}

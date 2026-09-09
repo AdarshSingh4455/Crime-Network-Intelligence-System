@@ -1,0 +1,81 @@
+{
+  "fixture_set": "name_ambiguity",
+  "description": "Tests for person name ambiguity and casing variations. Robustness categories E and F.",
+  "fixtures": [
+    {
+      "fixture_id": "TEST-E-001",
+      "category": "name_casing_variation",
+      "robustness_category": "E",
+      "input_condition": "Three records with the same person name in different case formats",
+      "source_records": [
+        {
+          "record_id": "TEST-E-001a",
+          "date": "2026-04-01",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Ravi Malhotra was observed at Test Location C."
+        },
+        {
+          "record_id": "TEST-E-001b",
+          "date": "2026-04-02",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: ravi malhotra was observed at Test Location C."
+        },
+        {
+          "record_id": "TEST-E-001c",
+          "date": "2026-04-03",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: RAVI MALHOTRA was observed at Test Location C."
+        }
+      ],
+      "expected_behavior": "Pipeline creates 3 separate PERSON entities: 'Ravi Malhotra', 'ravi malhotra', 'RAVI MALHOTRA'. These are treated as analytically distinct entities.",
+      "expected_outcome": "KNOWN_WEAKNESS_THREE_ENTITIES",
+      "rationale": "The RuleBasedNER gazetteer uses exact case-sensitive string matching. Name normalization is not implemented. This is a documented architectural limitation.",
+      "known_weakness": true,
+      "weakness_description": "No name normalization is implemented. Case variants of the same name ('Ravi Malhotra', 'ravi malhotra', 'RAVI MALHOTRA') create 3 separate entity nodes. A production system requires Unicode-normalized, case-folded entity resolution with fuzzy matching (Levenshtein distance or phonetic matching)."
+    },
+    {
+      "fixture_id": "TEST-E-002",
+      "category": "name_partial_match",
+      "robustness_category": "E",
+      "input_condition": "Record containing partial name that partially matches a gazetteer entry",
+      "source_records": [
+        {
+          "record_id": "TEST-E-002a",
+          "date": "2026-04-05",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Subject referred to only as 'Ravi' was observed at Test Location D."
+        }
+      ],
+      "expected_behavior": "'Ravi' alone does not match gazetteer entry 'Ravi Malhotra'. No PERSON entity extracted. Partial name is not recognized.",
+      "expected_outcome": "NO_ENTITY_EXTRACTED",
+      "rationale": "Gazetteer matching requires exact full-name string presence in text. Partial names are not matched.",
+      "known_weakness": true,
+      "weakness_description": "Partial name references (nicknames, first-name-only, initials) are not resolved. This causes under-extraction of person entities in informal reporting. A production system requires co-reference resolution."
+    },
+    {
+      "fixture_id": "TEST-F-001",
+      "category": "location_ambiguity",
+      "robustness_category": "F",
+      "input_condition": "Two records referencing the same physical area using different name granularities",
+      "source_records": [
+        {
+          "record_id": "TEST-F-001a",
+          "date": "2026-04-10",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Activity observed at Andheri. Subject Alpha present."
+        },
+        {
+          "record_id": "TEST-F-001b",
+          "date": "2026-04-11",
+          "source": "test_fixture",
+          "text": "TEST FIXTURE: Activity observed at Andheri Warehouse. Subject Alpha present."
+        }
+      ],
+      "expected_behavior": "Pipeline creates two separate LOCATION nodes: 'Andheri' and 'Andheri Warehouse'. They are not merged even though one is a subset of the other.",
+      "expected_outcome": "KNOWN_WEAKNESS_SEPARATE_NODES",
+      "rationale": "Gazetteer location matching uses exact string containment check. 'Andheri' and 'Andheri Warehouse' are separate gazetteer entries and produce separate nodes.",
+      "known_weakness": true,
+      "weakness_description": "No location normalization or spatial hierarchy is implemented. 'Andheri' and 'Andheri Warehouse' are treated as analytically distinct LOCATION nodes. Observed co-occurrence patterns at overlapping locations are split across two nodes, diluting the analytical signal. A production system requires a geo-ontology or location gazetteer with parent-child relationships."
+    }
+  ]
+}
