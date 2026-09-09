@@ -249,7 +249,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
 
   // Quick module access
   const quickModules = [
-    { name: "Overview Dashboard", path: "/", icon: Compass, desc: "High-level metrics & topology" },
+    { name: "Investigation Command", path: "/investigation", icon: Compass, desc: "Unified dossier, path & cross-case matrix" },
     { name: "Case Management", path: "/cases", icon: Briefcase, desc: "10 active investigation dossiers" },
     { name: "Interactive Network", path: "/network", icon: Share2, desc: "Force-directed graph view" },
     { name: "Entity Explorer", path: "/entities", icon: Users, desc: "15 indexed entities & registry" },
@@ -578,6 +578,18 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
+                                onClose();
+                                navigate(`/investigation?target_type=case&target_id=${encodeURIComponent(c.case_id)}`);
+                              }}
+                              className="px-2 py-1 text-[10px] font-medium text-cyan-800 bg-cyan-50 hover:bg-cyan-100 rounded-md transition-colors inline-flex items-center gap-1 flex-shrink-0 border border-cyan-200"
+                              title="Investigate Case in Unified Workspace"
+                            >
+                              <Compass className="w-3 h-3" />
+                              Investigate
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 executeItemAction({ type: "case", id: c.case_id, data: c });
                               }}
                               className="px-2.5 py-1 text-[10px] font-medium text-white bg-cyan-700 hover:bg-cyan-800 rounded-md transition-colors inline-flex items-center gap-1 flex-shrink-0"
@@ -670,6 +682,18 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                           </div>
 
                           <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onClose();
+                                navigate(`/investigation?target_type=entity&target_id=${encodeURIComponent(ent.id)}`);
+                              }}
+                              className="px-2 py-1 text-[10px] font-medium text-rose-800 bg-rose-50 hover:bg-rose-100 rounded-md transition-colors hidden sm:inline-flex items-center gap-1 border border-rose-200"
+                              title="Investigate Entity in Unified Workspace"
+                            >
+                              <Compass className="w-3 h-3" />
+                              Investigate
+                            </button>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -843,16 +867,30 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                             </div>
                           </div>
 
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              executeItemAction({ type: "anomaly", id: anom.id, data: anom });
-                            }}
-                            className="px-2.5 py-1 text-[10px] font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors inline-flex items-center gap-1 flex-shrink-0"
-                          >
-                            Details
-                            <ChevronRight className="w-3 h-3 text-slate-500" />
-                          </button>
+                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onClose();
+                                navigate(`/investigation?target_type=anomaly&target_id=${encodeURIComponent(anom.id)}`);
+                              }}
+                              className="px-2 py-1 text-[10px] font-medium text-amber-800 bg-amber-50 hover:bg-amber-100 rounded-md transition-colors inline-flex items-center gap-1 flex-shrink-0 border border-amber-200"
+                              title="Investigate Anomaly in Unified Workspace"
+                            >
+                              <Compass className="w-3 h-3" />
+                              Investigate
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                executeItemAction({ type: "anomaly", id: anom.id, data: anom });
+                              }}
+                              className="px-2.5 py-1 text-[10px] font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors inline-flex items-center gap-1 flex-shrink-0"
+                            >
+                              Details
+                              <ChevronRight className="w-3 h-3 text-slate-500" />
+                            </button>
+                          </div>
                         </div>
                       );
                     })}
@@ -915,16 +953,30 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                             </div>
                           </div>
 
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              executeItemAction({ type: "location", id: loc.id, data: loc });
-                            }}
-                            className="px-2.5 py-1 text-[10px] font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors inline-flex items-center gap-1 flex-shrink-0"
-                          >
-                            Inspect
-                            <ChevronRight className="w-3 h-3 text-slate-500" />
-                          </button>
+                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onClose();
+                                navigate(`/investigation?target_type=location&target_id=${encodeURIComponent(loc.id)}`);
+                              }}
+                              className="px-2 py-1 text-[10px] font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 rounded-md transition-colors inline-flex items-center gap-1 flex-shrink-0 border border-emerald-200"
+                              title="Investigate Location in Unified Workspace"
+                            >
+                              <Compass className="w-3 h-3" />
+                              Investigate
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                executeItemAction({ type: "location", id: loc.id, data: loc });
+                              }}
+                              className="px-2.5 py-1 text-[10px] font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors inline-flex items-center gap-1 flex-shrink-0"
+                            >
+                              Inspect
+                              <ChevronRight className="w-3 h-3 text-slate-500" />
+                            </button>
+                          </div>
                         </div>
                       );
                     })}

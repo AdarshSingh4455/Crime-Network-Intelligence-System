@@ -13,7 +13,8 @@ import {
   Briefcase,
   Settings,
   ChevronRight,
-  CheckCircle2
+  CheckCircle2,
+  Compass,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -38,8 +39,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   const secondaryNav = [
-    { name: 'Data Sources', path: '/sources', icon: Database, disabled: false, badge: '4 Active' },
+    { name: 'Investigation', path: '/investigation', icon: Compass, disabled: false, badge: 'Workspace' },
     { name: 'Cases', path: '/cases', icon: Briefcase, disabled: false, badge: '10 Cases' },
+    { name: 'Data Sources', path: '/sources', icon: Database, disabled: false, badge: '4 Active' },
     { name: 'Settings', path: '/settings', icon: Settings, disabled: false, badge: 'Config' },
   ];
 

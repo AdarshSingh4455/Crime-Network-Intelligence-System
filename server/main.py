@@ -96,8 +96,7 @@ def get_locations():
 
 @app.get("/api/locations/{location_id}")
 def get_location_detail(location_id: str):
-    locations = IntelligenceService.get_locations()
-    loc = next((l for l in locations if l["id"].lower() == location_id.lower()), None)
+    loc = IntelligenceService.get_location_detail(location_id)
     if not loc:
         raise HTTPException(status_code=404, detail=f"Location '{location_id}' not found")
     return loc
@@ -247,6 +246,28 @@ def get_system_health():
 def reset_system_session():
     """Safely resets investigator session modifications in WorkflowStore without affecting data."""
     return IntelligenceService.reset_session_workflow()
+
+
+@app.get("/api/investigation")
+def get_investigation(
+    target_type: str = "case",
+    target_id: str = "CR-1001",
+    temporal_window: str = "all",
+):
+    """Unified investigation dossier across case, entity, location, or anomaly targets."""
+    dossier = IntelligenceService.get_investigation_dossier(target_type, target_id, temporal_window)
+    if not dossier:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Investigation target '{target_id}' of type '{target_type}' not found."
+        )
+    return dossier
+
+
+@app.get("/api/investigation/path")
+def get_investigation_path(start: str, end: str):
+    """Deterministic shortest path analysis between two entities in the intelligence graph."""
+    return IntelligenceService.compute_path_analysis(start, end)
 
 
 if __name__ == "__main__":

@@ -817,3 +817,90 @@ export interface ResetSessionResponse {
   reset_timestamp: string;
   cases_reset_count: number;
 }
+
+export interface InvestigationTarget {
+  type: 'case' | 'entity' | 'location' | 'anomaly';
+  id: string;
+  label: string;
+  category: string;
+}
+
+export interface InvestigationSummary {
+  target_label: string;
+  target_type: string;
+  record_count: number;
+  entity_count: number;
+  signal_count: number;
+  related_case_count: number;
+  summary_text: string;
+}
+
+export interface InvestigationRelationship {
+  source: string;
+  target: string;
+  weight: number;
+  records: string[];
+  dates: string[];
+  basis: string;
+}
+
+export interface InvestigationTraceStep {
+  step: number;
+  label: string;
+  category: string;
+  module_url: string;
+}
+
+export interface InvestigationAssessment {
+  observed: string[];
+  derived: string[];
+  signals: string[];
+  review_required: string[];
+}
+
+export interface CrossCaseMatrixAttribute {
+  name: string;
+  category: string;
+  cases_present: Record<string, boolean>;
+}
+
+export interface CrossCaseMatrix {
+  cases: string[];
+  attributes: CrossCaseMatrixAttribute[];
+}
+
+export interface InvestigationResponse {
+  target: InvestigationTarget;
+  summary: InvestigationSummary;
+  target_data: any;
+  entities: any[];
+  relationships: InvestigationRelationship[];
+  anomalies: any[];
+  timeline: any[];
+  locations: any[];
+  related_cases: any[];
+  cross_case_matrix: CrossCaseMatrix;
+  evidence_trace: InvestigationTraceStep[];
+  assessment: InvestigationAssessment;
+  disclaimer: string;
+}
+
+export interface InvestigationPathEdge {
+  source: string;
+  target: string;
+  weight: number;
+  records: string[];
+  dates: string[];
+  basis: string;
+}
+
+export interface InvestigationPathResponse {
+  start: string;
+  end: string;
+  found: boolean;
+  path: string[];
+  length: number;
+  edges: InvestigationPathEdge[];
+  message: string;
+}
+

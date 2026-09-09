@@ -24,6 +24,8 @@ import {
   SystemConfigResponse,
   SystemHealthResponse,
   ResetSessionResponse,
+  InvestigationResponse,
+  InvestigationPathResponse,
 } from '../types';
 
 const API_BASE = '/api';
@@ -164,5 +166,24 @@ export const api = {
     const res = await apiClient.post<ResetSessionResponse>('/system/reset-session', {});
     return res.data;
   },
+
+  getInvestigation: async (
+    targetType: string = 'case',
+    targetId: string = 'CR-1001',
+    temporalWindow: string = 'all'
+  ): Promise<InvestigationResponse> => {
+    const res = await apiClient.get<InvestigationResponse>(
+      `/investigation?target_type=${encodeURIComponent(targetType)}&target_id=${encodeURIComponent(targetId)}&temporal_window=${encodeURIComponent(temporalWindow)}`
+    );
+    return res.data;
+  },
+
+  getPathAnalysis: async (start: string, end: string): Promise<InvestigationPathResponse> => {
+    const res = await apiClient.get<InvestigationPathResponse>(
+      `/investigation/path?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`
+    );
+    return res.data;
+  },
 };
+
 

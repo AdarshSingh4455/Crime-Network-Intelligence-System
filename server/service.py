@@ -42,7 +42,7 @@ from entity_extraction import extract_entities, co_occurrence_edges, RuleBasedNE
 from graph_builder import build_graph, graph_summary
 from network_analysis import (
     compute_centrality, rank_key_players, detect_communities,
-    critical_bridge_nodes,
+    critical_bridge_nodes, shortest_connection,
 )
 from anomaly_detection import (
     detect_burst_activity, detect_structuring, detect_new_entity_spikes,
@@ -385,6 +385,7 @@ class WorkflowStore:
 
 class IntelligenceService:
     _cached_data: Dict[str, Any] | None = None
+    _cached_graph: Any | None = None
     _last_ingestion_time: str = datetime.now(timezone.utc).isoformat()
 
     @classmethod
@@ -407,6 +408,7 @@ class IntelligenceService:
         # 3. Graph construction
         edges = co_occurrence_edges(extracted)
         G = build_graph(edges)
+        cls._cached_graph = G
         summary = graph_summary(G)
 
         # 4. Network analysis
@@ -2396,3 +2398,665 @@ class IntelligenceService:
             "reset_timestamp": datetime.now(timezone.utc).isoformat(),
             "cases_reset_count": len(cases),
         }
+
+    @classmethod
+    def get_graph(cls):
+        """Returns the cached NetworkX graph, building it if needed."""
+        if cls._cached_graph is None:
+            cls.get_data()
+        return cls._cached_graph
+
+    @classmethod
+    def get_location_detail(cls, location_id: str) -> Dict[str, Any] | None:
+        """Returns detail for a specific location node."""
+        locations = cls.get_locations()
+        return next((l for l in locations if l["id"].lower() == location_id.lower()), None)
+
+    @classmethod
+    def compute_path_analysis(cls, start: str, end: str) -> Dict[str, Any]:
+        """
+        Computes the deterministic shortest path between two entities in the
+        intelligence graph using Dijkstra / BFS from src/network_analysis.py.
+        Corroborates each hop with source records and dates.
+        """
+        G = cls.get_graph()
+        clean_start = (start or "").strip()
+        clean_end = (end or "").strip()
+
+        if not clean_start or not clean_end:
+            return {
+                "start": clean_start,
+                "end": clean_end,
+                "found": False,
+                "path": [],
+                "length": 0,
+                "edges": [],
+                "message": "Both origin and destination entities must be provided.",
+            }
+
+        node_map = {n.lower(): n for n in G.nodes}
+        s_node = node_map.get(clean_start.lower())
+        e_node = node_map.get(clean_end.lower())
+
+        if not s_node or not e_node:
+            missing = []
+            if not s_node:
+                missing.append(f"'{clean_start}'")
+            if not e_node:
+                missing.append(f"'{clean_end}'")
+            return {
+                "start": clean_start,
+                "end": clean_end,
+                "found": False,
+                "path": [],
+                "length": 0,
+                "edges": [],
+                "message": f"Entity {', '.join(missing)} not found in intelligence graph.",
+            }
+
+        path = shortest_connection(G, s_node, e_node)
+        if not path or len(path) < 2:
+            return {
+                "start": s_node,
+                "end": e_node,
+                "found": False,
+                "path": [],
+                "length": 0,
+                "edges": [],
+                "message": f"No observed path found between '{s_node}' and '{e_node}' in the current intelligence graph.",
+            }
+
+        edge_hops = []
+        for i in range(len(path) - 1):
+            u, v = path[i], path[i+1]
+            edata = G.get_edge_data(u, v, default={})
+            recs = edata.get("records", [])
+            dates = edata.get("dates", [])
+            weight = edata.get("weight", 1)
+            edge_hops.append({
+                "source": u,
+                "target": v,
+                "weight": weight,
+                "records": recs,
+                "dates": dates,
+                "basis": f"Observed co-occurrence in record(s): {', '.join(recs)}",
+            })
+
+        return {
+            "start": s_node,
+            "end": e_node,
+            "found": True,
+            "path": path,
+            "length": len(path) - 1,
+            "edges": edge_hops,
+            "message": f"Identified path with {len(path) - 1} hop(s) corroborated by source records.",
+        }
+
+    @classmethod
+    def get_investigation_dossier(
+        cls,
+        target_type: str = "case",
+        target_id: str = "CR-1001",
+        temporal_window: str = "all",
+    ) -> Dict[str, Any] | None:
+        """
+        Builds the unified investigation dossier across case, entity, location,
+        or anomaly targets with cross-case overlap matrix, temporal windowing,
+        evidence trace chain, and 4-tier assessment.
+        """
+        data = cls.get_data()
+        clean_type = (target_type or "case").lower().strip()
+        clean_id = (target_id or "CR-1001").strip()
+        cases_resp = cls.get_cases()
+        all_cases = cases_resp.get("cases", [])
+        node_type_map = {n["id"]: n.get("type", "UNKNOWN") for n in data["nodes"]}
+
+        disclaimer = "CNIS analytical results are derived from available source records and computational models. Relationships, anomalies, and temporal patterns are analytical signals and require authorized investigator validation."
+
+        if clean_type == "case":
+            cid = clean_id.upper()
+            case_detail = cls.get_case_detail(cid)
+            if not case_detail:
+                return None
+
+            related = case_detail.get("related_cases", [])
+            top_cases = [cid] + [r["case_id"] for r in related[:4]]
+
+            matrix_attrs = []
+            for ent in case_detail["entities"]:
+                ename = ent["id"]
+                row = {"name": ename, "category": ent["type"], "cases_present": {}}
+                for c in top_cases:
+                    c_obj = next((x for x in all_cases if x["case_id"] == c), None)
+                    row["cases_present"][c] = ename in c_obj["entities"] if c_obj else False
+                matrix_attrs.append(row)
+
+            for loc in case_detail["locations"]:
+                lname = loc["id"]
+                row = {"name": lname, "category": "LOCATION", "cases_present": {}}
+                for c in top_cases:
+                    c_obj = next((x for x in all_cases if x["case_id"] == c), None)
+                    row["cases_present"][c] = lname in c_obj.get("locations", []) if c_obj else False
+                matrix_attrs.append(row)
+
+            events = case_detail.get("timeline_events", [])
+            primary_date = case_detail.get("date")
+            filtered_events = events
+            if temporal_window != "all" and primary_date:
+                try:
+                    p_dt = datetime.fromisoformat(primary_date)
+                    window_days = {"24h": 1, "48h": 2, "7d": 7}.get(temporal_window, 999)
+                    filtered_events = [
+                        e for e in events
+                        if abs((datetime.fromisoformat(e["date"]) - p_dt).days) <= window_days
+                    ]
+                except Exception:
+                    filtered_events = events
+
+            trace = [
+                {"step": 1, "label": f"Case File {cid}", "category": "Target Dossier", "module_url": f"/cases?id={cid}"},
+                {"step": 2, "label": f"Primary Record {case_detail['primary_record']['record_id']}", "category": "Source Ingestion", "module_url": f"/timeline?record_id={case_detail['primary_record']['record_id']}"},
+                {"step": 3, "label": f"{len(case_detail['entities'])} Extracted Entities", "category": "Entity Mentions", "module_url": "/entities"},
+                {"step": 4, "label": f"{len(case_detail['anomalies'])} Correlated Signals", "category": "Detection Signals", "module_url": "/anomalies"},
+                {"step": 5, "label": f"{len(related)} Related Cases", "category": "Cross-Case Overlap", "module_url": "/cases"},
+            ]
+
+            observed = [
+                f"Case record {cid} recorded on {case_detail['date']} from source '{case_detail['source_label']}'.",
+                f"Ingested narrative references: {case_detail['primary_record']['text']}",
+                f"Contains {len(case_detail['entities'])} extracted entities across {len(case_detail['locations'])} geographic site(s)."
+            ]
+            derived = [
+                f"Internal subgraph contains {len(case_detail['entities'])} entities with {len(case_detail['network_context']['links'])} co-occurrence links.",
+                f"Key players present: {', '.join(case_detail['network_context']['key_players']) if case_detail['network_context']['key_players'] else 'None'}.",
+                f"Critical bridge nodes: {', '.join(case_detail['network_context']['bridge_nodes']) if case_detail['network_context']['bridge_nodes'] else 'None'}."
+            ]
+            signals = [
+                f"[{a.get('pattern_label') or a.get('pattern')}]: {a.get('note')}"
+                for a in case_detail["anomalies"]
+            ] if case_detail["anomalies"] else ["No active anomaly patterns flagged for this individual record."]
+            review_required = [
+                f"Cross-reference source record {case_detail['primary_record']['record_id']} against agency dispatch logs.",
+                f"Verify observed entity co-occurrence in vehicle and telephone data.",
+                "Human review required before drawing operational or investigative conclusions."
+            ]
+
+            summary_text = (
+                f"Case {cid} contains 1 primary source record, {len(case_detail['entities'])} associated entities, "
+                f"and {len(case_detail['anomalies'])} detected analytical signal(s). The case exhibits observed cross-case "
+                f"overlaps with {len(related)} related case file(s) through shared entities and locations. "
+                "Observed relationships require authorized investigator review."
+            )
+
+            return {
+                "target": {
+                    "type": "case",
+                    "id": cid,
+                    "label": case_detail["title"],
+                    "category": case_detail["source_label"],
+                },
+                "summary": {
+                    "target_label": case_detail["title"],
+                    "target_type": "case",
+                    "record_count": len(case_detail.get("related_records", [])) + 1,
+                    "entity_count": len(case_detail["entities"]),
+                    "signal_count": len(case_detail["anomalies"]),
+                    "related_case_count": len(related),
+                    "summary_text": summary_text,
+                },
+                "target_data": case_detail,
+                "entities": case_detail["entities"],
+                "relationships": [
+                    {
+                        "source": l["source"],
+                        "target": l["target"],
+                        "weight": l["weight"],
+                        "records": l["records"],
+                        "dates": l["dates"],
+                        "basis": f"Observed co-occurrence in record(s): {', '.join(l['records'])}",
+                    }
+                    for l in case_detail["network_context"]["links"]
+                ],
+                "anomalies": case_detail["anomalies"],
+                "timeline": filtered_events,
+                "locations": case_detail["locations"],
+                "related_cases": related,
+                "cross_case_matrix": {
+                    "cases": top_cases,
+                    "attributes": matrix_attrs,
+                },
+                "evidence_trace": trace,
+                "assessment": {
+                    "observed": observed,
+                    "derived": derived,
+                    "signals": signals,
+                    "review_required": review_required,
+                },
+                "disclaimer": disclaimer,
+            }
+
+        elif clean_type == "entity":
+            ent_detail = cls.get_entity_detail(clean_id)
+            if not ent_detail:
+                return None
+
+            eid = ent_detail["id"]
+            entity_cases = [c for c in all_cases if eid in c.get("entities", [])]
+            top_cases = [c["case_id"] for c in entity_cases[:5]]
+
+            node_links = [
+                {
+                    "source": l["source"],
+                    "target": l["target"],
+                    "weight": l["weight"],
+                    "records": l["records"],
+                    "dates": l["dates"],
+                    "basis": f"Observed co-occurrence in record(s): {', '.join(l['records'])}",
+                }
+                for l in data["links"]
+                if l["source"].lower() == eid.lower() or l["target"].lower() == eid.lower()
+            ]
+
+            matrix_attrs = []
+            for conn in ent_detail.get("connected_entities", [])[:8]:
+                cname = conn["entity"]
+                ctype = node_type_map.get(cname, "ENTITY")
+                row = {"name": cname, "category": ctype, "cases_present": {}}
+                for c in top_cases:
+                    c_obj = next((x for x in all_cases if x["case_id"] == c), None)
+                    row["cases_present"][c] = cname in c_obj["entities"] if c_obj else False
+                matrix_attrs.append(row)
+
+            loc_entities = [
+                c["entity"] for c in ent_detail.get("connected_entities", [])
+                if node_type_map.get(c["entity"]) == "LOCATION"
+            ]
+            for lname in loc_entities:
+                row = {"name": lname, "category": "LOCATION", "cases_present": {}}
+                for c in top_cases:
+                    c_obj = next((x for x in all_cases if x["case_id"] == c), None)
+                    row["cases_present"][c] = lname in c_obj.get("locations", []) if c_obj else False
+                matrix_attrs.append(row)
+
+            timeline_events = [
+                {
+                    "date": r["date"],
+                    "time": "12:00",
+                    "title": f"{r['record_id']} ({r['source'].replace('_', ' ').title()})",
+                    "description": r["text"],
+                    "record_id": r["record_id"],
+                    "source": r["source"],
+                    "entities": [e["text"] for e in r.get("extracted_entities", [])],
+                    "locations": [e["text"] for e in r.get("extracted_entities", []) if e["label"] == "LOCATION"],
+                    "anomalies": [],
+                    "has_anomalies": False,
+                }
+                for r in ent_detail.get("associated_records", [])
+            ]
+            timeline_events.sort(key=lambda x: x["date"])
+
+            events = timeline_events
+            primary_date = events[0]["date"] if events else None
+            filtered_events = events
+            if temporal_window != "all" and primary_date:
+                try:
+                    p_dt = datetime.fromisoformat(primary_date)
+                    window_days = {"24h": 1, "48h": 2, "7d": 7}.get(temporal_window, 999)
+                    filtered_events = [
+                        e for e in events
+                        if abs((datetime.fromisoformat(e["date"]) - p_dt).days) <= window_days
+                    ]
+                except Exception:
+                    filtered_events = events
+
+            trace = [
+                {"step": 1, "label": f"Entity {eid}", "category": "Target Entity", "module_url": f"/network?focus={eid}"},
+                {"step": 2, "label": f"{len(ent_detail.get('associated_records', []))} Associated Record(s)", "category": "Source Ingestion", "module_url": "/timeline"},
+                {"step": 3, "label": f"{len(ent_detail.get('connected_entities', []))} Co-Occurring Entity(ies)", "category": "Network Graph", "module_url": f"/entities?entity={eid}"},
+                {"step": 4, "label": f"{len(ent_detail.get('detected_anomalies', []))} Correlated Signal(s)", "category": "Detection Signals", "module_url": "/anomalies"},
+                {"step": 5, "label": f"{len(entity_cases)} Connected Case(s)", "category": "Case Dossiers", "module_url": "/cases"},
+            ]
+
+            observed = [
+                f"Entity '{eid}' ({ent_detail['type']}) appears across {len(ent_detail.get('associated_records', []))} distinct incident record(s).",
+                f"Observed at {len(loc_entities)} geographic location(s): {', '.join(loc_entities) if loc_entities else 'No physical locations recorded'}.",
+                f"Associated records span: {', '.join(r['record_id'] for r in ent_detail.get('associated_records', []))}."
+            ]
+            derived = [
+                f"Graph metrics: Degree centrality {ent_detail.get('degree', 0):.4f}, Betweenness centrality {ent_detail.get('betweenness', 0):.4f}.",
+                f"Network role: {'Key Player (High Influence)' if ent_detail.get('is_key_player') else 'Standard Actor'}, {'Critical Bridge Node' if ent_detail.get('is_bridge_node') else 'Peripheral Node'}.",
+                f"Assigned to Community {ent_detail.get('community', 'N/A')} with {len(ent_detail.get('connected_entities', []))} direct co-occurrence ties."
+            ]
+            signals = [
+                f"[{a.get('pattern_label') or a.get('pattern')}]: {a.get('note')}"
+                for a in ent_detail.get("detected_anomalies", [])
+            ] if ent_detail.get("detected_anomalies") else ["No direct anomaly patterns triggered for this entity."]
+            review_required = [
+                "Verify entity identity records across official registries.",
+                "Corroborate co-occurrence relationships through surveillance logs and electronic intercepts.",
+                "Human investigator review required before determining organizational hierarchy."
+            ]
+
+            summary_text = (
+                f"Entity '{eid}' ({ent_detail['type']}) is referenced in {len(ent_detail.get('associated_records', []))} record(s) "
+                f"and connects directly with {len(ent_detail.get('connected_entities', []))} other entity(ies). "
+                f"Participates in {len(entity_cases)} registered case file(s) with {len(ent_detail.get('detected_anomalies', []))} correlated analytical signal(s). "
+                "All findings represent computational intelligence indicators requiring authorized human review."
+            )
+
+            return {
+                "target": {
+                    "type": "entity",
+                    "id": eid,
+                    "label": eid,
+                    "category": ent_detail["type"],
+                },
+                "summary": {
+                    "target_label": eid,
+                    "target_type": "entity",
+                    "record_count": len(ent_detail.get("associated_records", [])),
+                    "entity_count": len(ent_detail.get("connected_entities", [])),
+                    "signal_count": len(ent_detail.get("detected_anomalies", [])),
+                    "related_case_count": len(entity_cases),
+                    "summary_text": summary_text,
+                },
+                "target_data": ent_detail,
+                "entities": [
+                    {
+                        "id": c["entity"],
+                        "type": node_type_map.get(c["entity"], "ENTITY"),
+                        "weight": c["weight"],
+                        "records": c["records"],
+                        "dates": c["dates"],
+                    }
+                    for c in ent_detail.get("connected_entities", [])
+                ],
+                "relationships": node_links,
+                "anomalies": ent_detail.get("detected_anomalies", []),
+                "timeline": filtered_events,
+                "locations": [{"id": l, "name": l, "type": "LOCATION"} for l in loc_entities],
+                "related_cases": [
+                    {
+                        "case_id": c["case_id"],
+                        "title": c["title"],
+                        "priority": c["priority"],
+                        "date": c["date"],
+                        "workflow_status": c["workflow_status"],
+                        "basis": ["Mentioned in Case Record"],
+                    }
+                    for c in entity_cases
+                ],
+                "cross_case_matrix": {
+                    "cases": top_cases,
+                    "attributes": matrix_attrs,
+                },
+                "evidence_trace": trace,
+                "assessment": {
+                    "observed": observed,
+                    "derived": derived,
+                    "signals": signals,
+                    "review_required": review_required,
+                },
+                "disclaimer": disclaimer,
+            }
+
+        elif clean_type == "location":
+            loc = cls.get_location_detail(clean_id)
+            if not loc:
+                return None
+
+            lid = loc["id"]
+            loc_cases = [c for c in all_cases if lid in c.get("locations", [])]
+            top_cases = [c["case_id"] for c in loc_cases[:5]]
+
+            loc_links = [
+                {
+                    "source": l["source"],
+                    "target": l["target"],
+                    "weight": l["weight"],
+                    "records": l["records"],
+                    "dates": l["dates"],
+                    "basis": f"Observed co-occurrence in record(s): {', '.join(l['records'])}",
+                }
+                for l in data["links"]
+                if l["source"].lower() == lid.lower() or l["target"].lower() == lid.lower()
+            ]
+
+            matrix_attrs = []
+            for ent in loc.get("entities", [])[:8]:
+                ename = ent["id"]
+                row = {"name": ename, "category": ent["type"], "cases_present": {}}
+                for c in top_cases:
+                    c_obj = next((x for x in all_cases if x["case_id"] == c), None)
+                    row["cases_present"][c] = ename in c_obj["entities"] if c_obj else False
+                matrix_attrs.append(row)
+
+            timeline_events = [
+                {
+                    "date": r["date"],
+                    "time": "12:00",
+                    "title": f"{r['record_id']} ({r['source'].replace('_', ' ').title()})",
+                    "description": r["text"],
+                    "record_id": r["record_id"],
+                    "source": r["source"],
+                    "entities": [e["text"] for e in r.get("extracted_entities", [])],
+                    "locations": [lid],
+                    "anomalies": [],
+                    "has_anomalies": False,
+                }
+                for r in loc.get("records", [])
+            ]
+            timeline_events.sort(key=lambda x: x["date"])
+
+            events = timeline_events
+            primary_date = events[0]["date"] if events else None
+            filtered_events = events
+            if temporal_window != "all" and primary_date:
+                try:
+                    p_dt = datetime.fromisoformat(primary_date)
+                    window_days = {"24h": 1, "48h": 2, "7d": 7}.get(temporal_window, 999)
+                    filtered_events = [
+                        e for e in events
+                        if abs((datetime.fromisoformat(e["date"]) - p_dt).days) <= window_days
+                    ]
+                except Exception:
+                    filtered_events = events
+
+            trace = [
+                {"step": 1, "label": f"Location {lid}", "category": "Geographic Site", "module_url": f"/locations?id={lid}"},
+                {"step": 2, "label": f"{loc['record_count']} Associated Record(s)", "category": "Incident Records", "module_url": "/timeline"},
+                {"step": 3, "label": f"{loc['entity_count']} Extracted Entities", "category": "Entities Present", "module_url": "/entities"},
+                {"step": 4, "label": f"{loc['anomaly_count']} Correlated Signal(s)", "category": "Detection Signals", "module_url": "/anomalies"},
+                {"step": 5, "label": f"{len(loc_cases)} Linked Case(s)", "category": "Case Dossiers", "module_url": "/cases"},
+            ]
+
+            observed = [
+                f"Location '{lid}' observed across {loc['record_count']} source incident record(s).",
+                f"Identified entities present: {', '.join(e['id'] for e in loc.get('entities', [])[:5])}{' and others' if len(loc.get('entities', [])) > 5 else ''}.",
+                f"Total observed co-occurrence activity score: {loc['activity_score']}."
+            ]
+            derived = [
+                f"Node topology: Degree centrality {loc.get('degree', 0):.4f}, Betweenness centrality {loc.get('betweenness', 0):.4f}.",
+                f"Girvan-Newman Bridge status: {'Confirmed Bridge Node' if loc.get('is_bridge_node') else 'Standard Location Node'}.",
+                f"Associated with Community {loc.get('community', 'N/A')}."
+            ]
+            signals = [
+                f"[{a.get('pattern_label') or a.get('pattern')}]: {a.get('note')}"
+                for a in loc.get("anomalies", [])
+            ] if loc.get("anomalies") else ["No direct anomaly patterns isolated to this specific location."]
+            review_required = [
+                f"Deploy or inspect physical surveillance footage around {lid}.",
+                "Cross-reference automated number plate recognition (ANPR) logs for nearby intersections.",
+                "Corroborate site visits against witness debriefs and dispatch records."
+            ]
+
+            summary_text = (
+                f"Location '{lid}' connects {loc['entity_count']} distinct entity(ies) across {loc['record_count']} incident report(s). "
+                f"Functions as a {'critical bridge node' if loc.get('is_bridge_node') else 'key operational venue'} "
+                f"spanning {len(loc_cases)} case file(s). All spatial links reflect observed mentions requiring field corroboration."
+            )
+
+            return {
+                "target": {
+                    "type": "location",
+                    "id": lid,
+                    "label": lid,
+                    "category": "Location Hub",
+                },
+                "summary": {
+                    "target_label": lid,
+                    "target_type": "location",
+                    "record_count": loc["record_count"],
+                    "entity_count": loc["entity_count"],
+                    "signal_count": loc["anomaly_count"],
+                    "related_case_count": len(loc_cases),
+                    "summary_text": summary_text,
+                },
+                "target_data": loc,
+                "entities": loc.get("entities", []),
+                "relationships": loc_links,
+                "anomalies": loc.get("anomalies", []),
+                "timeline": filtered_events,
+                "locations": [{"id": lid, "name": lid, "type": "LOCATION"}],
+                "related_cases": [
+                    {
+                        "case_id": c["case_id"],
+                        "title": c["title"],
+                        "priority": c["priority"],
+                        "date": c["date"],
+                        "workflow_status": c["workflow_status"],
+                        "basis": ["Geographic Occurrence"],
+                    }
+                    for c in loc_cases
+                ],
+                "cross_case_matrix": {
+                    "cases": top_cases,
+                    "attributes": matrix_attrs,
+                },
+                "evidence_trace": trace,
+                "assessment": {
+                    "observed": observed,
+                    "derived": derived,
+                    "signals": signals,
+                    "review_required": review_required,
+                },
+                "disclaimer": disclaimer,
+            }
+
+        elif clean_type == "anomaly":
+            anom = cls.get_anomaly_detail(clean_id)
+            if not anom:
+                return None
+
+            aid = anom["id"]
+            primary_rec = anom.get("record_id")
+            primary_ent = anom.get("entity")
+
+            anom_cases = [
+                c for c in all_cases
+                if (primary_rec and c["case_id"] == primary_rec) or (primary_ent and primary_ent in c.get("entities", []))
+            ]
+            top_cases = [c["case_id"] for c in anom_cases[:5]]
+
+            anom_links = []
+            if primary_ent:
+                anom_links = [
+                    {
+                        "source": l["source"],
+                        "target": l["target"],
+                        "weight": l["weight"],
+                        "records": l["records"],
+                        "dates": l["dates"],
+                        "basis": f"Observed co-occurrence in record(s): {', '.join(l['records'])}",
+                    }
+                    for l in data["links"]
+                    if l["source"].lower() == primary_ent.lower() or l["target"].lower() == primary_ent.lower()
+                ]
+
+            trace = [
+                {"step": 1, "label": f"Anomaly {aid}", "category": "Signal Origin", "module_url": f"/anomalies?id={aid}"},
+                {"step": 2, "label": f"Record {primary_rec or 'Multiple'}", "category": "Source Ingestion", "module_url": f"/timeline?record_id={primary_rec or ''}"},
+                {"step": 3, "label": f"Primary Entity {primary_ent or 'N/A'}", "category": "Entity Implicated", "module_url": f"/network?focus={primary_ent or ''}"},
+                {"step": 4, "label": f"Case {anom_cases[0]['case_id'] if anom_cases else 'N/A'}", "category": "Case Dossier", "module_url": f"/cases?id={anom_cases[0]['case_id'] if anom_cases else ''}"},
+                {"step": 5, "label": "Algorithmic Trigger Parameters", "category": "Pipeline Config", "module_url": "/settings"},
+            ]
+
+            observed = [
+                f"Anomaly flag {aid} registered for pattern '{anom.get('pattern_label') or anom.get('pattern')}'.",
+                f"Recorded event date: {anom.get('date', 'Multi-date observation')}, primary entity: '{primary_ent or 'General Network'}'.",
+                f"Associated source record: {primary_rec or 'Derived across multiple ingested events'}."
+            ]
+            derived = [
+                f"Detection algorithm: {anom.get('pattern', 'Statistical heuristic')}.",
+                f"System confidence / metric note: {anom.get('note', 'Pattern threshold exceeded.')}.",
+                f"Correlated with {len(anom_cases)} case file(s)."
+            ]
+            signals = [
+                f"[{anom.get('pattern_label') or anom.get('pattern')}]: {anom.get('note')}"
+            ]
+            review_required = [
+                "Review underlying raw data stream for calibration anomalies or ingestion artifacts.",
+                "Examine whether statistical spike aligns with known external operational events.",
+                "Analytical indicator only. Human corroboration required before operational deployment."
+            ]
+
+            summary_text = (
+                f"Signal {aid} flags a detected '{anom.get('pattern_label') or anom.get('pattern')}' pattern "
+                f"connected to entity '{primary_ent or 'Network'}' in record {primary_rec or 'Multi-record'}. "
+                f"Correlated with {len(anom_cases)} case file(s). This signal represents a mathematical deviation requiring investigator review."
+            )
+
+            return {
+                "target": {
+                    "type": "anomaly",
+                    "id": aid,
+                    "label": f"{aid} ({anom.get('pattern_label') or anom.get('pattern')})",
+                    "category": anom.get("pattern_label") or anom.get("pattern"),
+                },
+                "summary": {
+                    "target_label": f"{aid}: {anom.get('pattern_label') or anom.get('pattern')}",
+                    "target_type": "anomaly",
+                    "record_count": 1 if primary_rec else len(anom_cases),
+                    "entity_count": 1 if primary_ent else 0,
+                    "signal_count": 1,
+                    "related_case_count": len(anom_cases),
+                    "summary_text": summary_text,
+                },
+                "target_data": anom,
+                "entities": [{"id": primary_ent, "type": anom.get("entity_type", "ENTITY")}] if primary_ent else [],
+                "relationships": anom_links,
+                "anomalies": [anom],
+                "timeline": anom.get("timeline", []),
+                "locations": [],
+                "related_cases": [
+                    {
+                        "case_id": c["case_id"],
+                        "title": c["title"],
+                        "priority": c["priority"],
+                        "date": c["date"],
+                        "workflow_status": c["workflow_status"],
+                        "basis": ["Analytical Signal Occurrence"],
+                    }
+                    for c in anom_cases
+                ],
+                "cross_case_matrix": {
+                    "cases": top_cases,
+                    "attributes": [
+                        {
+                            "name": aid,
+                            "category": "ANOMALY",
+                            "cases_present": {c: True for c in top_cases}
+                        }
+                    ],
+                },
+                "evidence_trace": trace,
+                "assessment": {
+                    "observed": observed,
+                    "derived": derived,
+                    "signals": signals,
+                    "review_required": review_required,
+                },
+                "disclaimer": disclaimer,
+            }
+
+        return None
