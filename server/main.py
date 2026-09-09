@@ -231,6 +231,24 @@ def update_followup(case_id: str, followup_id: str, payload: FollowupUpdate):
         raise HTTPException(status_code=400, detail=str(e))
 
 
+@app.get("/api/system/config")
+def get_system_config():
+    """Returns transparent system architecture, pipeline, and algorithm configurations."""
+    return IntelligenceService.get_system_config()
+
+
+@app.get("/api/system/health")
+def get_system_health():
+    """Returns live operational diagnostics for API, engine, dataset, and workflow store."""
+    return IntelligenceService.get_system_health()
+
+
+@app.post("/api/system/reset-session")
+def reset_system_session():
+    """Safely resets investigator session modifications in WorkflowStore without affecting data."""
+    return IntelligenceService.reset_session_workflow()
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("server.main:app", host="127.0.0.1", port=8000, reload=True)

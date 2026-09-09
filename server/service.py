@@ -12,8 +12,24 @@ import sys
 import json
 import re
 import uuid
+import time
+import platform
+import inspect
 from datetime import datetime, timezone
 from typing import Dict, Any, List
+
+_server_start_time = time.time()
+
+def _safe_pkg_version(name: str) -> str:
+    try:
+        import importlib.metadata
+        return importlib.metadata.version(name)
+    except Exception:
+        try:
+            mod = __import__(name)
+            return getattr(mod, "__version__", "Version not exposed")
+        except Exception:
+            return "Version not exposed" 
 
 # Add src/ to sys.path so existing intelligence modules are loaded directly
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -1962,3 +1978,421 @@ class IntelligenceService:
         if not detail:
             return None
         return WorkflowStore.update_followup(clean_id, followup_id, payload)
+
+    @classmethod
+    def get_system_config(cls) -> Dict[str, Any]:
+        """
+        Exposes genuine pipeline, algorithm, connector, and runtime configuration
+        introspected directly from src/ modules and runtime state.
+        """
+        import entity_extraction
+        import network_analysis
+        import anomaly_detection
+        import graph_builder
+        import ingestion
+        import inspect
+
+        # 1. Platform & Environment
+        platform_info = {
+            "system_name": "Crime Network Intelligence System (CNIS)",
+            "version": "2.0.0-prototype",
+            "runtime_environment": "Local Development / Hackathon Prototype",
+            "python_version": platform.python_version(),
+            "fastapi_version": _safe_pkg_version("fastapi"),
+            "uvicorn_version": _safe_pkg_version("uvicorn"),
+            "networkx_version": _safe_pkg_version("networkx"),
+            "scikit_learn_version": _safe_pkg_version("scikit-learn"),
+            "numpy_version": _safe_pkg_version("numpy"),
+            "pydantic_version": _safe_pkg_version("pydantic"),
+            "dataset_reference": "data/sample_records.json",
+            "dataset_type": "Synthetic Demonstration Dataset",
+        }
+
+        # 2. Pipeline Stages (6 stages verified directly against src/pipeline.py)
+        pipeline_stages = [
+            {
+                "stage_number": 1,
+                "name": "Ingestion",
+                "module": "src/ingestion.py",
+                "class_name": "IngestionManager / JSONFileConnector",
+                "execution_order": 1,
+                "input_type": "data/sample_records.json (JSON)",
+                "output_type": "list[Record]",
+                "status": "Active Prototype",
+                "description": "Aggregates raw incident and intelligence records into unified Record dataclasses with normalized schema fields.",
+            },
+            {
+                "stage_number": 2,
+                "name": "Entity Extraction",
+                "module": "src/entity_extraction.py",
+                "class_name": "RuleBasedNER / extract_entities",
+                "execution_order": 2,
+                "input_type": "list[Record]",
+                "output_type": "list[ExtractedRecord]",
+                "status": "Active Prototype",
+                "description": "Extracts entity mentions (PERSON, ORG, LOCATION, VEHICLE, PHONE, MONEY) and normalizes identifiers.",
+            },
+            {
+                "stage_number": 3,
+                "name": "Graph Construction",
+                "module": "src/graph_builder.py",
+                "class_name": "co_occurrence_edges / build_graph",
+                "execution_order": 3,
+                "input_type": "list[ExtractedRecord]",
+                "output_type": "networkx.Graph",
+                "status": "Active Prototype",
+                "description": "Constructs an undirected co-occurrence multigraph where edge weights increment with each corroborating record.",
+            },
+            {
+                "stage_number": 4,
+                "name": "Network Analysis",
+                "module": "src/network_analysis.py",
+                "class_name": "compute_centrality / rank_key_players / detect_communities / critical_bridge_nodes",
+                "execution_order": 4,
+                "input_type": "networkx.Graph",
+                "output_type": "Centrality dict, Key Players list, Community partitions, Bridge node rankings",
+                "status": "Active Prototype",
+                "description": "Computes centrality metrics, ranks key influencers via composite formula, discovers Louvain communities, and isolates bridge broker nodes.",
+            },
+            {
+                "stage_number": 5,
+                "name": "Anomaly & Pattern Detection",
+                "module": "src/anomaly_detection.py",
+                "class_name": "detect_burst_activity / detect_structuring / detect_new_entity_spikes / isolation_forest_outliers",
+                "execution_order": 5,
+                "input_type": "edges, records, extracted_records, centrality",
+                "output_type": "list[dict] flagged suspicious patterns",
+                "status": "Active Prototype",
+                "description": "Detects behavioral burst activity, financial structuring patterns, new entity spikes, and statistical centrality outliers.",
+            },
+            {
+                "stage_number": 6,
+                "name": "Investigator Intelligence & Export",
+                "module": "src/visualize.py & server/service.py",
+                "class_name": "IntelligenceService / export_interactive_html / export_gexf",
+                "execution_order": 6,
+                "input_type": "nx.Graph, analytics, anomalies, case records",
+                "output_type": "REST API JSON, Interactive Link Chart, GEXF Graph, Case Dossiers",
+                "status": "Active Prototype",
+                "description": "Transforms raw graph and anomaly artifacts into structured investigator views, case dossiers, and API endpoints.",
+            },
+        ]
+
+        # 3. Entity Extraction Config (Introspected from entity_extraction)
+        entity_extraction_cfg = {
+            "active_backend": "RuleBasedNER",
+            "backend_interface": "NERBackend",
+            "planned_backend": "SpacyNERBackend (Planned transformer model: en_core_web_trf)",
+            "gazetteers": {
+                "persons": entity_extraction.PERSON_GAZETTEER,
+                "organizations": entity_extraction.ORG_GAZETTEER,
+                "locations": entity_extraction.LOCATION_GAZETTEER,
+            },
+            "regex_rules": {
+                "phone_regex": entity_extraction.PHONE_RE.pattern,
+                "vehicle_plate_regex": entity_extraction.VEHICLE_PLATE_RE.pattern,
+                "money_regex": entity_extraction.MONEY_RE.pattern,
+            },
+            "normalization_rules": [
+                {"entity_type": "PHONE", "rule": "Extract digits, retain last 10 digits to normalize national/international dial prefixes"},
+                {"entity_type": "VEHICLE", "rule": "Strip interior spaces, normalize to uppercase standard plate format"},
+                {"entity_type": "MONEY", "rule": "Parse currency symbol (INR / Rs / ₹) and extract numeric amounts"},
+                {"entity_type": "ALL", "rule": "De-duplicate identical (text, label) entity tuples within the same record"},
+            ],
+        }
+
+        # 4. Network Analysis Config (Introspected from network_analysis)
+        network_analysis_cfg = {
+            "graph_engine": "NetworkX",
+            "graph_type": "nx.Graph (Undirected)",
+            "edge_weight_rule": "Co-occurrence frequency: repeated appearances across independent records increment weight by 1",
+            "centrality_metrics": [
+                {"name": "Degree Centrality", "role": "Direct contact hubs & organizers", "weight_in_key_player": 0.25},
+                {"name": "Betweenness Centrality", "role": "Brokers and couriers bridging separate clusters (weight='weight')", "weight_in_key_player": 0.35},
+                {"name": "Eigenvector Centrality", "role": "Connection to other well-connected entities (max_iter=1000, weight='weight')", "weight_in_key_player": 0.25},
+                {"name": "PageRank", "role": "Blended stationary influence distribution (weight='weight')", "weight_in_key_player": 0.15},
+            ],
+            "key_player_formula": {
+                "expression": "0.25 * degree + 0.35 * betweenness + 0.25 * eigenvector + 0.15 * pagerank",
+                "entity_types": list(inspect.signature(network_analysis.rank_key_players).parameters["entity_types"].default),
+                "top_n": inspect.signature(network_analysis.rank_key_players).parameters["top_n"].default,
+                "weights": {
+                    "degree": 0.25,
+                    "betweenness": 0.35,
+                    "eigenvector": 0.25,
+                    "pagerank": 0.15,
+                },
+            },
+            "community_detection": {
+                "algorithm": "Louvain Community Detection",
+                "function": "nx.algorithms.community.louvain_communities",
+                "seed": 42,
+                "weight_attribute": "weight",
+                "resolution": 1.0,
+                "description": "Deterministic community partitioning based on edge weight density",
+            },
+            "critical_bridge_nodes": {
+                "function": "nx.betweenness_centrality",
+                "top_n": inspect.signature(network_analysis.critical_bridge_nodes).parameters["top_n"].default,
+                "weight_attribute": "weight",
+                "description": "Identifies top broker nodes whose removal would fragment the network topology",
+            },
+            "path_analysis": {
+                "algorithm": "nx.shortest_path",
+                "weight": "None (unweighted BFS shortest path)",
+                "description": "Identifies shortest connection path between any two selected entities",
+            },
+        }
+
+        # 5. Anomaly Detection Config (Introspected from anomaly_detection)
+        burst_sig = inspect.signature(anomaly_detection.detect_burst_activity)
+        structuring_sig = inspect.signature(anomaly_detection.detect_structuring)
+        iforest_sig = inspect.signature(anomaly_detection.isolation_forest_outliers)
+
+        anomaly_detection_cfg = {
+            "detectors": [
+                {
+                    "id": "burst_activity",
+                    "name": "Burst Activity Detection",
+                    "function": "detect_burst_activity",
+                    "pattern": "burst_activity",
+                    "parameters": {
+                        "window_hours": burst_sig.parameters["window_hours"].default,
+                        "min_events": burst_sig.parameters["min_events"].default,
+                    },
+                    "threshold_summary": f">={burst_sig.parameters['min_events'].default} interactions within {burst_sig.parameters['window_hours'].default}h window / calendar day",
+                    "significance": "Operational spike, imminent coordinated activity, or panic calling",
+                },
+                {
+                    "id": "structuring",
+                    "name": "Financial Structuring Detection",
+                    "function": "detect_structuring",
+                    "pattern": "structuring",
+                    "parameters": {
+                        "threshold": structuring_sig.parameters["threshold"].default,
+                        "currency": "INR",
+                        "keywords": ["structur", "split + deposit/transaction"],
+                    },
+                    "threshold_summary": f"Transactions split under INR {structuring_sig.parameters['threshold'].default:,} threshold",
+                    "significance": "Smurfing / money laundering to evade mandatory FIU threshold reporting",
+                },
+                {
+                    "id": "new_entity_spike",
+                    "name": "New Entity Spike Detection",
+                    "function": "detect_new_entity_spikes",
+                    "pattern": "new_entity_spike",
+                    "parameters": {
+                        "min_linked_known_entities": 2,
+                    },
+                    "threshold_summary": "First appearance linked to >= 2 previously known entities",
+                    "significance": "New recruit, outside supplier, or handler entering an established cell",
+                },
+                {
+                    "id": "isolation_forest_outliers",
+                    "name": "Isolation Forest Outlier Detection",
+                    "function": "isolation_forest_outliers",
+                    "pattern": "statistical_outlier",
+                    "parameters": {
+                        "algorithm": "scikit-learn IsolationForest",
+                        "contamination": iforest_sig.parameters["contamination"].default,
+                        "random_state": 42,
+                        "feature_count": 4,
+                        "features": ["degree", "betweenness", "eigenvector", "pagerank"],
+                    },
+                    "threshold_summary": f"Contamination {iforest_sig.parameters['contamination'].default} over 4D centrality feature space",
+                    "significance": "Topological outliers diverging from expected network distribution",
+                },
+            ]
+        }
+
+        # 6. Data Sources Config
+        data_sources_cfg = {
+            "active_connector": "JSONFileConnector",
+            "active_sources_count": len(cls.SOURCE_CONFIGS),
+            "prototype_connectors": [
+                {"name": "JSONFileConnector", "status": "Active Prototype", "description": "Local JSON file reader for prototype cases"},
+                {"name": "SQLConnector", "status": "Implemented in src/ingestion.py", "description": "Generic DB-API 2.0 relational connector"},
+                {"name": "CSVConnector", "status": "Implemented in src/ingestion.py", "description": "Tabular CSV parser for CDR / ANPR records"},
+                {"name": "RESTAPIConnector", "status": "Implemented in src/ingestion.py", "description": "HTTP REST client for external feeds"},
+            ],
+            "sources_center_url": "/sources",
+        }
+
+        # 7. Storage Model Transparency
+        storage_cfg = {
+            "workflow_store": "In-memory",
+            "intelligence_cache": "In-memory",
+            "persistent_database": "Not configured",
+            "enterprise_persistence": "Requires production integration",
+            "local_storage": "Client UI state only (no database usage)",
+            "persistence_note": "Workflow states, review checklists, and session activity are retained in server memory for the active runtime session only.",
+        }
+
+        # 8. Production Readiness Gaps
+        production_readiness = [
+            {
+                "category": "Storage & Database",
+                "prototype_state": "In-memory Python dictionaries & NetworkX graph",
+                "production_requirement": "PostgreSQL for relational case data + Neo4j / AWS Neptune for graph intelligence",
+                "gap_level": "High",
+                "status": "Planned",
+            },
+            {
+                "category": "Authentication & Authorization",
+                "prototype_state": "Single-session prototype; no user credentials or roles",
+                "production_requirement": "OAuth2 / OIDC, SSO with Active Directory / Keycloak, Role-Based Access Control (RBAC)",
+                "gap_level": "High",
+                "status": "Planned",
+            },
+            {
+                "category": "Audit & Compliance",
+                "prototype_state": "In-memory session activity log (ephemeral)",
+                "production_requirement": "Immutable append-only audit trail with cryptographic verification and query logging",
+                "gap_level": "High",
+                "status": "Planned",
+            },
+            {
+                "category": "Ingestion Pipeline",
+                "prototype_state": "Single JSON file batch ingestion via JSONFileConnector",
+                "production_requirement": "Streaming ingestion with Apache Kafka / RabbitMQ, scheduled ETL pipelines",
+                "gap_level": "Medium",
+                "status": "Planned",
+            },
+            {
+                "category": "Entity Extraction (NER)",
+                "prototype_state": "RuleBasedNER (regex + static gazetteer)",
+                "production_requirement": "Fine-tuned transformer model (spaCy / HuggingFace) trained on police FIR language",
+                "gap_level": "Medium",
+                "status": "Planned",
+            },
+            {
+                "category": "High Availability & Scaling",
+                "prototype_state": "Single-process FastAPI / Uvicorn server",
+                "production_requirement": "Containerized multi-replica deployment on Kubernetes with Redis distributed caching",
+                "gap_level": "Medium",
+                "status": "Planned",
+            },
+            {
+                "category": "Data Encryption",
+                "prototype_state": "Plaintext local storage without TLS",
+                "production_requirement": "TLS 1.3 in transit, AES-256 at rest, encrypted secret management (HashiCorp Vault)",
+                "gap_level": "High",
+                "status": "Planned",
+            },
+        ]
+
+        # 9. Disclaimers
+        disclaimers = {
+            "analytical": "Case intelligence is derived from available source records and analytical signals. Investigative conclusions require authorized human review.",
+            "configuration": "Configuration visibility reflects the current prototype implementation. Production deployments require appropriate security, persistence, authorization, and operational controls.",
+        }
+
+        return {
+            "platform": platform_info,
+            "pipeline_stages": pipeline_stages,
+            "entity_extraction": entity_extraction_cfg,
+            "network_analysis": network_analysis_cfg,
+            "anomaly_detection": anomaly_detection_cfg,
+            "data_sources": data_sources_cfg,
+            "storage": storage_cfg,
+            "production_readiness": production_readiness,
+            "disclaimers": disclaimers,
+        }
+
+    @classmethod
+    def get_system_health(cls) -> Dict[str, Any]:
+        """
+        Gathers live operational health diagnostics for the CNIS prototype.
+        """
+        data = cls.get_data()
+        cases = cls.get_cases().get("cases", [])
+
+        dataset_exists = os.path.exists(DATA_PATH)
+        dataset_size = os.path.getsize(DATA_PATH) if dataset_exists else 0
+        dataset_mtime = (
+            datetime.fromtimestamp(os.path.getmtime(DATA_PATH), timezone.utc).isoformat()
+            if dataset_exists else None
+        )
+
+        wf_cases = WorkflowStore._case_workflows
+        total_chk = sum(len(wf.get("checklist", [])) for wf in wf_cases.values())
+        done_chk = sum(
+            sum(1 for it in wf.get("checklist", []) if it.get("completed"))
+            for wf in wf_cases.values()
+        )
+        total_fu = sum(len(wf.get("followups", [])) for wf in wf_cases.values())
+        pending_fu = sum(
+            sum(1 for fu in wf.get("followups", []) if fu.get("status") != "Completed")
+            for wf in wf_cases.values()
+        )
+
+        return {
+            "status": "healthy",
+            "uptime_seconds": int(time.time() - _server_start_time),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "backend_api": {
+                "status": "available",
+                "version": "2.0.0-prototype",
+                "framework": f"FastAPI {_safe_pkg_version('fastapi')}",
+                "server": f"Uvicorn {_safe_pkg_version('uvicorn')}",
+            },
+            "intelligence_engine": {
+                "status": "cached" if cls._cached_data is not None else "ready",
+                "last_ingestion_time": cls._last_ingestion_time,
+                "record_count": len(data["records"]),
+                "entity_count": len(data["nodes"]),
+                "relationship_count": len(data["links"]),
+                "anomaly_count": len(data["suspicious_patterns"]),
+                "case_count": len(cases),
+                "key_players_count": len(data["key_players"]),
+                "communities_count": len(data["communities"]),
+            },
+            "dataset": {
+                "logical_reference": "data/sample_records.json",
+                "exists": dataset_exists,
+                "file_size_bytes": dataset_size,
+                "last_modified": dataset_mtime,
+                "record_count": len(data["records"]),
+            },
+            "workflow_store": {
+                "status": "in_memory",
+                "active_cases": len(wf_cases),
+                "total_checklist_items": total_chk,
+                "completed_checklist_items": done_chk,
+                "total_followups": total_fu,
+                "pending_followups": pending_fu,
+                "session_activity_count": len(WorkflowStore._session_activity),
+            },
+            "sources_registry": {
+                "configured_sources_count": len(cls.SOURCE_CONFIGS),
+                "active_sources_count": len(cls.SOURCE_CONFIGS),
+            },
+        }
+
+    @classmethod
+    def reset_session_workflow(cls) -> Dict[str, Any]:
+        """
+        Safely resets investigator session modifications in WorkflowStore.
+        Preserves data/sample_records.json, intelligence cache, entities,
+        relationships, and anomalies without alteration.
+        """
+        WorkflowStore._case_workflows.clear()
+        WorkflowStore._session_activity.clear()
+
+        cases = cls.get_cases().get("cases", [])
+        for case in cases:
+            cid = case.get("case_id") or case.get("id", "")
+            WorkflowStore.initialize_case_if_needed(cid, case)
+
+        WorkflowStore.log_activity(
+            "ALL",
+            "Session Workspace Reset",
+            "Investigator session workflow states and checklists were reset to baseline."
+        )
+
+        return {
+            "success": True,
+            "message": "Session workflow states, checklists, follow-ups, and activity history have been reset to baseline.",
+            "reset_timestamp": datetime.now(timezone.utc).isoformat(),
+            "cases_reset_count": len(cases),
+        }

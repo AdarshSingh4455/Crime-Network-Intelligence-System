@@ -616,3 +616,204 @@ export interface CasesResponse {
   date_coverage: { start: string; end: string };
   cases: CaseItem[];
 }
+
+// ==========================================
+// PHASE 3D: SYSTEM CONFIGURATION & HEALTH
+// ==========================================
+
+export interface SystemPlatformInfo {
+  system_name: string;
+  version: string;
+  runtime_environment: string;
+  python_version: string;
+  fastapi_version: string;
+  uvicorn_version: string;
+  networkx_version: string;
+  scikit_learn_version: string;
+  numpy_version: string;
+  pydantic_version: string;
+  dataset_reference: string;
+  dataset_type: string;
+}
+
+export interface PipelineStageInfo {
+  stage_number: number;
+  name: string;
+  module: string;
+  class_name: string;
+  execution_order: number;
+  input_type: string;
+  output_type: string;
+  status: string;
+  description: string;
+}
+
+export interface EntityExtractionConfig {
+  active_backend: string;
+  backend_interface: string;
+  planned_backend: string;
+  gazetteers: {
+    persons: string[];
+    organizations: string[];
+    locations: string[];
+  };
+  regex_rules: {
+    phone_regex: string;
+    vehicle_plate_regex: string;
+    money_regex: string;
+  };
+  normalization_rules: Array<{
+    entity_type: string;
+    rule: string;
+  }>;
+}
+
+export interface NetworkAnalysisConfig {
+  graph_engine: string;
+  graph_type: string;
+  edge_weight_rule: string;
+  centrality_metrics: Array<{
+    name: string;
+    role: string;
+    weight_in_key_player: number;
+  }>;
+  key_player_formula: {
+    expression: string;
+    entity_types: string[];
+    top_n: number;
+    weights: {
+      degree: number;
+      betweenness: number;
+      eigenvector: number;
+      pagerank: number;
+    };
+  };
+  community_detection: {
+    algorithm: string;
+    function: string;
+    seed: number;
+    weight_attribute: string;
+    resolution: number;
+    description: string;
+  };
+  critical_bridge_nodes: {
+    function: string;
+    top_n: number;
+    weight_attribute: string;
+    description: string;
+  };
+  path_analysis: {
+    algorithm: string;
+    weight: string;
+    description: string;
+  };
+}
+
+export interface AnomalyDetectorConfig {
+  id: string;
+  name: string;
+  function: string;
+  pattern: string;
+  parameters: Record<string, any>;
+  threshold_summary: string;
+  significance: string;
+}
+
+export interface AnomalyDetectionConfig {
+  detectors: AnomalyDetectorConfig[];
+}
+
+export interface PrototypeConnectorInfo {
+  name: string;
+  status: string;
+  description: string;
+}
+
+export interface DataSourcesConfig {
+  active_connector: string;
+  active_sources_count: number;
+  prototype_connectors: PrototypeConnectorInfo[];
+  sources_center_url: string;
+}
+
+export interface StorageConfig {
+  workflow_store: string;
+  intelligence_cache: string;
+  persistent_database: string;
+  enterprise_persistence: string;
+  local_storage: string;
+  persistence_note: string;
+}
+
+export interface ProductionReadinessItem {
+  category: string;
+  prototype_state: string;
+  production_requirement: string;
+  gap_level: 'High' | 'Medium' | 'Low';
+  status: string;
+}
+
+export interface SystemConfigResponse {
+  platform: SystemPlatformInfo;
+  pipeline_stages: PipelineStageInfo[];
+  entity_extraction: EntityExtractionConfig;
+  network_analysis: NetworkAnalysisConfig;
+  anomaly_detection: AnomalyDetectionConfig;
+  data_sources: DataSourcesConfig;
+  storage: StorageConfig;
+  production_readiness: ProductionReadinessItem[];
+  disclaimers: {
+    analytical: string;
+    configuration: string;
+  };
+}
+
+export interface SystemHealthResponse {
+  status: 'healthy' | 'degraded';
+  uptime_seconds: number;
+  timestamp: string;
+  backend_api: {
+    status: string;
+    version: string;
+    framework: string;
+    server: string;
+  };
+  intelligence_engine: {
+    status: string;
+    last_ingestion_time: string;
+    record_count: number;
+    entity_count: number;
+    relationship_count: number;
+    anomaly_count: number;
+    case_count: number;
+    key_players_count: number;
+    communities_count: number;
+  };
+  dataset: {
+    logical_reference: string;
+    exists: boolean;
+    file_size_bytes: number;
+    last_modified: string | null;
+    record_count: number;
+  };
+  workflow_store: {
+    status: string;
+    active_cases: number;
+    total_checklist_items: number;
+    completed_checklist_items: number;
+    total_followups: number;
+    pending_followups: number;
+    session_activity_count: number;
+  };
+  sources_registry: {
+    configured_sources_count: number;
+    active_sources_count: number;
+  };
+}
+
+export interface ResetSessionResponse {
+  success: boolean;
+  message: string;
+  reset_timestamp: string;
+  cases_reset_count: number;
+}

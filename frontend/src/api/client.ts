@@ -21,6 +21,9 @@ import {
   FollowUpItem,
   FollowUpCategory,
   FollowUpStatus,
+  SystemConfigResponse,
+  SystemHealthResponse,
+  ResetSessionResponse,
 } from '../types';
 
 const API_BASE = '/api';
@@ -144,6 +147,21 @@ export const api = {
 
   updateCaseFollowup: async (caseId: string, followupId: string, payload: { status?: FollowUpStatus; notes?: string }): Promise<FollowUpItem> => {
     const res = await apiClient.patch<FollowUpItem>(`/cases/${encodeURIComponent(caseId)}/followups/${encodeURIComponent(followupId)}`, payload);
+    return res.data;
+  },
+
+  getSystemConfig: async (): Promise<SystemConfigResponse> => {
+    const res = await apiClient.get<SystemConfigResponse>('/system/config');
+    return res.data;
+  },
+
+  getSystemHealth: async (): Promise<SystemHealthResponse> => {
+    const res = await apiClient.get<SystemHealthResponse>('/system/health');
+    return res.data;
+  },
+
+  resetSessionWorkflow: async (): Promise<ResetSessionResponse> => {
+    const res = await apiClient.post<ResetSessionResponse>('/system/reset-session', {});
     return res.data;
   },
 };
