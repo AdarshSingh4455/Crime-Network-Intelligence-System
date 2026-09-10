@@ -3,10 +3,10 @@
     "num_nodes": 15,
     "num_edges": 52,
     "nodes_by_type": {
-      "VEHICLE": 2,
       "PHONE": 4,
-      "LOCATION": 2,
       "PERSON": 5,
+      "VEHICLE": 2,
+      "LOCATION": 2,
       "ORG": 1,
       "MONEY": 1
     },
@@ -115,13 +115,6 @@
   ],
   "suspicious_patterns": [
     {
-      "entity": "MH12AB1234",
-      "date": "2026-01-05",
-      "event_count": 5,
-      "pattern": "burst_activity",
-      "note": "MH12AB1234 involved in 5 linked events on 2026-01-05 - possible coordination or operational spike."
-    },
-    {
       "entity": "9876543210",
       "date": "2026-01-05",
       "event_count": 5,
@@ -129,18 +122,18 @@
       "note": "9876543210 involved in 5 linked events on 2026-01-05 - possible coordination or operational spike."
     },
     {
-      "entity": "Andheri",
-      "date": "2026-01-05",
-      "event_count": 5,
-      "pattern": "burst_activity",
-      "note": "Andheri involved in 5 linked events on 2026-01-05 - possible coordination or operational spike."
-    },
-    {
       "entity": "Suresh Nair",
       "date": "2026-01-05",
       "event_count": 5,
       "pattern": "burst_activity",
       "note": "Suresh Nair involved in 5 linked events on 2026-01-05 - possible coordination or operational spike."
+    },
+    {
+      "entity": "MH12AB1234",
+      "date": "2026-01-05",
+      "event_count": 5,
+      "pattern": "burst_activity",
+      "note": "MH12AB1234 involved in 5 linked events on 2026-01-05 - possible coordination or operational spike."
     },
     {
       "entity": "Andheri Warehouse",
@@ -157,18 +150,18 @@
       "note": "Ravi Malhotra involved in 5 linked events on 2026-01-05 - possible coordination or operational spike."
     },
     {
+      "entity": "Andheri",
+      "date": "2026-01-05",
+      "event_count": 5,
+      "pattern": "burst_activity",
+      "note": "Andheri involved in 5 linked events on 2026-01-05 - possible coordination or operational spike."
+    },
+    {
       "entity": "Ajay Kulkarni",
       "date": "2026-01-12",
       "event_count": 5,
       "pattern": "burst_activity",
       "note": "Ajay Kulkarni involved in 5 linked events on 2026-01-12 - possible coordination or operational spike."
-    },
-    {
-      "entity": "MH12AB1234",
-      "date": "2026-01-12",
-      "event_count": 5,
-      "pattern": "burst_activity",
-      "note": "MH12AB1234 involved in 5 linked events on 2026-01-12 - possible coordination or operational spike."
     },
     {
       "entity": "Suresh Nair",
@@ -178,13 +171,6 @@
       "note": "Suresh Nair involved in 5 linked events on 2026-01-12 - possible coordination or operational spike."
     },
     {
-      "entity": "Ravi Malhotra",
-      "date": "2026-01-12",
-      "event_count": 5,
-      "pattern": "burst_activity",
-      "note": "Ravi Malhotra involved in 5 linked events on 2026-01-12 - possible coordination or operational spike."
-    },
-    {
       "entity": "Deepak Shah",
       "date": "2026-01-12",
       "event_count": 5,
@@ -192,11 +178,25 @@
       "note": "Deepak Shah involved in 5 linked events on 2026-01-12 - possible coordination or operational spike."
     },
     {
+      "entity": "MH12AB1234",
+      "date": "2026-01-12",
+      "event_count": 5,
+      "pattern": "burst_activity",
+      "note": "MH12AB1234 involved in 5 linked events on 2026-01-12 - possible coordination or operational spike."
+    },
+    {
       "entity": "Global Traders Pvt Ltd",
       "date": "2026-01-12",
       "event_count": 5,
       "pattern": "burst_activity",
       "note": "Global Traders Pvt Ltd involved in 5 linked events on 2026-01-12 - possible coordination or operational spike."
+    },
+    {
+      "entity": "Ravi Malhotra",
+      "date": "2026-01-12",
+      "event_count": 5,
+      "pattern": "burst_activity",
+      "note": "Ravi Malhotra involved in 5 linked events on 2026-01-12 - possible coordination or operational spike."
     },
     {
       "record_id": "CR-1004",
@@ -209,7 +209,7 @@
       "record_id": "CR-1002",
       "date": "2026-01-08",
       "pattern": "new_entity_spike",
-      "note": "'Global Traders Pvt Ltd' first appears already linked to 3 known entities (MH12AB1234, Andheri, Suresh Nair)."
+      "note": "'Global Traders Pvt Ltd' first appears already linked to 3 known entities (Suresh Nair, Andheri, MH12AB1234)."
     },
     {
       "entity": "9123456789",
@@ -223,49 +223,49 @@
       "record_id": "CR-1004",
       "date": "2026-01-10",
       "pattern": "new_entity_spike",
-      "note": "'INR 950000' first appears already linked to 2 known entities (Andheri, Suresh Nair)."
+      "note": "'INR 950000' first appears already linked to 2 known entities (Suresh Nair, Andheri)."
     },
     {
       "entity": "Deepak Shah",
       "record_id": "CR-1005",
       "date": "2026-01-12",
       "pattern": "new_entity_spike",
-      "note": "'Deepak Shah' first appears already linked to 4 known entities (Global Traders Pvt Ltd, Ravi Malhotra, MH12AB1234, Suresh Nair)."
+      "note": "'Deepak Shah' first appears already linked to 4 known entities (Global Traders Pvt Ltd, Ravi Malhotra, Suresh Nair, MH12AB1234)."
     },
     {
       "entity": "Ajay Kulkarni",
       "record_id": "CR-1005",
       "date": "2026-01-12",
       "pattern": "new_entity_spike",
-      "note": "'Ajay Kulkarni' first appears already linked to 4 known entities (Global Traders Pvt Ltd, Ravi Malhotra, MH12AB1234, Suresh Nair)."
+      "note": "'Ajay Kulkarni' first appears already linked to 4 known entities (Global Traders Pvt Ltd, Ravi Malhotra, Suresh Nair, MH12AB1234)."
     },
     {
       "entity": "9988776655",
       "record_id": "CR-1006",
       "date": "2026-01-15",
       "pattern": "new_entity_spike",
-      "note": "'9988776655' first appears already linked to 2 known entities (Deepak Shah, 9876543210)."
+      "note": "'9988776655' first appears already linked to 2 known entities (9876543210, Deepak Shah)."
     },
     {
       "entity": "MH14CD5678",
       "record_id": "CR-1007",
       "date": "2026-01-18",
       "pattern": "new_entity_spike",
-      "note": "'MH14CD5678' first appears already linked to 3 known entities (Deepak Shah, Global Traders Pvt Ltd, Ajay Kulkarni)."
+      "note": "'MH14CD5678' first appears already linked to 3 known entities (Deepak Shah, Ajay Kulkarni, Global Traders Pvt Ltd)."
     },
     {
       "entity": "9871234567",
       "record_id": "CR-1009",
       "date": "2026-01-22",
       "pattern": "new_entity_spike",
-      "note": "'9871234567' first appears already linked to 3 known entities (9988776655, 9876543210, 9123456789)."
+      "note": "'9871234567' first appears already linked to 3 known entities (9876543210, 9988776655, 9123456789)."
     },
     {
       "entity": "Vikram Rao",
       "record_id": "CR-1010",
       "date": "2026-01-25",
       "pattern": "new_entity_spike",
-      "note": "'Vikram Rao' first appears already linked to 4 known entities (Ravi Malhotra, Andheri, 9871234567, Andheri Warehouse)."
+      "note": "'Vikram Rao' first appears already linked to 4 known entities (9871234567, Andheri, Andheri Warehouse, Ravi Malhotra)."
     },
     {
       "entity": "INR 950000",
@@ -285,5 +285,26 @@
       "pattern": "statistical_outlier",
       "note": "Centrality profile is a statistical outlier relative to the rest of the network."
     }
-  ]
+  ],
+  "entity_resolution": {
+    "total_observations": 43,
+    "total_canonical_entities": 22,
+    "canonical_by_type": {
+      "PERSON": 12,
+      "LOCATION": 2,
+      "PHONE": 4,
+      "VEHICLE": 2,
+      "ORG": 1,
+      "MONEY": 1
+    },
+    "candidate_pairs_evaluated": 108,
+    "review_queue_count": 18,
+    "entities_requiring_review": 11,
+    "policy_governance": {
+      "guardrail_1_name_alone_no_auto_identity": true,
+      "guardrail_2_money_never_merged_on_amount": true,
+      "guardrail_3_baseline_topology_intact": true,
+      "guardrail_4_analytical_scores_not_probabilities": true
+    }
+  }
 }

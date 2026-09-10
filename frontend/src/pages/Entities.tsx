@@ -183,13 +183,193 @@ const RecordsTab: React.FC<{ records: Array<{ record_id: string; source: string;
   );
 };
 
+const ResolutionTab: React.FC<{
+  detail: EntityDetail;
+  onSelectEntity: (id: string) => void;
+}> = ({ detail }) => {
+  const res = detail.resolution;
+  const navigate = useNavigate();
+
+  const isReviewRequired = (detail.resolution_status || res?.review_status) === "REVIEW_REQUIRED";
+  const canonicalId = detail.canonical_id || res?.canonical_id || `ENT-${detail.type}-${detail.id}`;
+  const canonicalName = detail.canonical_name || res?.canonical_name || detail.id;
+  const variants = res?.observed_variants || detail.observed_variants || [detail.id];
+  const observationCount = res?.observation_count || detail.observation_count || 1;
+  const reviewReasons = res?.review_reasons || detail.review_reasons || [];
+  const phones = res?.associated_identifiers?.phones || detail.associated_identifiers?.phones || [];
+  const vehicles = res?.associated_identifiers?.vehicles || detail.associated_identifiers?.vehicles || [];
+  const candidateEvals = res?.candidate_evaluations || [];
+  const sourceRecs = res?.source_records || detail.associated_records.map(r => r.record_id);
+
+  return (
+    <div className="space-y-3.5">
+      {/* Human in the loop governance banner */}
+      <div className="p-2.5 rounded-lg border border-cyan-200/80 bg-cyan-50/60 flex items-start gap-2">
+        <Info className="w-4 h-4 text-cyan-700 flex-shrink-0 mt-0.5" />
+        <p className="text-[11px] text-cyan-900 leading-snug">
+          <strong>Analytical Notice:</strong> Entity resolution is an analytical aid. Ambiguous identity resolution requires authorized human review.
+        </p>
+      </div>
+
+      {/* Canonical Representation */}
+      <div className="p-3 rounded-lg border border-slate-200 bg-slate-50/70 space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Canonical Entity</span>
+          {isReviewRequired ? (
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-200 inline-flex items-center gap-1">
+              <AlertTriangle className="w-2.5 h-2.5" />
+              Review Required
+            </span>
+          ) : (
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200 inline-flex items-center gap-1">
+              <Shield className="w-2.5 h-2.5" />
+              Matched
+            </span>
+          )}
+        </div>
+        <div>
+          <p className="text-xs font-mono text-slate-500">{canonicalId}</p>
+          <p className="text-sm font-bold text-slate-900 mt-0.5">{canonicalName}</p>
+        </div>
+        <div className="flex items-center gap-2 pt-1 text-[11px] text-slate-500 border-t border-slate-200/60">
+          <span>Type: <strong className="text-slate-700">{detail.type}</strong></span>
+          <span>·</span>
+          <span>Observations: <strong className="text-slate-700">{observationCount}</strong></span>
+        </div>
+      </div>
+
+      {/* Review requirements if applicable */}
+      {isReviewRequired && reviewReasons.length > 0 && (
+        <div className="p-3 rounded-lg border border-amber-200 bg-amber-50/70 space-y-1.5">
+          <p className="text-[11px] font-bold text-amber-900 flex items-center gap-1.5">
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+            Ambiguity Review Reasons
+          </p>
+          <ul className="space-y-1">
+            {reviewReasons.map((r, i) => (
+              <li key={i} className="text-xs text-amber-800 leading-relaxed list-disc list-inside">
+                {r}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Observed variants */}
+      <div className="p-3 rounded-lg border border-slate-100 bg-white space-y-2">
+        <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+          Observed Variants ({variants.length})
+        </p>
+        <div className="flex flex-wrap gap-1.5">
+          {variants.map((v, i) => (
+            <span key={i} className="px-2 py-1 bg-slate-100 border border-slate-200 rounded text-xs font-medium text-slate-800">
+              {v}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Associated Identifiers */}
+      {(phones.length > 0 || vehicles.length > 0) && (
+        <div className="p-3 rounded-lg border border-slate-100 bg-white space-y-2">
+          <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+            Contextual Identifiers
+          </p>
+          <div className="space-y-1.5">
+            {phones.length > 0 && (
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-slate-400 w-14">Phones:</span>
+                <div className="flex flex-wrap gap-1">
+                  {phones.map(p => (
+                    <span key={p} className="px-1.5 py-0.5 bg-indigo-50 text-indigo-700 rounded font-mono text-[11px]">
+                      {p}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {vehicles.length > 0 && (
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-slate-400 w-14">Vehicles:</span>
+                <div className="flex flex-wrap gap-1">
+                  {vehicles.map(v => (
+                    <span key={v} className="px-1.5 py-0.5 bg-amber-50 text-amber-800 rounded font-mono text-[11px]">
+                      {v}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Candidate Evaluations & Evidence */}
+      {candidateEvals.length > 0 && (
+        <div className="p-3 rounded-lg border border-slate-100 bg-white space-y-2">
+          <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+            Candidate Evidence Evaluations ({candidateEvals.length})
+          </p>
+          <div className="space-y-2">
+            {candidateEvals.map((ev, i) => {
+              const dec = ev.decision;
+              const isMatch = dec.decision === "MATCH";
+              const isReview = dec.decision === "REVIEW_REQUIRED";
+              return (
+                <div key={i} className="p-2.5 rounded border border-slate-100 bg-slate-50 space-y-1">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="font-semibold text-slate-800 truncate max-w-[180px]">
+                      {ev.obs_a.raw_text} ↔ {ev.obs_b.raw_text}
+                    </span>
+                    <span className={"px-1.5 py-0.5 rounded text-[10px] font-semibold " +
+                      (isMatch ? "bg-emerald-100 text-emerald-700" : isReview ? "bg-amber-100 text-amber-700" : "bg-slate-200 text-slate-700")}>
+                      {isMatch ? "Matched" : isReview ? "Review Required" : "Distinct Entity"}
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-slate-500">
+                    Records: {ev.obs_a.record_id} & {ev.obs_b.record_id} · Compatibility Index: {ev.decision.evidence.compatibility_score.toFixed(2)}
+                  </div>
+                  {dec.reasons.length > 0 && (
+                    <p className="text-[11px] text-slate-600 italic mt-0.5">
+                      {dec.reasons[0]}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Source Records */}
+      <div className="p-3 rounded-lg border border-slate-100 bg-white space-y-1.5">
+        <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+          Source Records Provenance
+        </p>
+        <div className="flex flex-wrap gap-1">
+          {sourceRecs.map(rid => (
+            <button
+              key={rid}
+              onClick={() => navigate(`/cases?id=${encodeURIComponent(rid)}`)}
+              className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded text-xs font-mono text-slate-700 transition-colors"
+              title={`View record ${rid}`}
+            >
+              {rid}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const EntityDetailPanel: React.FC<{
   detail: EntityDetail; onClose: () => void;
   onNavigateToNetwork: () => void; onSelectEntity: (id: string) => void;
 }> = ({ detail, onClose, onNavigateToNetwork, onSelectEntity }) => {
   const cfg = getCfg(detail.type);
   const Icon = cfg.icon;
-  const [tab, setTab] = useState<"connections" | "anomalies" | "records">("connections");
+  const [tab, setTab] = useState<"resolution" | "connections" | "anomalies" | "records">("resolution");
   const metrics = [
     { label: "Degree Centrality", value: fmt4(detail.degree), pct: detail.degree, desc: "Normalised share of connections" },
     { label: "Betweenness", value: fmt4(detail.betweenness), pct: detail.betweenness * 5, desc: "Control over information flow" },
@@ -197,6 +377,7 @@ const EntityDetailPanel: React.FC<{
     { label: "Eigenvector", value: fmt4(detail.eigenvector), pct: detail.eigenvector, desc: "Influential-neighbour weighting" },
     { label: "Influence Score", value: fmt4(detail.influence_score), pct: detail.influence_score * 3, desc: "Composite investigative ranking" },
   ];
+  const isReviewReq = (detail.resolution_status || detail.resolution?.review_status) === "REVIEW_REQUIRED";
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <div className="p-4 border-b border-slate-100 flex items-start justify-between flex-shrink-0">
@@ -217,6 +398,15 @@ const EntityDetailPanel: React.FC<{
         <span className="px-2 py-0.5 rounded-full text-xs font-medium text-white" style={{ backgroundColor: cfg.color }}>
           Community {detail.community}
         </span>
+        {isReviewReq ? (
+          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700 border border-amber-200 inline-flex items-center gap-1">
+            <AlertTriangle className="w-2.5 h-2.5" />Review Required
+          </span>
+        ) : (
+          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 border border-emerald-200 inline-flex items-center gap-1">
+            <Shield className="w-2.5 h-2.5" />Matched
+          </span>
+        )}
         {detail.is_key_player && (
           <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700 border border-amber-200 inline-flex items-center gap-1">
             <Star className="w-2.5 h-2.5" />Key Player
@@ -258,17 +448,19 @@ const EntityDetailPanel: React.FC<{
           </button>
         </div>
         <div className="flex border-b border-slate-100">
-          {(["connections", "anomalies", "records"] as const).map(t => (
+          {(["resolution", "connections", "anomalies", "records"] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={"flex-1 py-2 text-xs font-semibold transition-colors " +
                 (tab === t ? "border-b-2 border-cyan-500 text-cyan-700 bg-cyan-50/50" : "text-slate-500 hover:text-slate-700")}>
-              {t === "connections" ? `Connections (${detail.connected_entities.length})`
-               : t === "anomalies" ? `Anomalies (${detail.detected_anomalies.length})`
-               : `Records (${detail.associated_records.length})`}
+              {t === "resolution" ? "Resolution"
+               : t === "connections" ? `Links (${detail.connected_entities.length})`
+               : t === "anomalies" ? `Anom (${detail.detected_anomalies.length})`
+               : `Recs (${detail.associated_records.length})`}
             </button>
           ))}
         </div>
         <div className="p-4">
+          {tab === "resolution" && <ResolutionTab detail={detail} onSelectEntity={onSelectEntity} />}
           {tab === "connections" && <ConnectionsTab entities={detail.connected_entities} onSelect={onSelectEntity} />}
           {tab === "anomalies" && <AnomaliesTab anomalies={detail.detected_anomalies} />}
           {tab === "records" && <RecordsTab records={detail.associated_records} />}
@@ -320,14 +512,15 @@ export const Entities: React.FC = () => {
 
   const counts = useMemo(() => {
     const typeCounts: Record<string, number> = {};
-    let keyPlayers = 0, bridgeNodes = 0, anomalyFlagged = 0;
+    let keyPlayers = 0, bridgeNodes = 0, anomalyFlagged = 0, reviewRequired = 0;
     for (const e of entities) {
       typeCounts[e.type] = (typeCounts[e.type] ?? 0) + 1;
       if (e.is_key_player) keyPlayers++;
       if (e.is_bridge_node) bridgeNodes++;
       if (e.anomaly_count > 0) anomalyFlagged++;
+      if (e.resolution_status === "REVIEW_REQUIRED") reviewRequired++;
     }
-    return { typeCounts, keyPlayers, bridgeNodes, anomalyFlagged };
+    return { typeCounts, keyPlayers, bridgeNodes, anomalyFlagged, reviewRequired };
   }, [entities]);
 
   const displayList = useMemo(() => {
@@ -338,6 +531,7 @@ export const Entities: React.FC = () => {
       if (typeFilter === "key_players") return e.is_key_player;
       if (typeFilter === "bridge_nodes") return e.is_bridge_node;
       if (typeFilter === "anomaly_flagged") return e.anomaly_count > 0;
+      if (typeFilter === "review_required") return e.resolution_status === "REVIEW_REQUIRED";
       return e.type === typeFilter;
     });
     return [...list].sort((a, b) => {
@@ -421,6 +615,10 @@ export const Entities: React.FC = () => {
               icon={<Share2 className="w-3 h-3" />} onClick={() => setTypeFilter(typeFilter === "bridge_nodes" ? "all" : "bridge_nodes")} />
             <FilterChip label="Anomaly Flagged" count={counts.anomalyFlagged} active={typeFilter === "anomaly_flagged"} color="#EA580C"
               icon={<AlertTriangle className="w-3 h-3" />} onClick={() => setTypeFilter(typeFilter === "anomaly_flagged" ? "all" : "anomaly_flagged")} />
+            {counts.reviewRequired > 0 && (
+              <FilterChip label="Review Required" count={counts.reviewRequired} active={typeFilter === "review_required"} color="#B45309"
+                icon={<AlertTriangle className="w-3 h-3 text-amber-600" />} onClick={() => setTypeFilter(typeFilter === "review_required" ? "all" : "review_required")} />
+            )}
           </div>
         </div>
 
@@ -499,6 +697,11 @@ export const Entities: React.FC = () => {
                           {entity.is_bridge_node && (
                             <span title="Bridge Node" className="inline-flex items-center justify-center w-5 h-5 rounded bg-indigo-100 text-indigo-600">
                               <Shield className="w-3 h-3" />
+                            </span>
+                          )}
+                          {entity.resolution_status === "REVIEW_REQUIRED" && (
+                            <span title="Entity Ambiguity: Manual Review Required" className="inline-flex items-center justify-center w-5 h-5 rounded bg-amber-100 text-amber-600">
+                              <AlertTriangle className="w-3 h-3" />
                             </span>
                           )}
                         </div>

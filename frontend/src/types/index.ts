@@ -38,6 +38,16 @@ export interface NetworkNode {
   is_bridge_node: boolean;
   bridge_betweenness: number;
   anomaly_count: number;
+  canonical_id?: string;
+  canonical_name?: string;
+  resolution_status?: string;
+  observed_variants?: string[];
+  observation_count?: number;
+  review_reasons?: string[];
+  associated_identifiers?: {
+    phones: string[];
+    vehicles: string[];
+  };
 }
 
 export interface NetworkLink {
@@ -87,10 +97,55 @@ export interface ConnectedEntity {
   dates: string[];
 }
 
+export interface ResolutionCandidateEvaluation {
+  pair: [string, string];
+  obs_a: {
+    observation_id: string;
+    raw_text: string;
+    record_id: string;
+    normalized_value: string;
+  };
+  obs_b: {
+    observation_id: string;
+    raw_text: string;
+    record_id: string;
+    normalized_value: string;
+  };
+  decision: {
+    decision: 'MATCH' | 'DISTINCT' | 'REVIEW_REQUIRED';
+    confidence_label: string;
+    reasons: string[];
+    evidence: {
+      signals: Record<string, number>;
+      rationale: string[];
+      compatibility_score: number;
+      contradictions: string[];
+    };
+  };
+}
+
+export interface EntityResolutionInfo {
+  canonical_id: string;
+  canonical_name: string;
+  entity_type: EntityType;
+  review_status: 'RESOLVED' | 'REVIEW_REQUIRED';
+  review_reasons: string[];
+  observed_variants: string[];
+  observation_count: number;
+  source_records: string[];
+  associated_identifiers: {
+    phones: string[];
+    vehicles: string[];
+  };
+  candidate_evaluations: ResolutionCandidateEvaluation[];
+  governance_notice: string;
+}
+
 export interface EntityDetail extends NetworkNode {
   connected_entities: ConnectedEntity[];
   associated_records: CaseRecord[];
   detected_anomalies: SuspiciousPattern[];
+  resolution?: EntityResolutionInfo | null;
 }
 
 export interface CaseRecord {

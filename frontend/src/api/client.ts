@@ -65,6 +65,16 @@ export const api = {
     return res.data;
   },
 
+  getEntityResolutionOverview: async (): Promise<any> => {
+    const res = await apiClient.get('/entity-resolution');
+    return res.data;
+  },
+
+  getEntityResolutionDetail: async (entityId: string): Promise<any> => {
+    const res = await apiClient.get(`/entity-resolution/${encodeURIComponent(entityId)}`);
+    return res.data;
+  },
+
   getAnomalies: async (): Promise<SuspiciousPattern[]> => {
     const res = await apiClient.get<SuspiciousPattern[]>('/anomalies');
     return res.data;

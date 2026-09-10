@@ -41,6 +41,12 @@ def _import_pipeline_modules():
         extract_entities, co_occurrence_edges,
         RuleBasedNER, PHONE_RE, VEHICLE_PLATE_RE, MONEY_RE,
     )
+    from entity_resolution import (  # noqa: F401
+        EntityResolutionEngine, EntityObservation, CandidateGenerator,
+        EvidenceCalculator, ResolutionPolicy, CanonicalEntity,
+        normalize_person_name, normalize_phone_number, normalize_vehicle_plate,
+        normalize_location_name, normalize_org_name, normalize_money_value,
+    )
     from graph_builder import build_graph, graph_summary  # noqa: F401
     from network_analysis import compute_centrality, rank_key_players  # noqa: F401
     from anomaly_detection import (  # noqa: F401
@@ -57,6 +63,18 @@ def _import_pipeline_modules():
         "PHONE_RE": PHONE_RE,
         "VEHICLE_PLATE_RE": VEHICLE_PLATE_RE,
         "MONEY_RE": MONEY_RE,
+        "EntityResolutionEngine": EntityResolutionEngine,
+        "EntityObservation": EntityObservation,
+        "CandidateGenerator": CandidateGenerator,
+        "EvidenceCalculator": EvidenceCalculator,
+        "ResolutionPolicy": ResolutionPolicy,
+        "CanonicalEntity": CanonicalEntity,
+        "normalize_person_name": normalize_person_name,
+        "normalize_phone_number": normalize_phone_number,
+        "normalize_vehicle_plate": normalize_vehicle_plate,
+        "normalize_location_name": normalize_location_name,
+        "normalize_org_name": normalize_org_name,
+        "normalize_money_value": normalize_money_value,
         "build_graph": build_graph,
         "graph_summary": graph_summary,
         "compute_centrality": compute_centrality,
@@ -368,6 +386,28 @@ class DataQualityService:
         results.append(cls._test_reg_3e_investigation())
         results.append(cls._test_int_1_catalogue())
         results.append(cls._test_int_2_coverage())
+
+        # ── Phase 3G: Advanced Entity Resolution Tests (29–48) ───────────────
+        results.append(cls._test_3g_01_exact_duplicate_records())
+        results.append(cls._test_3g_02_exact_duplicate_entities())
+        results.append(cls._test_3g_03_person_casing_variations())
+        results.append(cls._test_3g_04_whitespace_variations())
+        results.append(cls._test_3g_05_punctuation_variations())
+        results.append(cls._test_3g_06_phone_variations())
+        results.append(cls._test_3g_07_vehicle_variations())
+        results.append(cls._test_3g_08_near_duplicate_names())
+        results.append(cls._test_3g_09_same_name_diff_context())
+        results.append(cls._test_3g_10_conflicting_identifiers())
+        results.append(cls._test_3g_11_missing_identifiers())
+        results.append(cls._test_3g_12_ambiguous_locations())
+        results.append(cls._test_3g_13_org_variations())
+        results.append(cls._test_3g_14_unicode_special_chars())
+        results.append(cls._test_3g_15_false_positive_pairs())
+        results.append(cls._test_3g_16_repeated_observations_across_records())
+        results.append(cls._test_3g_17_graph_weight_preservation())
+        results.append(cls._test_3g_18_provenance_preservation())
+        results.append(cls._test_3g_19_idempotent_resolution())
+        results.append(cls._test_3g_20_baseline_protection())
 
         # ── Summary ──────────────────────────────────────────────────────────
         counts = {"PASS": 0, "FAIL": 0, "KNOWN_WEAKNESS": 0, "WARNING": 0}
@@ -1580,6 +1620,505 @@ class DataQualityService:
             }
         except Exception as exc:
             return cls._error_result("TEST-INT-2", "Fixture Catalogue Category Coverage", "Integration", str(exc))
+
+    # ── Phase 3G: Advanced Entity Resolution Tests (1–20) ───────────────────
+
+    @classmethod
+    def _test_3g_01_exact_duplicate_records(cls) -> dict:
+        """TEST-3G-01: Ingestion and resolution of exact duplicate records."""
+        mods = _import_pipeline_modules()
+        records = [
+            {"record_id": "TEST-DUP-01", "date": "2026-01-05", "source": "test_fixture",
+             "text": "Suspect Ravi Malhotra observed with Suresh Nair at Andheri Warehouse."},
+            {"record_id": "TEST-DUP-01", "date": "2026-01-05", "source": "test_fixture",
+             "text": "Suspect Ravi Malhotra observed with Suresh Nair at Andheri Warehouse."},
+        ]
+        result = _run_pipeline_on_records(records)
+        passed = result["error"] is None and len(result["collected_records"]) == 1
+        return {
+            "test_id": "TEST-3G-01",
+            "test_name": "Exact Duplicate Records Ingestion & Resolution",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify exact duplicate records are deduplicated at ingestion without observation duplication.",
+            "observed_behavior": f"Ingested {len(records)} records, deduplicated to {len(result['collected_records'])} records.",
+            "expected_behavior": "Exactly 1 record retained; no duplicate entity observations generated.",
+            "weakness_documented": False,
+            "detail": {"input_records": len(records), "retained_records": len(result["collected_records"])},
+        }
+
+    @classmethod
+    def _test_3g_02_exact_duplicate_entities(cls) -> dict:
+        """TEST-3G-02: Intra-record deduplication of identical entity mentions."""
+        mods = _import_pipeline_modules()
+        extract_entities = mods["extract_entities"]
+        Record = mods["Record"]
+        rec = Record(
+            record_id="TEST-3G-02",
+            source="test_fixture",
+            date="2026-01-05",
+            text="Ravi Malhotra met with someone. Later, Ravi Malhotra was seen departing.",
+        )
+        extracted = extract_entities([rec])
+        ravi_mentions = [e for e in extracted[0].entities if e.text == "Ravi Malhotra"]
+        passed = len(ravi_mentions) == 1
+        return {
+            "test_id": "TEST-3G-02",
+            "test_name": "Intra-Record Exact Duplicate Entity Mentions",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify repeated mentions of an entity within one record are deduplicated to a single observation.",
+            "observed_behavior": f"Mention count for Ravi Malhotra in single record: {len(ravi_mentions)}.",
+            "expected_behavior": "Exactly 1 entity mention preserved per record.",
+            "weakness_documented": False,
+            "detail": {"mention_count": len(ravi_mentions)},
+        }
+
+    @classmethod
+    def _test_3g_03_person_casing_variations(cls) -> dict:
+        """TEST-3G-03: Person name casing normalization and resolution."""
+        mods = _import_pipeline_modules()
+        norm_fn = mods["normalize_person_name"]
+        names = ["RAVI MALHOTRA", "Ravi Malhotra", "ravi malhotra", "rAvI mAlHoTrA"]
+        normalized_set = {norm_fn(n) for n in names}
+        passed = len(normalized_set) == 1 and "ravi malhotra" in normalized_set
+        return {
+            "test_id": "TEST-3G-03",
+            "test_name": "Person Name Casing Variations Normalization",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify varying letter casings of the same name map to identical normalized representation.",
+            "observed_behavior": f"Normalized variants: {normalized_set}.",
+            "expected_behavior": "All casing variations normalize to single canonical key 'ravi malhotra'.",
+            "weakness_documented": False,
+            "detail": {"inputs": names, "normalized_unique": list(normalized_set)},
+        }
+
+    @classmethod
+    def _test_3g_04_whitespace_variations(cls) -> dict:
+        """TEST-3G-04: Person name whitespace normalization."""
+        mods = _import_pipeline_modules()
+        norm_fn = mods["normalize_person_name"]
+        names = ["Ravi  Malhotra", " Ravi Malhotra ", "Ravi\tMalhotra\n", "Ravi   Malhotra"]
+        normalized_set = {norm_fn(n) for n in names}
+        passed = len(normalized_set) == 1 and "ravi malhotra" in normalized_set
+        return {
+            "test_id": "TEST-3G-04",
+            "test_name": "Whitespace Variations Normalization",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify irregular leading, trailing, and inter-token whitespaces normalize cleanly.",
+            "observed_behavior": f"Normalized set: {normalized_set}.",
+            "expected_behavior": "All whitespace variations normalize to 'ravi malhotra'.",
+            "weakness_documented": False,
+            "detail": {"inputs": names, "normalized_unique": list(normalized_set)},
+        }
+
+    @classmethod
+    def _test_3g_05_punctuation_variations(cls) -> dict:
+        """TEST-3G-05: Punctuation and honorific variations normalization."""
+        mods = _import_pipeline_modules()
+        norm_fn = mods["normalize_person_name"]
+        cases = ["Mr. Ravi Malhotra", "Dr. Ravi Malhotra", "Ravi Malhotra,", "Ravi Malhotra."]
+        results = [norm_fn(c) for c in cases]
+        passed = all(r == "ravi malhotra" for r in results)
+        return {
+            "test_id": "TEST-3G-05",
+            "test_name": "Punctuation & Honorific Variations Normalization",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify trailing punctuation and non-name honorifics strip safely.",
+            "observed_behavior": f"Normalized outcomes: {results}.",
+            "expected_behavior": "All variations resolve to 'ravi malhotra'.",
+            "weakness_documented": False,
+            "detail": {"inputs": cases, "results": results},
+        }
+
+    @classmethod
+    def _test_3g_06_phone_variations(cls) -> dict:
+        """TEST-3G-06: Telephone number formatting variations normalization."""
+        mods = _import_pipeline_modules()
+        norm_fn = mods["normalize_phone_number"]
+        phones = ["+91-9876543210", "+91 98765 43210", "09876543210", "98765-43210", "9876543210"]
+        normalized = [norm_fn(p) for p in phones]
+        all_match = all(n[0] == "9876543210" and n[1] is True for n in normalized)
+        return {
+            "test_id": "TEST-3G-06",
+            "test_name": "Telephone Formatting Variations Normalization",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if all_match else "FAIL",
+            "description": "Verify country code, zero-prefix, and delimiter variations normalize to 10-digit format.",
+            "observed_behavior": f"Normalized results: {normalized}.",
+            "expected_behavior": "All variants resolve to 9876543210 with is_complete=True.",
+            "weakness_documented": False,
+            "detail": {"inputs": phones, "results": normalized},
+        }
+
+    @classmethod
+    def _test_3g_07_vehicle_variations(cls) -> dict:
+        """TEST-3G-07: Vehicle registration plate formatting variations."""
+        mods = _import_pipeline_modules()
+        norm_fn = mods["normalize_vehicle_plate"]
+        plates = ["MH 12 AB 1234", "MH-12-AB-1234", "mh12ab1234", "MH.12.AB.1234", "MH12AB1234"]
+        normalized = [norm_fn(p) for p in plates]
+        all_match = all(n == "MH12AB1234" for n in normalized)
+        return {
+            "test_id": "TEST-3G-07",
+            "test_name": "Vehicle Plate Formatting Variations Normalization",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if all_match else "FAIL",
+            "description": "Verify spaces, hyphens, and casing in license plates normalize safely.",
+            "observed_behavior": f"Normalized plates: {normalized}.",
+            "expected_behavior": "All variants resolve to 'MH12AB1234'.",
+            "weakness_documented": False,
+            "detail": {"inputs": plates, "results": normalized},
+        }
+
+    @classmethod
+    def _test_3g_08_near_duplicate_names(cls) -> dict:
+        """TEST-3G-08: Near-duplicate person names evaluated to REVIEW_REQUIRED."""
+        mods = _import_pipeline_modules()
+        EntityObservation = mods["EntityObservation"]
+        EvidenceCalculator = mods["EvidenceCalculator"]
+        ResolutionPolicy = mods["ResolutionPolicy"]
+
+        obs_a = EntityObservation("OBS-1", "Ravi Malhotra", "PERSON", "REC-1", "src", "2026-01-01", "ravi malhotra")
+        obs_b = EntityObservation("OBS-2", "Ravi Malhothra", "PERSON", "REC-2", "src", "2026-01-02", "ravi malhothra")
+
+        evidence = EvidenceCalculator.evaluate_candidate_pair(obs_a, obs_b)
+        decision = ResolutionPolicy.evaluate(obs_a, obs_b, evidence)
+
+        passed = decision.decision == "REVIEW_REQUIRED"
+        return {
+            "test_id": "TEST-3G-08",
+            "test_name": "Near-Duplicate Names Ambiguity Handling",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify near-matching names without corroboration trigger REVIEW_REQUIRED rather than false merge.",
+            "observed_behavior": f"Decision: {decision.decision} ({decision.confidence_label}). Reasons: {decision.reasons}.",
+            "expected_behavior": "Decision must be 'REVIEW_REQUIRED'.",
+            "weakness_documented": False,
+            "detail": {"decision": decision.decision, "reasons": decision.reasons, "similarity": evidence.signals.get("string_similarity")},
+        }
+
+    @classmethod
+    def _test_3g_09_same_name_diff_context(cls) -> dict:
+        """TEST-3G-09: Guardrail 1 - Same name alone does NOT establish identity."""
+        mods = _import_pipeline_modules()
+        EntityObservation = mods["EntityObservation"]
+        EvidenceCalculator = mods["EvidenceCalculator"]
+        ResolutionPolicy = mods["ResolutionPolicy"]
+
+        obs_a = EntityObservation("OBS-1", "Ravi Malhotra", "PERSON", "REC-1", "src", "2026-01-01", "ravi malhotra")
+        obs_b = EntityObservation("OBS-2", "Ravi Malhotra", "PERSON", "REC-2", "src", "2026-01-02", "ravi malhotra")
+
+        evidence = EvidenceCalculator.evaluate_candidate_pair(obs_a, obs_b)
+        decision = ResolutionPolicy.evaluate(obs_a, obs_b, evidence)
+
+        passed = decision.decision == "REVIEW_REQUIRED"
+        return {
+            "test_id": "TEST-3G-09",
+            "test_name": "Guardrail 1: Same Name in Uncorroborated Contexts",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Enforce Guardrail 1: Same normalized name across different records without corroborating identifiers triggers REVIEW_REQUIRED.",
+            "observed_behavior": f"Decision: {decision.decision}. Reasons: {decision.reasons}.",
+            "expected_behavior": "Decision must be 'REVIEW_REQUIRED' (never auto-merge without corroborating identifiers).",
+            "weakness_documented": False,
+            "detail": {"decision": decision.decision, "reasons": decision.reasons},
+        }
+
+    @classmethod
+    def _test_3g_10_conflicting_identifiers(cls) -> dict:
+        """TEST-3G-10: Conflicting identifiers prevent matching and trigger REVIEW_REQUIRED."""
+        mods = _import_pipeline_modules()
+        EntityObservation = mods["EntityObservation"]
+        EvidenceCalculator = mods["EvidenceCalculator"]
+        ResolutionPolicy = mods["ResolutionPolicy"]
+
+        obs_a = EntityObservation("OBS-1", "Ravi Malhotra", "PERSON", "REC-1", "src", "2026-01-01", "ravi malhotra", associated_phone="9876543210")
+        obs_b = EntityObservation("OBS-2", "Ravi Malhotra", "PERSON", "REC-2", "src", "2026-01-02", "ravi malhotra", associated_phone="9123456789")
+
+        evidence = EvidenceCalculator.evaluate_candidate_pair(obs_a, obs_b)
+        decision = ResolutionPolicy.evaluate(obs_a, obs_b, evidence)
+
+        passed = decision.decision == "REVIEW_REQUIRED" and len(evidence.contradictions) > 0
+        return {
+            "test_id": "TEST-3G-10",
+            "test_name": "Conflicting Identifiers Ambiguity Flagging",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify conflicting telephone numbers between candidate matches prevent merge and flag contradictions.",
+            "observed_behavior": f"Decision: {decision.decision}. Contradictions: {evidence.contradictions}.",
+            "expected_behavior": "Decision must be 'REVIEW_REQUIRED' with explicit contradictions documented.",
+            "weakness_documented": False,
+            "detail": {"decision": decision.decision, "contradictions": evidence.contradictions},
+        }
+
+    @classmethod
+    def _test_3g_11_missing_identifiers(cls) -> dict:
+        """TEST-3G-11: Missing or partial identifier digits handled conservatively."""
+        mods = _import_pipeline_modules()
+        norm_fn = mods["normalize_phone_number"]
+        EntityObservation = mods["EntityObservation"]
+        EvidenceCalculator = mods["EvidenceCalculator"]
+        ResolutionPolicy = mods["ResolutionPolicy"]
+
+        norm_p, is_comp = norm_fn("98765")
+        obs_a = EntityObservation("OBS-1", "98765", "PHONE", "REC-1", "src", "2026-01-01", norm_p)
+        obs_b = EntityObservation("OBS-2", "98765", "PHONE", "REC-2", "src", "2026-01-02", norm_p)
+
+        evidence = EvidenceCalculator.evaluate_candidate_pair(obs_a, obs_b)
+        decision = ResolutionPolicy.evaluate(obs_a, obs_b, evidence)
+
+        passed = not is_comp and decision.decision == "REVIEW_REQUIRED"
+        return {
+            "test_id": "TEST-3G-11",
+            "test_name": "Incomplete Identifier Handling (No Invented Digits)",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify incomplete telephone numbers (<10 digits) are flagged for review without fabricating digits.",
+            "observed_behavior": f"Is complete: {is_comp}. Decision: {decision.decision}.",
+            "expected_behavior": "is_complete=False and decision='REVIEW_REQUIRED'.",
+            "weakness_documented": False,
+            "detail": {"is_complete": is_comp, "normalized": norm_p, "decision": decision.decision},
+        }
+
+    @classmethod
+    def _test_3g_12_ambiguous_locations(cls) -> dict:
+        """TEST-3G-12: Hierarchical locations are kept DISTINCT."""
+        mods = _import_pipeline_modules()
+        EntityObservation = mods["EntityObservation"]
+        EvidenceCalculator = mods["EvidenceCalculator"]
+        ResolutionPolicy = mods["ResolutionPolicy"]
+
+        obs_a = EntityObservation("OBS-1", "Andheri", "LOCATION", "REC-1", "src", "2026-01-01", "Andheri")
+        obs_b = EntityObservation("OBS-2", "Andheri Warehouse", "LOCATION", "REC-2", "src", "2026-01-02", "Andheri Warehouse")
+
+        evidence = EvidenceCalculator.evaluate_candidate_pair(obs_a, obs_b)
+        decision = ResolutionPolicy.evaluate(obs_a, obs_b, evidence)
+
+        passed = decision.decision == "DISTINCT"
+        return {
+            "test_id": "TEST-3G-12",
+            "test_name": "Hierarchical Locations Distinction Preservation",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify 'Andheri' and 'Andheri Warehouse' remain distinct entities without automatic hierarchical collapsing.",
+            "observed_behavior": f"Decision: {decision.decision}. Rationale: {decision.reasons}.",
+            "expected_behavior": "Decision must be 'DISTINCT'.",
+            "weakness_documented": False,
+            "detail": {"decision": decision.decision, "reasons": decision.reasons},
+        }
+
+    @classmethod
+    def _test_3g_13_org_variations(cls) -> dict:
+        """TEST-3G-13: Corporate suffix variations normalization."""
+        mods = _import_pipeline_modules()
+        norm_org = mods["normalize_org_name"]
+        disp1, idx1 = norm_org("Global Traders Pvt Ltd")
+        disp2, idx2 = norm_org("Global Traders Private Limited")
+
+        passed = idx1 == idx2 == "global traders"
+        return {
+            "test_id": "TEST-3G-13",
+            "test_name": "Organization Corporate Suffix Normalization",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify corporate suffixes (Pvt Ltd, Private Limited) normalize to matching indexing keys while preserving display names.",
+            "observed_behavior": f"Indexing keys: '{idx1}' vs '{idx2}'. Display: '{disp1}' vs '{disp2}'.",
+            "expected_behavior": "Indexing keys match 'global traders'.",
+            "weakness_documented": False,
+            "detail": {"idx1": idx1, "idx2": idx2, "disp1": disp1, "disp2": disp2},
+        }
+
+    @classmethod
+    def _test_3g_14_unicode_special_chars(cls) -> dict:
+        """TEST-3G-14: Unicode and NFKC normalization robustness."""
+        mods = _import_pipeline_modules()
+        norm_person = mods["normalize_person_name"]
+        unicode_name = "Ｒａｖｉ　Ｍａｌｈｏｔｒａ"
+        norm = norm_person(unicode_name)
+        passed = norm == "ravi malhotra"
+        return {
+            "test_id": "TEST-3G-14",
+            "test_name": "Unicode NFKC Normalization Robustness",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify full-width and non-standard unicode characters normalize cleanly to standard representation.",
+            "observed_behavior": f"Input: '{unicode_name}' -> Normalized: '{norm}'.",
+            "expected_behavior": "Normalized result is 'ravi malhotra'.",
+            "weakness_documented": False,
+            "detail": {"input": unicode_name, "normalized": norm},
+        }
+
+    @classmethod
+    def _test_3g_15_false_positive_pairs(cls) -> dict:
+        """TEST-3G-15: Dissimilar entity candidate pairs evaluated to DISTINCT."""
+        mods = _import_pipeline_modules()
+        EntityObservation = mods["EntityObservation"]
+        EvidenceCalculator = mods["EvidenceCalculator"]
+        ResolutionPolicy = mods["ResolutionPolicy"]
+
+        obs_a = EntityObservation("OBS-1", "Ravi Malhotra", "PERSON", "REC-1", "src", "2026-01-01", "ravi malhotra")
+        obs_b = EntityObservation("OBS-2", "Vikram Rao", "PERSON", "REC-2", "src", "2026-01-02", "vikram rao")
+
+        evidence = EvidenceCalculator.evaluate_candidate_pair(obs_a, obs_b)
+        decision = ResolutionPolicy.evaluate(obs_a, obs_b, evidence)
+
+        passed = decision.decision == "DISTINCT"
+        return {
+            "test_id": "TEST-3G-15",
+            "test_name": "Dissimilar Candidate Pairs Discrimination",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify dissimilar candidate entity pairs are deterministically classified as DISTINCT.",
+            "observed_behavior": f"Decision: {decision.decision}. Compatibility score: {evidence.compatibility_score}.",
+            "expected_behavior": "Decision must be 'DISTINCT'.",
+            "weakness_documented": False,
+            "detail": {"decision": decision.decision, "score": evidence.compatibility_score},
+        }
+
+    @classmethod
+    def _test_3g_16_repeated_observations_across_records(cls) -> dict:
+        """TEST-3G-16: Traceability of repeated observations across source records."""
+        from server.service import IntelligenceService
+        data = IntelligenceService.get_data()
+        reg = IntelligenceService._cached_canonical_registry or {}
+
+        ravi_ce = None
+        for ce in reg.values():
+            if "Ravi Malhotra" in ce.observed_variants or ce.canonical_name == "Ravi Malhotra":
+                ravi_ce = ce
+                break
+
+        passed = ravi_ce is not None and len(ravi_ce.source_records) >= 2
+        return {
+            "test_id": "TEST-3G-16",
+            "test_name": "Multi-Record Observation Provenance Traceability",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify canonical entities maintain full list of originating source record references.",
+            "observed_behavior": f"Ravi Malhotra canonical records: {ravi_ce.source_records if ravi_ce else []}.",
+            "expected_behavior": "Canonical entity contains multiple originating source record IDs.",
+            "weakness_documented": False,
+            "detail": {"source_records": ravi_ce.source_records if ravi_ce else []},
+        }
+
+    @classmethod
+    def _test_3g_17_graph_weight_preservation(cls) -> dict:
+        """TEST-3G-17: Co-occurrence edge weights reflect true corroborating record count."""
+        from server.service import IntelligenceService
+        G = IntelligenceService._cached_graph
+        wt = G["Ravi Malhotra"]["Suresh Nair"]["weight"] if G and G.has_edge("Ravi Malhotra", "Suresh Nair") else 0
+        recs = G["Ravi Malhotra"]["Suresh Nair"]["records"] if G and G.has_edge("Ravi Malhotra", "Suresh Nair") else []
+        passed = wt == 2 and set(recs) == {"CR-1001", "CR-1005"}
+        return {
+            "test_id": "TEST-3G-17",
+            "test_name": "Graph Relationship Weight Preservation",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify relationship edge weights correspond exactly to independent corroborating record counts.",
+            "observed_behavior": f"Edge weight: {wt}. Associated records: {recs}.",
+            "expected_behavior": "Weight == 2, records == ['CR-1001', 'CR-1005'].",
+            "weakness_documented": False,
+            "detail": {"edge_weight": wt, "records": recs},
+        }
+
+    @classmethod
+    def _test_3g_18_provenance_preservation(cls) -> dict:
+        """TEST-3G-18: Verbatim raw text and offsets preserved in observation model."""
+        from server.service import IntelligenceService
+        reg = IntelligenceService._cached_canonical_registry or {}
+        all_obs = []
+        for ce in reg.values():
+            all_obs.extend(ce.observations)
+
+        has_raw_and_recs = len(all_obs) > 0 and all(bool(o.raw_text) and bool(o.record_id) and bool(o.observation_id) for o in all_obs)
+        passed = has_raw_and_recs
+        return {
+            "test_id": "TEST-3G-18",
+            "test_name": "Verbatim Raw Text & Provenance Retention",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify every constituent observation retains exact raw text and record identifier.",
+            "observed_behavior": f"Validated {len(all_obs)} observations across canonical registry.",
+            "expected_behavior": "All observations preserve raw_text, record_id, and observation_id.",
+            "weakness_documented": False,
+            "detail": {"total_observations_validated": len(all_obs)},
+        }
+
+    @classmethod
+    def _test_3g_19_idempotent_resolution(cls) -> dict:
+        """TEST-3G-19: Idempotency of entity resolution engine across consecutive runs."""
+        mods = _import_pipeline_modules()
+        EntityResolutionEngine = mods["EntityResolutionEngine"]
+        from ingestion import JSONFileConnector
+        manager = mods["IngestionManager"]()
+        manager.register(JSONFileConnector(_SAMPLE_RECORDS_PATH))
+        records = manager.collect()
+        extracted = mods["extract_entities"](records)
+
+        eng1 = EntityResolutionEngine()
+        reg1 = eng1.resolve(extracted)
+
+        eng2 = EntityResolutionEngine()
+        reg2 = eng2.resolve(extracted)
+
+        passed = len(reg1) == len(reg2) and sorted(reg1.keys()) == sorted(reg2.keys())
+        return {
+            "test_id": "TEST-3G-19",
+            "test_name": "Entity Resolution Engine Idempotency",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify executing resolution repeatedly on the same extracted records yields identical canonical entities.",
+            "observed_behavior": f"Run 1 count: {len(reg1)}. Run 2 count: {len(reg2)}. Key match: {sorted(reg1.keys()) == sorted(reg2.keys())}.",
+            "expected_behavior": "Identical canonical registry produced on consecutive runs.",
+            "weakness_documented": False,
+            "detail": {"run1_count": len(reg1), "run2_count": len(reg2)},
+        }
+
+    @classmethod
+    def _test_3g_20_baseline_protection(cls) -> dict:
+        """TEST-3G-20: Production baseline integrity verification."""
+        from server.service import IntelligenceService
+        data = IntelligenceService.get_data(force_reload=True)
+
+        rec_cnt = data["total_records"]
+        node_cnt = data["summary"]["num_nodes"]
+        edge_cnt = data["summary"]["num_edges"]
+        anom_cnt = len(data["suspicious_patterns"])
+        comm_cnt = len(data["communities"])
+        kp_cnt = len(data["key_players"])
+        br_cnt = len(data["critical_bridge_nodes"])
+
+        passed = (
+            rec_cnt == 10
+            and node_cnt == 15
+            and edge_cnt == 52
+            and anom_cnt == 25
+            and comm_cnt == 3
+            and kp_cnt == 6
+            and br_cnt == 5
+        )
+        return {
+            "test_id": "TEST-3G-20",
+            "test_name": "Production Baseline Dataset Protection",
+            "category": "Phase 3G: Advanced Entity Resolution",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify production baseline intelligence metrics remain 100% intact after Phase 3G integration.",
+            "observed_behavior": (
+                f"Records: {rec_cnt}/10, Nodes: {node_cnt}/15, Edges: {edge_cnt}/52, "
+                f"Anomalies: {anom_cnt}/25, Communities: {comm_cnt}/3, Key Players: {kp_cnt}/6, Bridges: {br_cnt}/5."
+            ),
+            "expected_behavior": "10 records, 15 nodes, 52 edges, 25 anomalies, 3 communities, 6 key players, 5 bridge nodes.",
+            "weakness_documented": False,
+            "detail": {
+                "records": rec_cnt, "nodes": node_cnt, "edges": edge_cnt,
+                "anomalies": anom_cnt, "communities": comm_cnt,
+                "key_players": kp_cnt, "bridge_nodes": br_cnt,
+            },
+        }
 
     # ── Utility ──────────────────────────────────────────────────────────────
 

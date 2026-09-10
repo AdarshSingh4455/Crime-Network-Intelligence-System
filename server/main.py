@@ -71,6 +71,21 @@ def get_entity_detail(entity_id: str):
     return detail
 
 
+@app.get("/api/entity-resolution")
+def get_entity_resolution_overview():
+    """Phase 3G: Returns overall entity resolution summary, canonical entities, and review queue."""
+    return IntelligenceService.get_entity_resolution_overview()
+
+
+@app.get("/api/entity-resolution/{entity_id}")
+def get_entity_resolution_detail(entity_id: str):
+    """Phase 3G: Returns detailed resolution dossier, variants, and evidence evaluations for an entity."""
+    detail = IntelligenceService.get_entity_resolution_detail(entity_id)
+    if not detail:
+        raise HTTPException(status_code=404, detail=f"Canonical resolution for '{entity_id}' not found")
+    return detail
+
+
 @app.get("/api/anomalies")
 def get_anomalies():
     return IntelligenceService.get_anomalies()

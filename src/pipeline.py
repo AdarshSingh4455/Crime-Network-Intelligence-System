@@ -13,6 +13,7 @@ import os
 
 from ingestion import IngestionManager, JSONFileConnector
 from entity_extraction import extract_entities, co_occurrence_edges, RuleBasedNER
+from entity_resolution import EntityResolutionEngine
 from graph_builder import build_graph, graph_summary, export_gexf
 from network_analysis import (
     compute_centrality, rank_key_players, detect_communities,
@@ -35,15 +36,19 @@ def run_pipeline():
     # 1. INGESTION -----------------------------------------------------
     manager = IngestionManager()
     manager.register(JSONFileConnector(DATA_PATH))
-    # In production, also register CSVConnector(cdr_dump, "telecom"),
-    # SQLConnector(rms_conn, query, "case_mgmt"), RESTAPIConnector(fiu_api, "fiu"), etc.
     records = manager.collect()
     print(f"[1/6] Ingested {len(records)} records from {len({r.source for r in records})} source(s).")
 
-    # 2. ENTITY EXTRACTION ----------------------------------------------
+    # 2. ENTITY EXTRACTION & RESOLUTION (Phase 3G) ---------------------
     extracted = extract_entities(records, backend=RuleBasedNER())
     total_entities = sum(len(r.entities) for r in extracted)
     print(f"[2/6] Extracted {total_entities} entity mentions.")
+
+    resolution_engine = EntityResolutionEngine()
+    canonical_registry = resolution_engine.resolve(extracted)
+    resolution_summary = resolution_engine.get_summary()
+    print(f"[2b/6] Entity Resolution: {resolution_summary['total_canonical_entities']} canonical entities, "
+          f"{resolution_summary['entities_requiring_review']} flagged for review.")
 
     # 3. GRAPH CONSTRUCTION ----------------------------------------------
     edges = co_occurrence_edges(extracted)
@@ -81,6 +86,7 @@ def run_pipeline():
         "communities": [sorted(list(c)) for c in communities],
         "critical_bridge_nodes": [{"entity": n, "betweenness": round(v, 4)} for n, v in bridges],
         "suspicious_patterns": anomalies,
+        "entity_resolution": resolution_summary,
     }
     with open(os.path.join(OUT_DIR, "intelligence_report.json"), "w") as f:
         json.dump(report, f, indent=2)

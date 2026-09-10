@@ -39,6 +39,7 @@ if SRC_DIR not in sys.path:
 
 from ingestion import IngestionManager, JSONFileConnector
 from entity_extraction import extract_entities, co_occurrence_edges, RuleBasedNER
+from entity_resolution import EntityResolutionEngine, CanonicalEntity
 from graph_builder import build_graph, graph_summary
 from network_analysis import (
     compute_centrality, rank_key_players, detect_communities,
@@ -386,6 +387,8 @@ class WorkflowStore:
 class IntelligenceService:
     _cached_data: Dict[str, Any] | None = None
     _cached_graph: Any | None = None
+    _cached_resolution_engine: Any | None = None
+    _cached_canonical_registry: Dict[str, Any] | None = None
     _last_ingestion_time: str = datetime.now(timezone.utc).isoformat()
 
     @classmethod
@@ -404,6 +407,12 @@ class IntelligenceService:
         # 2. Entity extraction
         extracted = extract_entities(records, backend=RuleBasedNER())
         total_entity_mentions = sum(len(r.entities) for r in extracted)
+
+        # 2b. Entity resolution (Phase 3G)
+        resolution_engine = EntityResolutionEngine()
+        canonical_registry = resolution_engine.resolve(extracted)
+        cls._cached_resolution_engine = resolution_engine
+        cls._cached_canonical_registry = canonical_registry
 
         # 3. Graph construction
         edges = co_occurrence_edges(extracted)
@@ -450,11 +459,20 @@ class IntelligenceService:
         bridge_lookup = {b[0]: round(b[1], 4) for b in bridges}
         key_player_set = {kp["entity"] for kp in key_players}
 
-        # Build node list for API
+        # Build node list for API enriched with Entity Resolution metadata
         nodes = []
         for node, data in G.nodes(data=True):
             c_info = centrality.get(node, {})
             entity_anomalies = [a for a in anomalies if a.get("entity") == node]
+
+            # Find corresponding canonical entity
+            ce = canonical_registry.get(node)
+            if not ce:
+                for c_ent in canonical_registry.values():
+                    if node in c_ent.observed_variants or c_ent.canonical_name == node:
+                        ce = c_ent
+                        break
+
             nodes.append({
                 "id": node,
                 "type": data.get("type", "UNKNOWN"),
@@ -468,6 +486,13 @@ class IntelligenceService:
                 "is_bridge_node": node in bridge_lookup,
                 "bridge_betweenness": bridge_lookup.get(node, 0.0),
                 "anomaly_count": len(entity_anomalies),
+                "canonical_id": ce.canonical_id if ce else f"ENT-{data.get('type', 'UNKNOWN')}-{node}",
+                "canonical_name": ce.canonical_name if ce else node,
+                "resolution_status": ce.review_status if ce else "RESOLVED",
+                "observed_variants": ce.observed_variants if ce else [node],
+                "observation_count": ce.observation_count if ce else 1,
+                "review_reasons": ce.review_reasons if ce else [],
+                "associated_identifiers": ce.associated_identifiers if ce else {"phones": [], "vehicles": []},
             })
 
         # Build edge list for API
@@ -507,6 +532,8 @@ class IntelligenceService:
             "nodes": nodes,
             "links": links,
             "records": formatted_records,
+            "entity_resolution": resolution_engine.get_summary(),
+            "canonical_entities": {k: ce.to_dict() for k, ce in canonical_registry.items()},
             "status": "ACTIVE_INVESTIGATION",
         }
         return cls._cached_data
@@ -588,11 +615,98 @@ class IntelligenceService:
             if a.get("entity") == actual_id or a.get("record_id") in associated_record_ids
         ]
 
+        # Resolution dossier for entity (Phase 3G)
+        res_info = None
+        if hasattr(cls, "_cached_canonical_registry") and cls._cached_canonical_registry:
+            for ce in cls._cached_canonical_registry.values():
+                if (
+                    actual_id in ce.observed_variants
+                    or ce.canonical_name.lower() == actual_id.lower()
+                    or ce.canonical_id.lower() == entity_id.lower()
+                ):
+                    candidate_pairs = []
+                    if hasattr(cls, "_cached_resolution_engine") and cls._cached_resolution_engine:
+                        obs_ids = {o.observation_id for o in ce.observations}
+                        for dec in cls._cached_resolution_engine.decisions:
+                            if dec["pair"][0] in obs_ids or dec["pair"][1] in obs_ids:
+                                candidate_pairs.append(dec)
+
+                    res_info = {
+                        "canonical_id": ce.canonical_id,
+                        "canonical_name": ce.canonical_name,
+                        "entity_type": ce.entity_type,
+                        "review_status": ce.review_status,
+                        "review_reasons": ce.review_reasons,
+                        "observed_variants": ce.observed_variants,
+                        "observation_count": len(ce.observations),
+                        "source_records": ce.source_records,
+                        "associated_identifiers": ce.associated_identifiers,
+                        "candidate_evaluations": candidate_pairs[:10],
+                        "governance_notice": "Entity resolution is an analytical aid. Ambiguous identity resolution requires authorized human review.",
+                    }
+                    break
+
         return {
             **target_node,
             "connected_entities": connected_entities,
             "associated_records": associated_records,
             "detected_anomalies": associated_anomalies,
+            "resolution": res_info,
+        }
+
+    @classmethod
+    def get_entity_resolution_overview(cls) -> Dict[str, Any]:
+        cls.get_data()
+        engine = cls._cached_resolution_engine
+        registry = cls._cached_canonical_registry or {}
+
+        canonical_list = [ce.to_dict() for ce in registry.values()]
+        return {
+            "summary": engine.get_summary() if engine else {},
+            "canonical_entities": canonical_list,
+            "review_queue": [rq for rq in (engine.review_queue if engine else [])],
+            "governance_policy": {
+                "statement": "Entity resolution is an analytical aid. Ambiguous identity resolution requires authorized human review.",
+                "guardrail_1_name_alone_no_auto_identity": True,
+                "guardrail_2_money_never_merged_on_amount": True,
+                "guardrail_3_baseline_topology_intact": True,
+                "guardrail_4_analytical_scores_not_probabilities": True,
+            },
+        }
+
+    @classmethod
+    def get_entity_resolution_detail(cls, entity_id: str) -> Dict[str, Any] | None:
+        cls.get_data()
+        registry = cls._cached_canonical_registry or {}
+        engine = cls._cached_resolution_engine
+
+        target_ce = None
+        target_id_lower = entity_id.lower()
+        for ce in registry.values():
+            if (
+                ce.canonical_id.lower() == target_id_lower
+                or ce.canonical_name.lower() == target_id_lower
+                or any(v.lower() == target_id_lower for v in ce.observed_variants)
+            ):
+                target_ce = ce
+                break
+
+        if not target_ce:
+            return None
+
+        obs_ids = {o.observation_id for o in target_ce.observations}
+        related_evaluations = []
+        if engine:
+            for dec in engine.decisions:
+                if dec["pair"][0] in obs_ids or dec["pair"][1] in obs_ids:
+                    related_evaluations.append(dec)
+
+        return {
+            "canonical_entity": target_ce.to_dict(),
+            "related_evaluations": related_evaluations,
+            "review_required": target_ce.review_status == "REVIEW_REQUIRED",
+            "review_reasons": target_ce.review_reasons,
+            "governance_notice": "Entity resolution is an analytical aid. Ambiguous identity resolution requires authorized human review.",
         }
 
     @classmethod
