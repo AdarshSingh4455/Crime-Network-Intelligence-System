@@ -53,10 +53,12 @@ export const GraphIntelligenceDrawer: React.FC<GraphIntelligenceDrawerProps> = (
   // Find bridge detail if bridgeNode is provided
   const bridgeDetail =
     bridgeNode && bridgeData
-      ? bridgeData.betweenness_bridges.find((b) => b.node === bridgeNode)
+      ? bridgeData.betweenness_bridges.find((b) => (b.node || b.entity) === bridgeNode)
       : null;
   const bridgeEvidence =
-    bridgeNode && bridgeData ? bridgeData.evidence_ids_by_bridge[bridgeNode] || [] : [];
+    bridgeNode && bridgeData?.evidence_ids_by_bridge
+      ? bridgeData.evidence_ids_by_bridge[bridgeNode] || []
+      : [];
 
   return (
     <>
@@ -81,9 +83,9 @@ export const GraphIntelligenceDrawer: React.FC<GraphIntelligenceDrawerProps> = (
                   Phase 3K Graph Intelligence Inspector
                 </span>
                 <h2 className="text-base font-bold text-slate-900 leading-tight">
-                  {neighborhood && `Neighborhood: ${neighborhood.center_node}`}
+                  {neighborhood && `Neighborhood: ${neighborhood.center_node || neighborhood.entity_id}`}
                   {path && `Relational Path: ${path.source} → ${path.target}`}
-                  {motif && `Motif: ${motif.motif_name}`}
+                  {motif && `Motif: ${motif.title || motif.motif_name}`}
                   {bridgeNode && `Structural Bridge: ${bridgeNode}`}
                   {comparison && `Entity Comparison: ${comparison.entity_a} vs ${comparison.entity_b}`}
                 </h2>
@@ -106,12 +108,14 @@ export const GraphIntelligenceDrawer: React.FC<GraphIntelligenceDrawerProps> = (
                 <div className="grid grid-cols-2 gap-3">
                   <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
                     <span className="text-xs text-slate-500 uppercase font-mono">1-Hop Direct Neighbors</span>
-                    <p className="text-2xl font-bold text-slate-900 mt-1">{neighborhood.one_hop_count}</p>
+                    <p className="text-2xl font-bold text-slate-900 mt-1">
+                      {neighborhood.one_hop_count ?? neighborhood.one_hop_degree ?? 0}
+                    </p>
                     <span className="text-[11px] text-slate-500">Documented direct co-occurrences</span>
                   </div>
                   <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
                     <span className="text-xs text-slate-500 uppercase font-mono">2-Hop Distance Neighbors</span>
-                    <p className="text-2xl font-bold text-slate-900 mt-1">{neighborhood.two_hop_count}</p>
+                    <p className="text-2xl font-bold text-slate-900 mt-1">{neighborhood.two_hop_count ?? 0}</p>
                     <span className="text-[11px] text-slate-500">Indirect topological connections</span>
                   </div>
                 </div>
@@ -121,32 +125,37 @@ export const GraphIntelligenceDrawer: React.FC<GraphIntelligenceDrawerProps> = (
                     Direct Adjacency (1-Hop)
                   </h4>
                   <div className="space-y-2">
-                    {neighborhood.one_hop_neighbors.map((nb) => (
+                    {(neighborhood.one_hop_neighbors || []).map((nb: any) => (
                       <div
-                        key={nb.node}
+                        key={nb.node || nb.target || nb}
                         className="p-3 bg-white border border-slate-200 rounded-lg hover:border-indigo-300 transition-colors flex items-center justify-between"
                       >
                         <div>
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() => onSelectEntity && onSelectEntity(nb.node)}
+                              onClick={() => onSelectEntity && onSelectEntity(nb.node || nb.target || nb)}
                               className="font-semibold text-slate-900 hover:text-indigo-600 text-left"
                             >
-                              {nb.node}
+                              {nb.node || nb.target || nb}
                             </button>
-                            <span className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded font-mono">
-                              {nb.node_type}
-                            </span>
-                            <span className="text-[10px] px-1.5 py-0.5 bg-indigo-50 text-indigo-700 rounded font-mono">
-                              {nb.connecting_edge_type}
-                            </span>
+                            {nb.node_type && (
+                              <span className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded font-mono">
+                                {nb.node_type}
+                              </span>
+                            )}
+                            {nb.connecting_edge_type && (
+                              <span className="text-[10px] px-1.5 py-0.5 bg-indigo-50 text-indigo-700 rounded font-mono">
+                                {nb.connecting_edge_type}
+                              </span>
+                            )}
                           </div>
                           <p className="text-xs text-slate-500 mt-0.5">
-                            {nb.evidence_count} evidence records ({nb.record_ids.join(", ")})
+                            {nb.evidence_count || nb.evidence_ids?.length || 0} evidence records (
+                            {(nb.record_ids || nb.records || []).join(", ") || "Recorded co-occurrence"})
                           </p>
                         </div>
                         <div className="flex items-center gap-1.5">
-                          {nb.evidence_ids.length > 0 && (
+                          {nb.evidence_ids && nb.evidence_ids.length > 0 && (
                             <button
                               onClick={() => setActiveEvidenceId(nb.evidence_ids[0])}
                               className="text-xs text-indigo-600 hover:text-indigo-800 font-medium px-2 py-1 bg-indigo-50 rounded flex items-center gap-1"
@@ -168,28 +177,30 @@ export const GraphIntelligenceDrawer: React.FC<GraphIntelligenceDrawerProps> = (
                   </div>
                 </div>
 
-                {neighborhood.two_hop_neighbors.length > 0 && (
+                {(neighborhood.two_hop_neighbors || []).length > 0 && (
                   <div>
                     <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
                       Indirect Reach (2-Hop)
                     </h4>
                     <div className="space-y-2">
-                      {neighborhood.two_hop_neighbors.map((nb) => (
+                      {(neighborhood.two_hop_neighbors || []).map((nb: any) => (
                         <div
-                          key={nb.node}
+                          key={nb.node || nb}
                           className="p-3 bg-slate-50/70 border border-slate-200 rounded-lg flex items-center justify-between"
                         >
                           <div>
                             <div className="flex items-center gap-2">
                               <button
-                                onClick={() => onSelectEntity && onSelectEntity(nb.node)}
+                                onClick={() => onSelectEntity && onSelectEntity(nb.node || nb)}
                                 className="font-semibold text-slate-900 hover:text-indigo-600 text-left"
                               >
-                                {nb.node}
+                                {nb.node || nb}
                               </button>
-                              <span className="text-[10px] px-1.5 py-0.5 bg-slate-200 text-slate-700 rounded font-mono">
-                                via {nb.via_nodes.join(", ")}
-                              </span>
+                              {nb.via_nodes && nb.via_nodes.length > 0 && (
+                                <span className="text-[10px] px-1.5 py-0.5 bg-slate-200 text-slate-700 rounded font-mono">
+                                  via {nb.via_nodes.join(", ")}
+                                </span>
+                              )}
                             </div>
                             <span className="text-[11px] text-slate-500">
                               Requires 2-step graph navigation through observed intermediary
@@ -209,22 +220,25 @@ export const GraphIntelligenceDrawer: React.FC<GraphIntelligenceDrawerProps> = (
                 <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg">
                   <div className="flex items-center justify-between text-xs font-mono text-slate-500 mb-1">
                     <span>PATH SUMMARY</span>
-                    <span>{path.hop_count} HOPS ({path.path_nodes.length} NODES)</span>
+                    <span>
+                      {path.hop_count} HOPS ({(path.path_nodes || path.path || []).length} NODES)
+                    </span>
                   </div>
                   <div className="text-base font-bold text-slate-900 flex items-center gap-2 flex-wrap">
-                    {path.path_nodes.map((node, idx) => (
+                    {(path.path_nodes || path.path || []).map((node, idx, arr) => (
                       <React.Fragment key={node}>
                         <span className="px-2 py-1 bg-white border border-slate-200 rounded shadow-2xs font-mono text-xs">
                           {node}
                         </span>
-                        {idx < path.path_nodes.length - 1 && (
+                        {idx < arr.length - 1 && (
                           <ArrowRight className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
                         )}
                       </React.Fragment>
                     ))}
                   </div>
                   <p className="text-xs text-slate-500 mt-2">
-                    Total Relational Path Weight: {path.total_weight.toFixed(2)} | Evidence Records: {path.all_record_ids.join(", ") || "None"}
+                    Total Relational Path Weight: {(path.total_weight ?? 1.0).toFixed(2)} | Evidence Records:{" "}
+                    {(path.all_record_ids || []).join(", ") || "Linked Records"}
                   </p>
                 </div>
 
@@ -233,50 +247,58 @@ export const GraphIntelligenceDrawer: React.FC<GraphIntelligenceDrawerProps> = (
                     Step-by-Step Traversal Hops
                   </h4>
                   <div className="space-y-3">
-                    {path.hops.map((hop) => (
-                      <div
-                        key={hop.step_index}
-                        className="p-3 bg-white border border-slate-200 rounded-lg space-y-2"
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-mono font-bold text-indigo-600">
-                            Hop #{hop.step_index + 1}
-                          </span>
-                          <span className="text-[10px] px-2 py-0.5 bg-slate-100 rounded font-mono text-slate-600">
-                            Weight: {hop.weight.toFixed(2)}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm font-semibold text-slate-800">
-                          <span>{hop.source_node}</span>
-                          <span className="text-xs font-mono px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded">
-                            {hop.relationship_type}
-                          </span>
-                          <ChevronRight className="w-4 h-4 text-slate-400" />
-                          <span>{hop.target_node}</span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100">
-                          <span>Records: {hop.record_ids.join(", ")}</span>
-                          <div className="flex items-center gap-2">
-                            {hop.evidence_ids.length > 0 && (
-                              <button
-                                onClick={() => setActiveEvidenceId(hop.evidence_ids[0])}
-                                className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1"
-                              >
-                                <Link className="w-3 h-3" /> Evidence ({hop.evidence_ids.length})
-                              </button>
-                            )}
-                            {hop.explanation_id && (
-                              <button
-                                onClick={() => setActiveExplanationId(hop.explanation_id!)}
-                                className="text-purple-600 hover:text-purple-800 font-medium"
-                              >
-                                Explanation
-                              </button>
-                            )}
+                    {(path.hops || []).map((hop, idx) => {
+                      const stepIdx = hop.step_index ?? hop.step ?? idx;
+                      const srcNode = hop.source_node || hop.from_node;
+                      const tgtNode = hop.target_node || hop.to_node;
+                      const relType = hop.relationship_type || "CO_OCCURRENCE";
+                      const recs = hop.record_ids || hop.records || [];
+
+                      return (
+                        <div
+                          key={stepIdx}
+                          className="p-3 bg-white border border-slate-200 rounded-lg space-y-2"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-mono font-bold text-indigo-600">
+                              Hop #{stepIdx + 1}
+                            </span>
+                            <span className="text-[10px] px-2 py-0.5 bg-slate-100 rounded font-mono text-slate-600">
+                              Weight: {hop.weight.toFixed(2)}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm font-semibold text-slate-800">
+                            <span>{srcNode}</span>
+                            <span className="text-xs font-mono px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded">
+                              {relType}
+                            </span>
+                            <ChevronRight className="w-4 h-4 text-slate-400" />
+                            <span>{tgtNode}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100">
+                            <span>Records: {recs.join(", ") || "Recorded in dataset"}</span>
+                            <div className="flex items-center gap-2">
+                              {hop.evidence_ids && hop.evidence_ids.length > 0 && (
+                                <button
+                                  onClick={() => setActiveEvidenceId(hop.evidence_ids[0])}
+                                  className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1"
+                                >
+                                  <Link className="w-3 h-3" /> Evidence ({hop.evidence_ids.length})
+                                </button>
+                              )}
+                              {hop.explanation_id && (
+                                <button
+                                  onClick={() => setActiveExplanationId(hop.explanation_id!)}
+                                  className="text-purple-600 hover:text-purple-800 font-medium"
+                                >
+                                  Explanation
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -292,16 +314,16 @@ export const GraphIntelligenceDrawer: React.FC<GraphIntelligenceDrawerProps> = (
                     </span>
                     <span className="text-xs font-mono text-slate-500">{motif.motif_id}</span>
                   </div>
-                  <h3 className="text-base font-bold text-slate-900">{motif.motif_name}</h3>
-                  <p className="text-xs text-slate-600">{motif.metric_basis}</p>
+                  <h3 className="text-base font-bold text-slate-900">{motif.title || motif.motif_name}</h3>
+                  <p className="text-xs text-slate-600">{motif.description || motif.metric_basis}</p>
                 </div>
 
                 <div>
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
-                    Participating Entities ({motif.nodes.length})
+                    Participating Entities ({(motif.nodes || motif.entities || []).length})
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {motif.nodes.map((node) => (
+                    {(motif.nodes || motif.entities || []).map((node) => (
                       <button
                         key={node}
                         onClick={() => onSelectEntity && onSelectEntity(node)}
@@ -315,10 +337,10 @@ export const GraphIntelligenceDrawer: React.FC<GraphIntelligenceDrawerProps> = (
 
                 <div>
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
-                    Sub-Graph Relational Edges ({motif.edges.length})
+                    Sub-Graph Relational Edges ({(motif.edges || motif.subgraph_edges || []).length})
                   </h4>
                   <div className="space-y-1.5">
-                    {motif.edges.map((e, idx) => (
+                    {(motif.edges || motif.subgraph_edges || []).map((e, idx) => (
                       <div
                         key={idx}
                         className="p-2 bg-slate-50 rounded border border-slate-200 text-xs font-mono text-slate-700 flex items-center justify-between"
@@ -331,7 +353,7 @@ export const GraphIntelligenceDrawer: React.FC<GraphIntelligenceDrawerProps> = (
                   </div>
                 </div>
 
-                {motif.evidence_ids.length > 0 && (
+                {motif.evidence_ids && motif.evidence_ids.length > 0 && (
                   <div>
                     <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
                       Linked Evidence Items
@@ -365,7 +387,9 @@ export const GraphIntelligenceDrawer: React.FC<GraphIntelligenceDrawerProps> = (
                     <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-slate-200">
                       <div>
                         <span className="text-[11px] text-slate-500 font-mono">Betweenness Score</span>
-                        <p className="text-lg font-bold text-slate-900">{bridgeDetail.betweenness_score.toFixed(4)}</p>
+                        <p className="text-lg font-bold text-slate-900">
+                          {(bridgeDetail.betweenness_score ?? bridgeDetail.betweenness ?? 0).toFixed(4)}
+                        </p>
                       </div>
                       <div>
                         <span className="text-[11px] text-slate-500 font-mono">Cut Articulation</span>
@@ -415,23 +439,26 @@ export const GraphIntelligenceDrawer: React.FC<GraphIntelligenceDrawerProps> = (
                 <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg">
                   <div className="flex items-center justify-between text-xs font-mono text-slate-500 mb-2">
                     <span>STRUCTURAL SIMILARITY</span>
-                    <span>Jaccard: {(comparison.jaccard_similarity * 100).toFixed(1)}%</span>
+                    <span>Jaccard: {((comparison.jaccard_similarity ?? 0) * 100).toFixed(1)}%</span>
                   </div>
                   <div className="flex items-center justify-between font-bold text-slate-900 text-base">
                     <span>{comparison.entity_a}</span>
                     <span className="text-xs text-slate-400 font-mono">VS</span>
                     <span>{comparison.entity_b}</span>
                   </div>
-                  <p className="text-xs text-slate-600 mt-2">{comparison.structural_summary}</p>
+                  <p className="text-xs text-slate-600 mt-2">
+                    {comparison.structural_summary ||
+                      `Entities differ by degree (${comparison.degree_a} vs ${comparison.degree_b}) and betweenness.`}
+                  </p>
                 </div>
 
                 <div>
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
-                    Shared Direct Neighbors ({comparison.common_neighbor_count})
+                    Shared Direct Neighbors ({comparison.common_neighbor_count ?? comparison.shared_neighbors_count ?? 0})
                   </h4>
-                  {comparison.common_neighbors.length > 0 ? (
+                  {(comparison.common_neighbors || comparison.shared_neighbors || []).length > 0 ? (
                     <div className="flex flex-wrap gap-2">
-                      {comparison.common_neighbors.map((cn) => (
+                      {(comparison.common_neighbors || comparison.shared_neighbors || []).map((cn) => (
                         <button
                           key={cn}
                           onClick={() => onSelectEntity && onSelectEntity(cn)}
@@ -446,16 +473,16 @@ export const GraphIntelligenceDrawer: React.FC<GraphIntelligenceDrawerProps> = (
                   )}
                 </div>
 
-                {comparison.shortest_path_nodes.length > 0 && (
+                {(comparison.shortest_path_nodes || []).length > 0 && (
                   <div className="p-3 bg-white border border-slate-200 rounded-lg">
                     <span className="text-xs font-mono text-slate-500 block mb-1">
                       SHORTEST GRAPH DISTANCE: {comparison.shortest_path_distance} HOP(S)
                     </span>
                     <div className="flex items-center gap-1.5 flex-wrap font-mono text-xs text-indigo-700">
-                      {comparison.shortest_path_nodes.map((node, i) => (
+                      {(comparison.shortest_path_nodes || []).map((node, i, arr) => (
                         <React.Fragment key={node}>
                           <span className="bg-indigo-50 px-2 py-0.5 rounded">{node}</span>
-                          {i < comparison.shortest_path_nodes.length - 1 && <span>→</span>}
+                          {i < arr.length - 1 && <span>→</span>}
                         </React.Fragment>
                       ))}
                     </div>

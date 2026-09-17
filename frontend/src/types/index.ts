@@ -1411,139 +1411,183 @@ export interface TemporalCaseResponse {
 // ============================================================================
 
 export interface GraphOverview {
-  total_nodes: number;
-  total_edges: number;
-  density: number;
-  diameter: number;
-  average_shortest_path_length: number;
-  transitivity: number;
-  number_connected_components: number;
+  node_count: number;
+  edge_count: number;
+  connected_components: number;
   is_connected: boolean;
-  top_by_degree: Array<{ node: string; degree: number }>;
-  top_by_betweenness: Array<{ node: string; betweenness: number }>;
-  top_by_closeness: Array<{ node: string; closeness: number }>;
-  top_by_pagerank: Array<{ node: string; pagerank: number }>;
+  graph_density: number;
+  average_degree: number;
+  max_degree: number;
+  max_degree_nodes: string[];
+  isolated_nodes: string[];
+  graph_diameter?: number | null;
+  average_shortest_path_length?: number | null;
+  nodes_by_type: Record<string, number>;
   epistemic_limitation: string;
+  total_nodes?: number;
+  total_edges?: number;
+  density?: number;
+  diameter?: number;
+  transitivity?: number;
+  top_by_degree?: Array<{ node: string; degree: number }>;
+  top_by_betweenness?: Array<{ node: string; betweenness: number }>;
+  top_by_closeness?: Array<{ node: string; closeness: number }>;
+  top_by_pagerank?: Array<{ node: string; pagerank: number }>;
 }
 
 export interface HopDetail {
-  node: string;
-  node_type: string;
-  hop_distance: number;
-  connecting_edge_type: string;
-  via_nodes: string[];
+  step: number;
+  from_node: string;
+  to_node: string;
+  weight: number;
+  records: string[];
+  dates: string[];
   evidence_ids: string[];
-  evidence_count: number;
-  record_ids: string[];
+  step_index?: number;
+  source_node?: string;
+  target_node?: string;
+  relationship_type?: string;
+  record_ids?: string[];
   explanation_id?: string | null;
 }
 
 export interface GraphNeighborhood {
-  center_node: string;
-  center_node_type: string;
-  one_hop_count: number;
+  entity_id: string;
+  entity_type: string;
+  direct_neighbors: string[];
+  one_hop_degree: number;
+  two_hop_neighborhood: string[];
   two_hop_count: number;
-  one_hop_neighbors: HopDetail[];
-  two_hop_neighbors: HopDetail[];
-  all_boundary_evidence_ids: string[];
-  all_boundary_record_ids: string[];
-  epistemic_limitation: string;
-}
-
-export interface PathHop {
-  step_index: number;
-  source_node: string;
-  target_node: string;
-  relationship_type: string;
-  weight: number;
-  evidence_ids: string[];
-  record_ids: string[];
+  total_neighborhood_size: number;
+  neighbor_types_breakdown: Record<string, number>;
+  incident_relationships: Array<{
+    target: string;
+    type: string;
+    weight: number;
+    records: string[];
+    evidence_ids: string[];
+  }>;
+  supporting_evidence_ids: string[];
   explanation_id?: string | null;
+  epistemic_limitation: string;
+  center_node?: string;
+  center_node_type?: string;
+  one_hop_count?: number;
+  one_hop_neighbors?: any[];
+  two_hop_neighbors?: any[];
+  all_boundary_evidence_ids?: string[];
+  all_boundary_record_ids?: string[];
 }
 
 export interface GraphPath {
   source: string;
   target: string;
   path_exists: boolean;
-  path_nodes: string[];
+  path: string[];
   hop_count: number;
-  total_weight: number;
-  hops: PathHop[];
-  all_evidence_ids: string[];
-  all_record_ids: string[];
-  explanation_ids: string[];
+  hops: HopDetail[];
+  alternative_paths: string[][];
   epistemic_limitation: string;
+  path_nodes?: string[];
+  total_weight?: number;
+  all_evidence_ids?: string[];
+  all_record_ids?: string[];
+  explanation_ids?: string[];
+}
+
+export interface BetweennessBridgeItem {
+  entity: string;
+  betweenness: number;
+  is_bridge: boolean;
+  is_articulation_point: boolean;
+  explanation: string;
+  node?: string;
+  betweenness_score?: number;
+  cut_component_count?: number;
+  structural_role?: string;
+  connected_communities?: number[];
 }
 
 export interface BridgeAnalysis {
-  total_bridges_betweenness: number;
-  total_articulation_points: number;
-  betweenness_bridges: Array<{
-    node: string;
-    betweenness_score: number;
-    cut_component_count: number;
-    is_articulation_point: boolean;
-    structural_role: string;
-    connected_communities: number[];
-  }>;
+  betweenness_bridges: BetweennessBridgeItem[];
   articulation_points: string[];
+  biconnected_components_count: number;
+  biconnected_component_sizes: number[];
   distinction_explanation: string;
-  evidence_ids_by_bridge: Record<string, string[]>;
   epistemic_limitation: string;
+  total_bridges_betweenness?: number;
+  total_articulation_points?: number;
+  evidence_ids_by_bridge?: Record<string, string[]>;
 }
 
 export interface CommunityStructuralDetail {
   community_id: number;
-  member_count: number;
-  internal_edge_count: number;
-  external_edge_count: number;
-  density: number;
+  size: number;
   members: string[];
-  top_internal_nodes: string[];
-  boundary_nodes: string[];
-  boundary_targets_by_community: Record<string, number>;
+  member_types: Record<string, number>;
+  internal_edge_count: number;
+  internal_density: number;
+  external_edge_count: number;
+  external_connections_by_community: Record<string, number>;
+  bridge_entities: string[];
+  member_count?: number;
+  density?: number;
+  top_internal_nodes?: string[];
+  boundary_nodes?: string[];
+  boundary_targets_by_community?: Record<string, number>;
 }
 
 export interface CommunityAnalysis {
   total_communities: number;
   communities: CommunityStructuralDetail[];
-  inter_community_edges_total: number;
+  inter_community_edges: any[];
   epistemic_limitation: string;
+  inter_community_edges_total?: number;
 }
 
 export interface CentralityComparisonRow {
-  node: string;
-  node_type: string;
+  entity: string;
+  entity_type: string;
   degree: number;
-  degree_rank: number;
   betweenness: number;
-  betweenness_rank: number;
-  closeness: number;
-  closeness_rank: number;
+  eigenvector: number;
   pagerank: number;
-  pagerank_rank: number;
   composite_influence: number;
+  degree_rank: number;
+  betweenness_rank: number;
+  eigenvector_rank: number;
+  pagerank_rank: number;
   composite_rank: number;
-  max_rank_divergence: number;
-  structural_role_note: string;
+  node?: string;
+  node_type?: string;
+  closeness?: number;
+  closeness_rank?: number;
+  max_rank_divergence?: number;
+  structural_role_note?: string;
 }
 
 export interface GraphCentralityComparison {
-  total_entities: number;
-  rankings: CentralityComparisonRow[];
-  high_divergence_nodes: string[];
+  formula: string;
+  rows: CentralityComparisonRow[];
   epistemic_limitation: string;
+  total_entities?: number;
+  rankings?: CentralityComparisonRow[];
+  high_divergence_nodes?: string[];
 }
 
 export interface StructuralMotif {
   motif_id: string;
   motif_type: string;
-  motif_name: string;
-  nodes: string[];
-  edges: string[][];
+  title: string;
+  description: string;
+  entities: string[];
+  subgraph_edges: string[][];
   metric_basis: string;
   evidence_ids: string[];
   epistemic_limitation: string;
+  motif_name?: string;
+  nodes?: string[];
+  edges?: string[][];
 }
 
 export interface MotifAnalysis {
@@ -1558,14 +1602,32 @@ export interface MotifAnalysis {
 export interface GraphComparison {
   entity_a: string;
   entity_b: string;
-  common_neighbors: string[];
-  common_neighbor_count: number;
-  jaccard_similarity: number;
+  type_a: string;
+  type_b: string;
+  degree_a: number;
+  degree_b: number;
+  betweenness_a: number;
+  betweenness_b: number;
+  eigenvector_a: number;
+  eigenvector_b: number;
+  pagerank_a: number;
+  pagerank_b: number;
+  composite_influence_a: number;
+  composite_influence_b: number;
+  community_a: number;
+  community_b: number;
+  shared_neighbors: string[];
+  shared_neighbors_count: number;
   shortest_path_distance?: number | null;
-  shortest_path_nodes: string[];
-  centrality_comparison: Record<string, any>;
-  structural_summary: string;
-  evidence_ids: string[];
+  is_directly_connected: boolean;
+  connection_weight?: number | null;
   epistemic_limitation: string;
+  common_neighbors?: string[];
+  common_neighbor_count?: number;
+  jaccard_similarity?: number;
+  shortest_path_nodes?: string[];
+  centrality_comparison?: Record<string, any>;
+  structural_summary?: string;
+  evidence_ids?: string[];
 }
 
