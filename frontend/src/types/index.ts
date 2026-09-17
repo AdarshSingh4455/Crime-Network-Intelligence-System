@@ -38,6 +38,7 @@ export interface NetworkNode {
   is_bridge_node: boolean;
   bridge_betweenness: number;
   anomaly_count: number;
+  evidence_id?: string;
   canonical_id?: string;
   canonical_name?: string;
   resolution_status?: string;
@@ -56,6 +57,7 @@ export interface NetworkLink {
   weight: number;
   records: string[];
   dates: string[];
+  evidence_id?: string;
 }
 
 export interface NetworkData {
@@ -72,6 +74,7 @@ export interface NetworkData {
 
 export interface SuspiciousPattern {
   id?: string;
+  evidence_id?: string;
   entity?: string;
   entity_type?: EntityType;
   record_id?: string;
@@ -88,6 +91,8 @@ export interface AnomalyDetail extends SuspiciousPattern {
   entity_details?: NetworkNode;
   connected_entities?: ConnectedEntity[];
   associated_records?: CaseRecord[];
+  evidence_item?: EvidenceItem;
+  evidence_trace?: EvidenceTrace;
 }
 
 export interface ConnectedEntity {
@@ -146,6 +151,7 @@ export interface EntityDetail extends NetworkNode {
   associated_records: CaseRecord[];
   detected_anomalies: SuspiciousPattern[];
   resolution?: EntityResolutionInfo | null;
+  evidence_items?: EvidenceItem[];
 }
 
 export interface CaseRecord {
@@ -223,6 +229,7 @@ export interface LocationItem {
 
 export interface KeyFinding {
   finding_id: string;
+  evidence_id?: string;
   category: 'NETWORK' | 'LOCATION' | 'ANOMALY' | 'ENTITY' | 'TEMPORAL';
   priority: 'HIGH' | 'MEDIUM' | 'LOW';
   title: string;
@@ -1048,3 +1055,354 @@ export interface DataQualityResults {
   completed_at: string;
   disclaimer: string;
 }
+
+// ─── Phase 3H: Evidence & Provenance Engine Types ─────────────────────────────
+
+export type EvidenceClassification =
+  | 'SOURCE_RECORD'
+  | 'ENTITY_OBSERVATION'
+  | 'RELATIONSHIP'
+  | 'ANOMALY_SIGNAL'
+  | 'NETWORK_METRIC'
+  | 'TEMPORAL_OBSERVATION'
+  | 'LOCATION_OBSERVATION'
+  | 'ENTITY_RESOLUTION';
+
+export type EpistemicStatus =
+  | 'OBSERVED'
+  | 'DERIVED'
+  | 'SIGNAL'
+  | 'REVIEW_REQUIRED';
+
+export interface RawExcerpt {
+  record_id: string;
+  source: string;
+  date: string;
+  verbatim_text: string;
+}
+
+export interface EvidenceReference {
+  target_id: string;
+  target_type: string;
+  description: string;
+}
+
+export interface EvidenceItem {
+  evidence_id: string;
+  evidence_type: EvidenceClassification;
+  epistemic_status: EpistemicStatus;
+  finding: string;
+  source_records: string[];
+  raw_excerpts: RawExcerpt[];
+  entities: string[];
+  temporal_context?: string | null;
+  spatial_context?: string | null;
+  analytical_method: string;
+  rationale: string;
+  limitations: string;
+  references?: EvidenceReference[];
+  metadata?: Record<string, unknown>;
+}
+
+export interface TraceStep {
+  stage: string;
+  epistemic_status?: EpistemicStatus;
+  record_id?: string;
+  source?: string;
+  date?: string;
+  description?: string;
+  verbatim_excerpt?: string;
+  entities_observed?: string[];
+  analytical_method?: string;
+  rationale?: string;
+  limitations?: string;
+  [key: string]: unknown;
+}
+
+export interface EvidenceTrace {
+  target_id: string;
+  target_type: string;
+  evidence_id: string;
+  steps: TraceStep[];
+}
+
+export interface EvidenceOverviewResponse {
+  summary: {
+    total_evidence_items: number;
+    indexed_entities: number;
+    indexed_records: number;
+    indexed_relationships: number;
+    indexed_anomalies: number;
+    counts_by_classification: Record<string, number>;
+    counts_by_epistemic_status: Record<string, number>;
+    epistemic_guardrails_enforced: boolean;
+  };
+  total_items: number;
+  items: EvidenceItem[];
+  governance_notice: string;
+}
+
+export interface SingleEvidenceResponse {
+  item: EvidenceItem;
+  trace?: EvidenceTrace | null;
+}
+
+export interface RelationshipEvidenceResponse {
+  item: EvidenceItem;
+  trace?: EvidenceTrace | null;
+  source: string;
+  target: string;
+}
+
+// ─── Phase 3I: Explainable Intelligence Types ─────────────────────────────────
+
+export type ExplainabilityType =
+  | 'NETWORK_IMPORTANCE'
+  | 'RELATIONSHIP'
+  | 'ANOMALY'
+  | 'ENTITY_RESOLUTION'
+  | 'TEMPORAL_PATTERN'
+  | 'LOCATION_PATTERN'
+  | 'COMMUNITY'
+  | 'BRIDGE_NODE'
+  | 'PATH_ANALYSIS'
+  | 'REPORT_FINDING';
+
+export type ExplanationStatus = 'COMPLETE' | 'SIGNAL' | 'REVIEW_REQUIRED';
+
+export interface ExplanationStep {
+  step_number: number;
+  stage: string;
+  description: string;
+  inputs?: Record<string, unknown>;
+  method_or_rule?: string;
+  intermediate_result?: unknown;
+  evidence_ids?: string[];
+  source_records?: string[];
+}
+
+export interface IntelligenceExplanation {
+  explanation_id: string;
+  explanation_type: ExplainabilityType;
+  status: ExplanationStatus;
+  target_id: string;
+  target_label: string;
+  finding: string;
+  observation: string;
+  analytical_inputs: Record<string, unknown>;
+  analytical_method: string;
+  calculation_summary: string;
+  derivation_steps: ExplanationStep[];
+  supporting_evidence_ids: string[];
+  supporting_source_records: string[];
+  interpretation: string;
+  limitations: string;
+  related_entities: string[];
+  metadata?: Record<string, unknown>;
+}
+
+export interface ExplainabilityOverviewResponse {
+  summary: {
+    total_explanations: number;
+    by_type: Record<string, number>;
+    indexed_entities: number;
+    indexed_anomalies: number;
+    indexed_relationships: number;
+    epistemic_disclaimer: string;
+  };
+  total_explanations: number;
+  explanations: IntelligenceExplanation[];
+  governance_notice: string;
+}
+
+export interface EntityExplanationsResponse {
+  entity: string;
+  total: number;
+  explanations: IntelligenceExplanation[];
+}
+
+// ─── Phase 3J: Temporal Intelligence Types ────────────────────────────────────
+
+export type TemporalPrecision = 'DATE_TIME' | 'DATE_ONLY' | 'UNKNOWN';
+
+export type TemporalPatternType =
+  | 'BURST_ACTIVITY'
+  | 'RECURRING_ACTIVITY'
+  | 'LATE_TIMELINE_APPEARANCE'
+  | 'SAME_DATE_LOCATION_OVERLAP'
+  | 'TEMPORAL_GAP';
+
+export interface TemporalObservation {
+  observation_id: string;
+  record_id: string;
+  case_id: string;
+  date: string;
+  time?: string | null;
+  iso_timestamp: string;
+  precision: TemporalPrecision;
+  timezone: string;
+  source: string;
+  source_label: string;
+  entities: string[];
+  locations: string[];
+  observation_type: string;
+  description: string;
+  evidence_id: string;
+  metadata: Record<string, unknown>;
+  epistemic_limitation: string;
+}
+
+export interface TemporalGap {
+  prior_date: string;
+  next_date: string;
+  gap_days: number;
+  prior_record_id: string;
+  next_record_id: string;
+  epistemic_note: string;
+}
+
+export interface TemporalEntityActivity {
+  entity_id: string;
+  entity_type: string;
+  first_observed: string;
+  last_observed: string;
+  span_days: number;
+  observation_count: number;
+  active_dates: string[];
+  observation_ids: string[];
+  gaps: TemporalGap[];
+  max_gap_days: number;
+  related_cases: string[];
+  locations_over_time: Array<{
+    date: string;
+    time?: string | null;
+    location: string;
+    record_id: string;
+  }>;
+  relationships_over_time: Array<{
+    date: string;
+    target_entity: string;
+    relationship_id: string;
+    first_observed: string;
+    observation_count: number;
+  }>;
+  anomalies_over_time: Array<{
+    anomaly_id: string;
+    pattern: string;
+    date: string;
+    record_id?: string;
+    note: string;
+  }>;
+  epistemic_limitation: string;
+}
+
+export interface TemporalRelationshipEvolution {
+  relationship_id: string;
+  source: string;
+  target: string;
+  canonical_pair: [string, string];
+  first_observed: string;
+  last_observed: string;
+  span_days: number;
+  observation_count: number;
+  observation_dates: string[];
+  supporting_records: string[];
+  supporting_evidence_ids: string[];
+  explanation_id?: string | null;
+  epistemic_limitation: string;
+}
+
+export interface NetworkEvolutionSnapshot {
+  window_index: number;
+  window_id: string;
+  window_label: string;
+  start_date: string;
+  end_date: string;
+  observation_count: number;
+  active_nodes: string[];
+  active_edges: string[][];
+  added_nodes: string[];
+  departed_nodes: string[];
+  new_edges: string[][];
+  no_longer_observed_edges: string[][];
+  epistemic_limitation: string;
+}
+
+export interface TemporalPattern {
+  pattern_id: string;
+  pattern_type: TemporalPatternType;
+  pattern_label: string;
+  target_entities: string[];
+  target_records: string[];
+  date_range: [string, string];
+  observation_ids: string[];
+  metric_value: string;
+  description: string;
+  supporting_evidence_ids: string[];
+  explanation_id?: string | null;
+  epistemic_limitation: string;
+}
+
+export interface TemporalOverviewResponse {
+  summary_kpis: {
+    total_observations: number;
+    date_span_days: number;
+    earliest_date: string;
+    latest_date: string;
+    total_entities_tracked: number;
+    total_relationships_tracked: number;
+    total_time_windows: number;
+    total_patterns_detected: number;
+    patterns_by_type: Record<string, number>;
+    timed_observations_count: number;
+    date_only_observations_count: number;
+    activity_density_days: number;
+  };
+  activity_density: {
+    day: Record<string, number>;
+    week: Record<string, number>;
+    month: Record<string, number>;
+  };
+  recent_observations: TemporalObservation[];
+  network_snapshots_count: number;
+  patterns_summary: TemporalPattern[];
+  epistemic_limitation: string;
+}
+
+export interface TemporalActivityResponse {
+  granularity: string;
+  total_buckets: number;
+  buckets: Record<string, number>;
+  total_dated_observations: number;
+  epistemic_limitation: string;
+}
+
+export interface TemporalEvolutionResponse {
+  total_snapshots: number;
+  snapshots: NetworkEvolutionSnapshot[];
+  epistemic_limitation: string;
+}
+
+export interface TemporalPatternsResponse {
+  total_patterns: number;
+  filter: string;
+  patterns: TemporalPattern[];
+  epistemic_limitation: string;
+}
+
+export interface TemporalEntityResponse {
+  activity_profile: TemporalEntityActivity;
+  observations: TemporalObservation[];
+  total_observations: number;
+  epistemic_limitation: string;
+}
+
+export interface TemporalCaseResponse {
+  case_id: string;
+  total_observations: number;
+  earliest_observation?: string | null;
+  latest_observation?: string | null;
+  observations: TemporalObservation[];
+  epistemic_limitation: string;
+}
+

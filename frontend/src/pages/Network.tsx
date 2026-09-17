@@ -6,9 +6,10 @@ import { NetworkData, NetworkNode, NetworkLink, EntityType } from "../types";
 import {
   Search, RefreshCw, Maximize2, Filter, X, Users, Phone, Car, MapPin,
   Building2, DollarSign, AlertTriangle, ChevronRight, Cpu, Share2,
-  TrendingUp, Activity, Info, Shield, Circle,
+  TrendingUp, Activity, Info, Shield, Circle, FileText, Lightbulb
 } from "lucide-react";
 import { LucideIcon } from "lucide-react";
+import { EvidenceDrawer } from "../components/EvidenceDrawer";
 
 // ─── Entity config ────────────────────────────────────────────────────────────
 interface EntityCfg {
@@ -55,6 +56,18 @@ export const Network: React.FC = () => {
   const [selectedNode, setSelectedNode] = useState<FGNode | null>(null);
   const [focusMode, setFocusMode] = useState(false);
   const [focusNeighbors, setFocusNeighbors] = useState<Set<string>>(new Set());
+  const [drawerEvidenceId, setDrawerEvidenceId] = useState<string | null>(null);
+
+  const handleInspectRelationship = async (sourceId: string, targetId: string) => {
+    try {
+      const res = await api.getRelationshipEvidence(sourceId, targetId);
+      if (res && res.item?.evidence_id) {
+        setDrawerEvidenceId(res.item.evidence_id);
+      }
+    } catch (err) {
+      console.error("Failed to load relationship evidence:", err);
+    }
+  };
 
   const loadData = useCallback(async () => {
     setLoading(true); setError(null);
@@ -371,6 +384,15 @@ export const Network: React.FC = () => {
             }}
             linkDirectionalParticleColor={() => "#6366F1"}
             onNodeClick={handleNodeClick}
+            onLinkClick={(link: FGLink) => {
+              if (link.evidence_id) {
+                setDrawerEvidenceId(link.evidence_id);
+              } else {
+                const s = resolveId(link.source);
+                const t = resolveId(link.target);
+                if (s && t) handleInspectRelationship(s, t);
+              }
+            }}
             onBackgroundClick={() => { setSelectedNode(null); setFocusMode(false); }}
             cooldownTicks={100}
             d3VelocityDecay={0.3}
@@ -414,11 +436,23 @@ export const Network: React.FC = () => {
               if (n) handleNodeClick(n);
             }}
             onNavigateToEntity={(id: string) => navigate(`/entities?id=${encodeURIComponent(id)}`)}
+            onInspectCentrality={() => {
+              if (selectedNode.evidence_id) setDrawerEvidenceId(selectedNode.evidence_id);
+            }}
+            onInspectRelationship={(targetId: string) => {
+              if (selectedNode.id) handleInspectRelationship(selectedNode.id, targetId);
+            }}
           />
         ) : (
           <GraphHintPanel nodeCount={summary.num_nodes} edgeCount={summary.num_edges} />
         )}
       </div>
+
+      {/* Evidence & Provenance Trace Drawer */}
+      <EvidenceDrawer
+        evidenceId={drawerEvidenceId}
+        onClose={() => setDrawerEvidenceId(null)}
+      />
     </div>
   );
 };
@@ -455,9 +489,23 @@ interface DetailPanelProps {
   onClose: () => void;
   onSelectEntity: (id: string) => void;
   onNavigateToEntity: (id: string) => void;
+  onInspectCentrality?: () => void;
+  onInspectRelationship?: (targetId: string) => void;
 }
 
-const EntityDetailPanel: React.FC<DetailPanelProps> = ({ node, connectedEntities, focusMode, onEnterFocus, onExitFocus, onClose, onSelectEntity, onNavigateToEntity }) => {
+const EntityDetailPanel: React.FC<DetailPanelProps> = ({
+  node,
+  connectedEntities,
+  focusMode,
+  onEnterFocus,
+  onExitFocus,
+  onClose,
+  onSelectEntity,
+  onNavigateToEntity,
+  onInspectCentrality,
+  onInspectRelationship,
+}) => {
+  const navigate = useNavigate();
   const cfg = getEntityConfig(node.type);
   const Icon = cfg.icon;
   const metrics: Array<{ label: string; value: string; desc: string }> = [
@@ -508,6 +556,22 @@ const EntityDetailPanel: React.FC<DetailPanelProps> = ({ node, connectedEntities
               </div>
             ))}
           </div>
+          {node.evidence_id && onInspectCentrality && (
+            <button
+              onClick={onInspectCentrality}
+              className="mt-3 w-full py-1.5 px-2 text-xs font-medium border border-cyan-200 text-cyan-800 bg-cyan-50/50 rounded-lg hover:bg-cyan-50 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Shield className="w-3.5 h-3.5 text-cyan-600" />
+              Inspect Metric Evidence Trace
+            </button>
+          )}
+          <button
+            onClick={() => navigate(`/explainability?q=${encodeURIComponent(node.id ?? "")}`)}
+            className="mt-2 w-full py-1.5 px-2 text-xs font-medium border border-cyan-200 text-cyan-800 bg-cyan-50/70 rounded-lg hover:bg-cyan-100 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+          >
+            <Lightbulb className="w-3.5 h-3.5 text-cyan-700" />
+            Explain Intelligence Derivation
+          </button>
         </div>
         <div className="px-4 py-3 border-b border-slate-100 flex-shrink-0 space-y-2">
           {focusMode ? (
@@ -534,14 +598,34 @@ const EntityDetailPanel: React.FC<DetailPanelProps> = ({ node, connectedEntities
                 const connCfg = getEntityConfig(conn.type);
                 const ConnIcon = connCfg.icon;
                 return (
-                  <button key={conn.id} onClick={() => onSelectEntity(conn.id)} className="w-full flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-50 transition-colors text-left group">
-                    <div className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0" style={{ backgroundColor: connCfg.bg }}>
-                      <ConnIcon className="w-3.5 h-3.5" style={{ color: connCfg.color }} />
-                    </div>
-                    <span className="text-xs text-slate-700 flex-1 truncate font-medium">{conn.id}</span>
-                    <span className="text-[10px] text-slate-400">w={conn.weight.toFixed(1)}</span>
-                    <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500 flex-shrink-0" />
-                  </button>
+                  <div key={conn.id} className="flex items-center gap-1 p-1 rounded-lg hover:bg-slate-50 transition-colors group">
+                    <button
+                      onClick={() => onSelectEntity(conn.id)}
+                      className="flex items-center gap-2.5 flex-1 min-w-0 p-1 text-left cursor-pointer"
+                    >
+                      <div className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0" style={{ backgroundColor: connCfg.bg }}>
+                        <ConnIcon className="w-3.5 h-3.5" style={{ color: connCfg.color }} />
+                      </div>
+                      <span className="text-xs text-slate-700 flex-1 truncate font-medium">{conn.id}</span>
+                      <span className="text-[10px] text-slate-400">w={conn.weight.toFixed(1)}</span>
+                    </button>
+                    {onInspectRelationship && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onInspectRelationship(conn.id);
+                        }}
+                        title="Why are these entities connected? Inspect relationship evidence"
+                        className="px-1.5 py-1 text-slate-400 hover:text-cyan-700 hover:bg-cyan-50 rounded text-[11px] font-medium flex items-center gap-0.5 cursor-pointer transition-colors"
+                      >
+                        <FileText className="w-3 h-3 text-cyan-600" />
+                        <span>Why?</span>
+                      </button>
+                    )}
+                    <button onClick={() => onSelectEntity(conn.id)} className="p-1 text-slate-300 group-hover:text-slate-500 cursor-pointer">
+                      <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
+                    </button>
+                  </div>
                 );
               })}
             </div>

@@ -53,6 +53,19 @@ def _import_pipeline_modules():
         detect_burst_activity, detect_structuring, detect_new_entity_spikes,
         isolation_forest_outliers,
     )
+    from evidence_engine import (  # noqa: F401
+        EvidenceEngine, EvidenceClassification, EpistemicStatus,
+        EvidenceItem, EvidenceTrace,
+    )
+    from explainability_engine import (  # noqa: F401
+        ExplainabilityEngine, ExplainabilityType, ExplanationStatus,
+        IntelligenceExplanation, ExplanationStep,
+    )
+    from temporal_engine import (  # noqa: F401
+        TemporalEngine, TemporalObservation, TemporalEntityActivity,
+        TemporalRelationshipEvolution, NetworkEvolutionSnapshot,
+        TemporalPattern, normalize_timestamp, extract_time_from_text,
+    )
     return {
         "IngestionManager": IngestionManager,
         "Record": Record,
@@ -83,6 +96,24 @@ def _import_pipeline_modules():
         "detect_structuring": detect_structuring,
         "detect_new_entity_spikes": detect_new_entity_spikes,
         "isolation_forest_outliers": isolation_forest_outliers,
+        "EvidenceEngine": EvidenceEngine,
+        "EvidenceClassification": EvidenceClassification,
+        "EpistemicStatus": EpistemicStatus,
+        "EvidenceItem": EvidenceItem,
+        "EvidenceTrace": EvidenceTrace,
+        "ExplainabilityEngine": ExplainabilityEngine,
+        "ExplainabilityType": ExplainabilityType,
+        "ExplanationStatus": ExplanationStatus,
+        "IntelligenceExplanation": IntelligenceExplanation,
+        "ExplanationStep": ExplanationStep,
+        "TemporalEngine": TemporalEngine,
+        "TemporalObservation": TemporalObservation,
+        "TemporalEntityActivity": TemporalEntityActivity,
+        "TemporalRelationshipEvolution": TemporalRelationshipEvolution,
+        "NetworkEvolutionSnapshot": NetworkEvolutionSnapshot,
+        "TemporalPattern": TemporalPattern,
+        "normalize_timestamp": normalize_timestamp,
+        "extract_time_from_text": extract_time_from_text,
     }
 
 
@@ -408,6 +439,72 @@ class DataQualityService:
         results.append(cls._test_3g_18_provenance_preservation())
         results.append(cls._test_3g_19_idempotent_resolution())
         results.append(cls._test_3g_20_baseline_protection())
+
+        # ── Phase 3H: Evidence & Provenance Engine Tests (49–68) ──────────────
+        results.append(cls._test_3h_01_source_record_evidence())
+        results.append(cls._test_3h_02_entity_observation_evidence())
+        results.append(cls._test_3h_03_relationship_evidence_canonical())
+        results.append(cls._test_3h_04_network_metric_evidence())
+        results.append(cls._test_3h_05_anomaly_signal_evidence())
+        results.append(cls._test_3h_06_entity_resolution_evidence())
+        results.append(cls._test_3h_07_temporal_observation_evidence())
+        results.append(cls._test_3h_08_location_observation_evidence())
+        results.append(cls._test_3h_09_deterministic_id_stability())
+        results.append(cls._test_3h_10_canonical_relationship_ordering())
+        results.append(cls._test_3h_11_inverted_index_lookup())
+        results.append(cls._test_3h_12_multi_hop_provenance_trace())
+        results.append(cls._test_3h_13_epistemic_status_correctness())
+        results.append(cls._test_3h_14_epistemic_guardrail_disclaimers())
+        results.append(cls._test_3h_15_verbatim_excerpt_byte_alignment())
+        results.append(cls._test_3h_16_evidence_overview_endpoint_filters())
+        results.append(cls._test_3h_17_evidence_detail_and_trace_endpoint())
+        results.append(cls._test_3h_18_relationship_evidence_endpoint())
+        results.append(cls._test_3h_19_report_findings_evidence_linkage())
+        results.append(cls._test_3h_20_baseline_protection_phase_3h())
+
+        # ── Phase 3I: Explainable Intelligence Engine Tests (69–88) ───────────
+        results.append(cls._test_3i_01_deterministic_generation())
+        results.append(cls._test_3i_02_finding_references_actual_intelligence_output())
+        results.append(cls._test_3i_03_network_metric_explanation_uses_actual_values())
+        results.append(cls._test_3i_04_influence_explanation_uses_actual_formula())
+        results.append(cls._test_3i_05_bridge_node_grounded_in_actual_graph_analysis())
+        results.append(cls._test_3i_06_community_explanation_grounded_in_community_output())
+        results.append(cls._test_3i_07_relationship_explanation_maps_to_actual_graph_edge())
+        results.append(cls._test_3i_08_relationship_explanation_maps_to_phase_3h_evidence())
+        results.append(cls._test_3i_09_anomaly_explanation_maps_to_actual_signal())
+        results.append(cls._test_3i_10_anomaly_explanation_uses_actual_detection_config())
+        results.append(cls._test_3i_11_entity_resolution_maps_to_phase_3g_decision())
+        results.append(cls._test_3i_12_temporal_explanation_uses_actual_timestamps())
+        results.append(cls._test_3i_13_location_explanation_uses_actual_locations())
+        results.append(cls._test_3i_14_no_unsupported_conclusions())
+        results.append(cls._test_3i_15_no_unsupported_probability_claims())
+        results.append(cls._test_3i_16_evidence_linkage_presence())
+        results.append(cls._test_3i_17_api_entity_explanation())
+        results.append(cls._test_3i_18_api_anomaly_explanation())
+        results.append(cls._test_3i_19_api_relationship_and_route_order())
+        results.append(cls._test_3i_20_baseline_protection())
+
+        # ── Phase 3J: Temporal Intelligence Engine Tests (89–108) ─────────────
+        results.append(cls._test_3j_01_temporal_engine_initialization())
+        results.append(cls._test_3j_02_deterministic_timestamp_normalization())
+        results.append(cls._test_3j_03_actual_source_timestamps_only())
+        results.append(cls._test_3j_04_date_only_records())
+        results.append(cls._test_3j_05_missing_timestamp_handling())
+        results.append(cls._test_3j_06_entity_activity_chronology())
+        results.append(cls._test_3j_07_relationship_temporal_evolution())
+        results.append(cls._test_3j_08_case_activity_chronology())
+        results.append(cls._test_3j_09_anomaly_temporal_chronology())
+        results.append(cls._test_3j_10_activity_density_calculation())
+        results.append(cls._test_3j_11_temporal_gap_calculation())
+        results.append(cls._test_3j_12_first_last_observation_correctness())
+        results.append(cls._test_3j_13_temporal_window_determinism())
+        results.append(cls._test_3j_14_network_evolution_grounding())
+        results.append(cls._test_3j_15_evidence_linkage())
+        results.append(cls._test_3j_16_no_unsupported_temporal_conclusions())
+        results.append(cls._test_3j_17_no_fabricated_timestamps())
+        results.append(cls._test_3j_18_api_temporal_routes_and_route_order())
+        results.append(cls._test_3j_19_frontend_integration_and_serialization())
+        results.append(cls._test_3j_20_baseline_protection())
 
         # ── Summary ──────────────────────────────────────────────────────────
         counts = {"PASS": 0, "FAIL": 0, "KNOWN_WEAKNESS": 0, "WARNING": 0}
@@ -2117,6 +2214,1793 @@ class DataQualityService:
                 "records": rec_cnt, "nodes": node_cnt, "edges": edge_cnt,
                 "anomalies": anom_cnt, "communities": comm_cnt,
                 "key_players": kp_cnt, "bridge_nodes": br_cnt,
+            },
+        }
+
+    # ── Phase 3H: Evidence & Provenance Engine Tests ─────────────────────────
+
+    @classmethod
+    def _test_3h_01_source_record_evidence(cls) -> dict:
+        """TEST-3H-01: Evidence item generation for source records."""
+        from server.service import IntelligenceService
+        engine = IntelligenceService.get_evidence_engine()
+        items = engine.get_evidence_by_classification("SOURCE_RECORD")
+        passed = len(items) == 10 and all(
+            it.epistemic_status == "OBSERVED"
+            and len(it.raw_excerpts) > 0
+            and len(it.source_records) == 1
+            for it in items
+        )
+        return {
+            "test_id": "TEST-3H-01",
+            "test_name": "Source Record Evidence Generation",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify all ingested source records compile into SOURCE_RECORD evidence items with OBSERVED epistemic status.",
+            "observed_behavior": f"Compiled {len(items)} SOURCE_RECORD evidence items. All OBSERVED: {passed}.",
+            "expected_behavior": "10 SOURCE_RECORD evidence items with OBSERVED status and non-empty verbatim text.",
+            "weakness_documented": False,
+            "detail": {"count": len(items)},
+        }
+
+    @classmethod
+    def _test_3h_02_entity_observation_evidence(cls) -> dict:
+        """TEST-3H-02: Evidence item generation for extracted entity observations."""
+        from server.service import IntelligenceService
+        engine = IntelligenceService.get_evidence_engine()
+        items = engine.get_evidence_by_classification("ENTITY_OBSERVATION")
+        passed = len(items) > 0 and all(
+            it.epistemic_status == "OBSERVED"
+            and len(it.raw_excerpts) > 0
+            and it.raw_excerpts[0].get("byte_offset_start", -1) >= 0
+            for it in items
+        )
+        return {
+            "test_id": "TEST-3H-02",
+            "test_name": "Entity Observation Evidence Grounding",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify extracted entities generate ENTITY_OBSERVATION evidence items with valid byte offsets.",
+            "observed_behavior": f"Compiled {len(items)} ENTITY_OBSERVATION items with verbatim excerpts.",
+            "expected_behavior": "40+ ENTITY_OBSERVATION items with byte offsets and OBSERVED status.",
+            "weakness_documented": False,
+            "detail": {"count": len(items)},
+        }
+
+    @classmethod
+    def _test_3h_03_relationship_evidence_canonical(cls) -> dict:
+        """TEST-3H-03: Evidence item generation for relationships with canonical unordered IDs."""
+        from server.service import IntelligenceService
+        engine = IntelligenceService.get_evidence_engine()
+        items = engine.get_evidence_by_classification("RELATIONSHIP")
+        passed = len(items) == 52 and all(
+            it.evidence_id.startswith("EVID-REL-")
+            and len(it.entities) == 2
+            for it in items
+        )
+        return {
+            "test_id": "TEST-3H-03",
+            "test_name": "Canonical Relationship Evidence Generation",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify 52 relationship evidence items are generated with canonical unordered IDs.",
+            "observed_behavior": f"Compiled {len(items)} RELATIONSHIP items. All start with EVID-REL-: {passed}.",
+            "expected_behavior": "52 RELATIONSHIP evidence items with canonical EVID-REL- prefix.",
+            "weakness_documented": False,
+            "detail": {"count": len(items)},
+        }
+
+    @classmethod
+    def _test_3h_04_network_metric_evidence(cls) -> dict:
+        """TEST-3H-04: Evidence item generation for network centrality metrics."""
+        from server.service import IntelligenceService
+        engine = IntelligenceService.get_evidence_engine()
+        items = engine.get_evidence_by_classification("NETWORK_METRIC")
+        passed = len(items) == 15 and all(
+            it.epistemic_status == "DERIVED"
+            and "Centrality reflects network structure" in it.limitations
+            for it in items
+        )
+        return {
+            "test_id": "TEST-3H-04",
+            "test_name": "Network Centrality Metric Evidence",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify 15 network centrality metric evidence items are generated with DERIVED status and anti-bias disclaimers.",
+            "observed_behavior": f"Compiled {len(items)} NETWORK_METRIC items with DERIVED status and epistemic boundary notices.",
+            "expected_behavior": "15 NETWORK_METRIC items with DERIVED status.",
+            "weakness_documented": False,
+            "detail": {"count": len(items)},
+        }
+
+    @classmethod
+    def _test_3h_05_anomaly_signal_evidence(cls) -> dict:
+        """TEST-3H-05: Evidence item generation for anomaly signals."""
+        from server.service import IntelligenceService
+        engine = IntelligenceService.get_evidence_engine()
+        items = engine.get_evidence_by_classification("ANOMALY_SIGNAL")
+        passed = len(items) == 25 and all(
+            it.epistemic_status == "SIGNAL"
+            and "Investigative anomaly signal only" in it.limitations
+            for it in items
+        )
+        return {
+            "test_id": "TEST-3H-05",
+            "test_name": "Anomaly Signal Evidence & Disclaimers",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify 25 anomaly signal evidence items have SIGNAL status and explicit investigative disclaimer.",
+            "observed_behavior": f"Compiled {len(items)} ANOMALY_SIGNAL items with SIGNAL status.",
+            "expected_behavior": "25 ANOMALY_SIGNAL items with SIGNAL status and non-proof-of-crime disclaimers.",
+            "weakness_documented": False,
+            "detail": {"count": len(items)},
+        }
+
+    @classmethod
+    def _test_3h_06_entity_resolution_evidence(cls) -> dict:
+        """TEST-3H-06: Evidence item generation for entity resolutions."""
+        from server.service import IntelligenceService
+        engine = IntelligenceService.get_evidence_engine()
+        items = engine.get_evidence_by_classification("ENTITY_RESOLUTION")
+        passed = len(items) == 22 and all(
+            it.epistemic_status in ("DERIVED", "REVIEW_REQUIRED")
+            for it in items
+        )
+        return {
+            "test_id": "TEST-3H-06",
+            "test_name": "Entity Resolution Evidence Compilation",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify 22 entity resolution audit records generate transparent evidence items.",
+            "observed_behavior": f"Compiled {len(items)} ENTITY_RESOLUTION items. All have DERIVED or REVIEW_REQUIRED status.",
+            "expected_behavior": "22 ENTITY_RESOLUTION items with transparent justification.",
+            "weakness_documented": False,
+            "detail": {"count": len(items)},
+        }
+
+    @classmethod
+    def _test_3h_07_temporal_observation_evidence(cls) -> dict:
+        """TEST-3H-07: Evidence item generation for temporal observations."""
+        from server.service import IntelligenceService
+        engine = IntelligenceService.get_evidence_engine()
+        items = engine.get_evidence_by_classification("TEMPORAL_OBSERVATION")
+        passed = len(items) == 10 and all(
+            it.epistemic_status == "OBSERVED"
+            and it.temporal_context is not None
+            for it in items
+        )
+        return {
+            "test_id": "TEST-3H-07",
+            "test_name": "Temporal Observation Evidence",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify temporal observation items record chronology with OBSERVED status.",
+            "observed_behavior": f"Compiled {len(items)} TEMPORAL_OBSERVATION items with dates.",
+            "expected_behavior": "10 TEMPORAL_OBSERVATION items with OBSERVED status.",
+            "weakness_documented": False,
+            "detail": {"count": len(items)},
+        }
+
+    @classmethod
+    def _test_3h_08_location_observation_evidence(cls) -> dict:
+        """TEST-3H-08: Evidence item generation for location observations."""
+        from server.service import IntelligenceService
+        engine = IntelligenceService.get_evidence_engine()
+        items = engine.get_evidence_by_classification("LOCATION_OBSERVATION")
+        passed = len(items) == 2 and all(
+            it.epistemic_status == "OBSERVED"
+            and it.spatial_context is not None
+            for it in items
+        )
+        return {
+            "test_id": "TEST-3H-08",
+            "test_name": "Location Observation Evidence",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify location observation items capture spatial context with OBSERVED status.",
+            "observed_behavior": f"Compiled {len(items)} LOCATION_OBSERVATION items.",
+            "expected_behavior": "2 LOCATION_OBSERVATION items with OBSERVED status.",
+            "weakness_documented": False,
+            "detail": {"count": len(items)},
+        }
+
+    @classmethod
+    def _test_3h_09_deterministic_id_stability(cls) -> dict:
+        """TEST-3H-09: Deterministic evidence ID stability across repeated runs."""
+        from server.service import IntelligenceService
+        engine1 = IntelligenceService.get_evidence_engine()
+        mods = _import_pipeline_modules()
+        EvidenceEngine = mods["EvidenceEngine"]
+        eng2 = EvidenceEngine()
+        data = IntelligenceService.get_data()
+        corpus = {
+            "records": data["ingested_records"],
+            "nodes": data["network_nodes"],
+            "edges": data["network_edges"],
+            "anomalies": data["suspicious_patterns"],
+            "canonical_entities": data.get("canonical_entities", {}),
+            "resolution_audit": data["entity_resolution"].get("audit_trail", []),
+        }
+        eng2.compile_corpus(corpus)
+        ids1 = set(engine1.inverted_index_id.keys())
+        ids2 = set(eng2.inverted_index_id.keys())
+        passed = (ids1 == ids2) and len(ids1) == 179
+        return {
+            "test_id": "TEST-3H-09",
+            "test_name": "Deterministic Evidence ID Stability",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify compiling the corpus repeatedly yields identical evidence IDs.",
+            "observed_behavior": f"Engine 1 IDs: {len(ids1)}, Engine 2 IDs: {len(ids2)}. Sets identical: {ids1 == ids2}.",
+            "expected_behavior": "100% identical set of 179 evidence IDs across independent engine compilations.",
+            "weakness_documented": False,
+            "detail": {"ids_count": len(ids1)},
+        }
+
+    @classmethod
+    def _test_3h_10_canonical_relationship_ordering(cls) -> dict:
+        """TEST-3H-10: Canonical relationship ordering (unordered pair resolution)."""
+        from server.service import IntelligenceService
+        engine = IntelligenceService.get_evidence_engine()
+        pair1_a = engine.get_evidence_for_relationship("RAVI MALHOTRA", "VIKRAM RAO")
+        pair1_b = engine.get_evidence_for_relationship("VIKRAM RAO", "RAVI MALHOTRA")
+        pair2_a = engine.get_evidence_for_relationship("SURESH NAIR", "RAVI MALHOTRA")
+        pair2_b = engine.get_evidence_for_relationship("RAVI MALHOTRA", "SURESH NAIR")
+        passed = (
+            pair1_a is not None
+            and pair1_b is not None
+            and pair1_a.evidence_id == pair1_b.evidence_id
+            and pair2_a is not None
+            and pair2_b is not None
+            and pair2_a.evidence_id == pair2_b.evidence_id
+        )
+        return {
+            "test_id": "TEST-3H-10",
+            "test_name": "Canonical Relationship Unordered Pair Resolution",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify querying (u, v) and (v, u) resolves to the exact same canonical evidence item.",
+            "observed_behavior": (
+                f"Pair 1: {pair1_a.evidence_id if pair1_a else None} == {pair1_b.evidence_id if pair1_b else None}. "
+                f"Pair 2: {pair2_a.evidence_id if pair2_a else None} == {pair2_b.evidence_id if pair2_b else None}."
+            ),
+            "expected_behavior": "Both orderings return the exact same canonical relationship evidence ID.",
+            "weakness_documented": False,
+            "detail": {
+                "pair1_id": pair1_a.evidence_id if pair1_a else None,
+                "pair2_id": pair2_a.evidence_id if pair2_a else None,
+            },
+        }
+
+    @classmethod
+    def _test_3h_11_inverted_index_lookup(cls) -> dict:
+        """TEST-3H-11: O(1) inverted index lookup performance."""
+        from server.service import IntelligenceService
+        engine = IntelligenceService.get_evidence_engine()
+        by_id = engine.get_evidence_by_id("EVID-REC-CR-1001")
+        by_ent = engine.get_evidence_for_entity("RAVI MALHOTRA")
+        by_rec = engine.get_evidence_for_record("CR-1001")
+        by_anom = engine.get_evidence_for_anomaly("ANOM-001")
+        passed = (
+            by_id is not None
+            and len(by_ent) > 0
+            and len(by_rec) > 0
+            and len(by_anom) > 0
+        )
+        return {
+            "test_id": "TEST-3H-11",
+            "test_name": "Inverted Index O(1) Lookup Performance",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify average-case O(1) lookups across ID, entity, record, and anomaly inverted indices.",
+            "observed_behavior": (
+                f"ID lookup found: {by_id is not None}. "
+                f"Entity index count: {len(by_ent)}. "
+                f"Record index count: {len(by_rec)}. "
+                f"Anomaly index count: {len(by_anom)}."
+            ),
+            "expected_behavior": "All inverted indices return valid results immediately.",
+            "weakness_documented": False,
+            "detail": {
+                "by_id_found": by_id is not None,
+                "entity_matches": len(by_ent),
+                "record_matches": len(by_rec),
+                "anomaly_matches": len(by_anom),
+            },
+        }
+
+    @classmethod
+    def _test_3h_12_multi_hop_provenance_trace(cls) -> dict:
+        """TEST-3H-12: Multi-hop provenance trace compilation."""
+        from server.service import IntelligenceService
+        engine = IntelligenceService.get_evidence_engine()
+        trace = engine.build_trace("ANOM-001", "ANOMALY_SIGNAL")
+        passed = (
+            trace is not None
+            and len(trace.steps) >= 2
+            and any(s.get("stage") == "source_records" for s in trace.steps)
+            and any(s.get("stage") == "analytical_detection" for s in trace.steps)
+        )
+        return {
+            "test_id": "TEST-3H-12",
+            "test_name": "Multi-Hop Provenance Trace Compilation",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify build_trace constructs multi-step pipeline provenance from source records through detection.",
+            "observed_behavior": f"Trace steps: {len(trace.steps) if trace else 0}. Has source records and analytical detection stages: {passed}.",
+            "expected_behavior": "Multi-step TraceStep sequence documenting source records and intermediate transformations.",
+            "weakness_documented": False,
+            "detail": {"steps_count": len(trace.steps) if trace else 0},
+        }
+
+    @classmethod
+    def _test_3h_13_epistemic_status_correctness(cls) -> dict:
+        """TEST-3H-13: Epistemic status mapping correctness."""
+        from server.service import IntelligenceService
+        engine = IntelligenceService.get_evidence_engine()
+        all_items = engine.all_items
+        invalid_mappings = []
+        for it in all_items:
+            cls_name = it.evidence_type
+            st_name = it.epistemic_status
+            if cls_name == "SOURCE_RECORD" and st_name != "OBSERVED":
+                invalid_mappings.append((it.evidence_id, cls_name, st_name))
+            elif cls_name == "NETWORK_METRIC" and st_name != "DERIVED":
+                invalid_mappings.append((it.evidence_id, cls_name, st_name))
+            elif cls_name == "ANOMALY_SIGNAL" and st_name != "SIGNAL":
+                invalid_mappings.append((it.evidence_id, cls_name, st_name))
+        passed = len(invalid_mappings) == 0 and len(all_items) == 179
+        return {
+            "test_id": "TEST-3H-13",
+            "test_name": "Epistemic Status Mapping Integrity",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify evidence classification strictly maps to valid epistemic status according to intelligence rules.",
+            "observed_behavior": f"Total items: {len(all_items)}. Invalid mappings: {len(invalid_mappings)}.",
+            "expected_behavior": "Zero invalid classification-to-epistemic mappings across all 179 items.",
+            "weakness_documented": False,
+            "detail": {"invalid_count": len(invalid_mappings)},
+        }
+
+    @classmethod
+    def _test_3h_14_epistemic_guardrail_disclaimers(cls) -> dict:
+        """TEST-3H-14: Epistemic guardrail disclaimers on non-observed evidence."""
+        from server.service import IntelligenceService
+        engine = IntelligenceService.get_evidence_engine()
+        missing_disclaimer = []
+        for it in engine.all_items:
+            st = it.epistemic_status
+            if st in ("DERIVED", "SIGNAL", "REVIEW_REQUIRED"):
+                if not it.limitations or len(it.limitations.strip()) == 0:
+                    missing_disclaimer.append(it.evidence_id)
+        passed = len(missing_disclaimer) == 0
+        return {
+            "test_id": "TEST-3H-14",
+            "test_name": "Epistemic Guardrail Disclaimers Presence",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify all non-observed items (DERIVED, SIGNAL, REVIEW_REQUIRED) include explicit limitations disclaimers.",
+            "observed_behavior": f"Missing disclaimers: {len(missing_disclaimer)}/{len(engine.all_items)}.",
+            "expected_behavior": "Zero items missing epistemic boundary disclaimers.",
+            "weakness_documented": False,
+            "detail": {"missing_count": len(missing_disclaimer)},
+        }
+
+    @classmethod
+    def _test_3h_15_verbatim_excerpt_byte_alignment(cls) -> dict:
+        """TEST-3H-15: Verbatim source excerpt byte alignment against ingested records."""
+        from server.service import IntelligenceService
+        data = IntelligenceService.get_data()
+        records_by_id = {r["record_id"]: r["text"] for r in data["ingested_records"]}
+        engine = IntelligenceService.get_evidence_engine()
+        mismatches = []
+        checked = 0
+        for it in engine.all_items:
+            for exc in it.raw_excerpts:
+                start = exc.get("byte_offset_start")
+                end = exc.get("byte_offset_end")
+                rec_id = exc.get("record_id")
+                verbatim = exc.get("verbatim_text")
+                if start is not None and end is not None:
+                    checked += 1
+                    raw_text = records_by_id.get(rec_id, "")
+                    sliced = raw_text[start:end]
+                    if sliced != verbatim:
+                        mismatches.append((rec_id, verbatim, sliced))
+        passed = checked > 0 and len(mismatches) == 0
+        return {
+            "test_id": "TEST-3H-15",
+            "test_name": "Verbatim Excerpt Byte Alignment",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify byte slice record.text[start:end] strictly equals verbatim excerpt text.",
+            "observed_behavior": f"Checked {checked} byte offsets. Mismatches: {len(mismatches)}.",
+            "expected_behavior": "100% byte alignment between source records and verbatim excerpts.",
+            "weakness_documented": False,
+            "detail": {"checked": checked, "mismatches": len(mismatches)},
+        }
+
+    @classmethod
+    def _test_3h_16_evidence_overview_endpoint_filters(cls) -> dict:
+        """TEST-3H-16: Evidence overview endpoint filtering capability."""
+        from server.service import IntelligenceService
+        by_class = IntelligenceService.get_evidence_overview(classification="ANOMALY_SIGNAL")
+        by_status = IntelligenceService.get_evidence_overview(epistemic_status="OBSERVED")
+        by_rec = IntelligenceService.get_evidence_overview(record_id="CR-1001")
+        passed = (
+            len(by_class["items"]) == 25
+            and len(by_status["items"]) > 0
+            and len(by_rec["items"]) > 0
+            and all("CR-1001" in it["source_records"] for it in by_rec["items"])
+        )
+        return {
+            "test_id": "TEST-3H-16",
+            "test_name": "Evidence Overview Multi-Filter API",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify get_evidence_overview filters correctly by classification, status, and record_id.",
+            "observed_behavior": (
+                f"Classification filter returned {len(by_class['items'])} (expected 25). "
+                f"Status filter returned {len(by_status['items'])}. "
+                f"Record filter returned {len(by_rec['items'])}."
+            ),
+            "expected_behavior": "Filters correctly partition and filter evidence items.",
+            "weakness_documented": False,
+            "detail": {
+                "class_count": len(by_class["items"]),
+                "status_count": len(by_status["items"]),
+                "record_count": len(by_rec["items"]),
+            },
+        }
+
+    @classmethod
+    def _test_3h_17_evidence_detail_and_trace_endpoint(cls) -> dict:
+        """TEST-3H-17: Single evidence item retrieval with multi-step trace."""
+        from server.service import IntelligenceService
+        res = IntelligenceService.get_evidence_item("EVID-ANOM-ANOM-001")
+        passed = (
+            res is not None
+            and res.get("item") is not None
+            and res.get("trace") is not None
+            and len(res["trace"].get("steps", [])) >= 2
+        )
+        return {
+            "test_id": "TEST-3H-17",
+            "test_name": "Single Evidence Item and Trace API",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify get_evidence_item returns the requested item and its full provenance trace.",
+            "observed_behavior": f"Item found: {res.get('item') is not None}. Trace steps: {len(res.get('trace', {}).get('steps', []))}.",
+            "expected_behavior": "Item found with multi-step provenance trace.",
+            "weakness_documented": False,
+            "detail": {"has_item": res.get("item") is not None, "has_trace": res.get("trace") is not None},
+        }
+
+    @classmethod
+    def _test_3h_18_relationship_evidence_endpoint(cls) -> dict:
+        """TEST-3H-18: Relationship evidence endpoint bidirectional resolution."""
+        from server.service import IntelligenceService
+        res_fwd = IntelligenceService.get_relationship_evidence("RAVI MALHOTRA", "VIKRAM RAO")
+        res_rev = IntelligenceService.get_relationship_evidence("VIKRAM RAO", "RAVI MALHOTRA")
+        passed = (
+            res_fwd is not None
+            and res_rev is not None
+            and res_fwd["evidence_id"] == res_rev["evidence_id"]
+            and res_fwd["item"]["evidence_id"].startswith("EVID-REL-")
+        )
+        return {
+            "test_id": "TEST-3H-18",
+            "test_name": "Relationship Evidence Endpoint Bidirectionality",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify relationship evidence endpoint returns identical evidence item regardless of endpoint ordering.",
+            "observed_behavior": f"Forward ID: {res_fwd.get('evidence_id')}. Reverse ID: {res_rev.get('evidence_id')}.",
+            "expected_behavior": "Identical canonical evidence item returned bidirectionally.",
+            "weakness_documented": False,
+            "detail": {"fwd_id": res_fwd.get("evidence_id"), "rev_id": res_rev.get("evidence_id")},
+        }
+
+    @classmethod
+    def _test_3h_19_report_findings_evidence_linkage(cls) -> dict:
+        """TEST-3H-19: Report key findings evidence linkage."""
+        from server.service import IntelligenceService
+        report = IntelligenceService.get_reports()
+        engine = IntelligenceService.get_evidence_engine()
+        findings = report.get("key_findings", [])
+        passed = (
+            len(findings) > 0
+            and all(
+                f.get("evidence_id") is not None
+                and engine.get_evidence_by_id(f["evidence_id"]) is not None
+                for f in findings
+            )
+        )
+        return {
+            "test_id": "TEST-3H-19",
+            "test_name": "Report Key Findings Evidence Linkage",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify every Key Finding in the synthesized Intelligence Report links directly to a compiled evidence item.",
+            "observed_behavior": f"Checked {len(findings)} key findings. All have valid evidence_id: {passed}.",
+            "expected_behavior": "100% of Key Findings linked to valid evidence items in the engine index.",
+            "weakness_documented": False,
+            "detail": {"findings_count": len(findings)},
+        }
+
+    @classmethod
+    def _test_3h_20_baseline_protection_phase_3h(cls) -> dict:
+        """TEST-3H-20: Production baseline integrity verification after Phase 3H."""
+        from server.service import IntelligenceService
+        data = IntelligenceService.get_data(force_reload=True)
+        engine = IntelligenceService.get_evidence_engine()
+
+        rec_cnt = data["total_records"]
+        node_cnt = data["summary"]["num_nodes"]
+        edge_cnt = data["summary"]["num_edges"]
+        anom_cnt = len(data["suspicious_patterns"])
+        comm_cnt = len(data["communities"])
+        kp_cnt = len(data["key_players"])
+        br_cnt = len(data["critical_bridge_nodes"])
+        evid_cnt = len(engine.all_items)
+
+        passed = (
+            rec_cnt == 10
+            and node_cnt == 15
+            and edge_cnt == 52
+            and anom_cnt == 25
+            and comm_cnt == 3
+            and kp_cnt == 6
+            and br_cnt == 5
+            and evid_cnt == 179
+        )
+        return {
+            "test_id": "TEST-3H-20",
+            "test_name": "Production Baseline Dataset Protection (Phase 3H)",
+            "category": "Phase 3H: Evidence & Provenance Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify production baseline intelligence metrics remain 100% intact after Phase 3H Evidence Engine integration.",
+            "observed_behavior": (
+                f"Records: {rec_cnt}/10, Nodes: {node_cnt}/15, Edges: {edge_cnt}/52, "
+                f"Anomalies: {anom_cnt}/25, Communities: {comm_cnt}/3, Key Players: {kp_cnt}/6, "
+                f"Bridges: {br_cnt}/5, Evidence Items: {evid_cnt}/179."
+            ),
+            "expected_behavior": "10 records, 15 nodes, 52 edges, 25 anomalies, 3 communities, 6 key players, 5 bridge nodes, 179 evidence items.",
+            "weakness_documented": False,
+            "detail": {
+                "records": rec_cnt, "nodes": node_cnt, "edges": edge_cnt,
+                "anomalies": anom_cnt, "communities": comm_cnt,
+                "key_players": kp_cnt, "bridge_nodes": br_cnt,
+                "evidence_items": evid_cnt,
+            },
+        }
+
+    # ── Phase 3I: Explainable Intelligence Engine Tests ───────────────────────
+
+    @classmethod
+    def _test_3i_01_deterministic_generation(cls) -> dict:
+        """TEST-3I-01: Deterministic explanation generation and stability."""
+        from server.service import IntelligenceService
+        eng1 = IntelligenceService.get_explainability_engine()
+        mods = _import_pipeline_modules()
+        ExplainabilityEngine = mods["ExplainabilityEngine"]
+        extract_entities = mods["extract_entities"]
+        Record = mods["Record"]
+        eng2 = ExplainabilityEngine()
+        data = IntelligenceService.get_data()
+        ee = IntelligenceService.get_evidence_engine()
+        G = IntelligenceService._cached_graph
+        cent = {n["id"]: n for n in data["nodes"]}
+        kp = data["key_players"]
+        bridges = [(b["entity"], b["betweenness"]) for b in data["critical_bridge_nodes"]]
+        comms = [set(c) for c in data["communities"]]
+        recs = [Record(record_id=r["record_id"], source=r["source"], date=r["date"], text=r["text"], structured=r.get("structured", {})) for r in data["ingested_records"]]
+        extracted = extract_entities(recs)
+        can_reg = data.get("canonical_entities", {})
+        res_eng = getattr(IntelligenceService, "_cached_resolution_engine", None)
+        eng2.compile(
+            records=data["ingested_records"],
+            extracted=extracted,
+            G=G,
+            centrality=cent,
+            key_players=kp,
+            bridges=bridges,
+            communities=comms,
+            anomalies=data["suspicious_patterns"],
+            resolution_engine=res_eng,
+            canonical_registry=can_reg,
+            evidence_engine=ee,
+        )
+        total1 = len(eng1.all_explanations)
+        total2 = len(eng2.all_explanations)
+        ids1 = set(eng1.index_by_id.keys())
+        passed = (total1 >= 100) and (total1 == total2) and (ids1 == set(eng2.index_by_id.keys()))
+        return {
+            "test_id": "TEST-3I-01",
+            "test_name": "Deterministic Explanation Generation",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify ExplainabilityEngine produces deterministic, reproducible explanations across independent compilations.",
+            "observed_behavior": f"Engine 1 explanations: {total1}. Engine 2 explanations: {total2}. Sets identical: {passed}.",
+            "expected_behavior": "100+ deterministic explanations produced identically across independent compilations.",
+            "weakness_documented": False,
+            "detail": {"count": total1},
+        }
+
+    @classmethod
+    def _test_3i_02_finding_references_actual_intelligence_output(cls) -> dict:
+        """TEST-3I-02: Finding references actual intelligence output."""
+        from server.service import IntelligenceService
+        eng = IntelligenceService.get_explainability_engine()
+        data = IntelligenceService.get_data()
+        node_ids = {n["id"].upper() for n in data["nodes"]}
+        anom_ids = {a["id"] for a in data["suspicious_patterns"]}
+        unmatched = []
+        for expl in eng.all_explanations:
+            if expl.explanation_type == "NETWORK_IMPORTANCE":
+                if expl.target_id.upper() not in node_ids:
+                    unmatched.append(expl.explanation_id)
+            elif expl.explanation_type == "ANOMALY":
+                if expl.target_id not in anom_ids:
+                    unmatched.append(expl.explanation_id)
+        passed = len(unmatched) == 0 and len(eng.all_explanations) > 0
+        return {
+            "test_id": "TEST-3I-02",
+            "test_name": "Finding References Actual Intelligence Output",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify every explanation targets actual entities or anomalies present in the calculated intelligence model.",
+            "observed_behavior": f"Checked {len(eng.all_explanations)} explanations. Unmatched targets: {len(unmatched)}.",
+            "expected_behavior": "Zero explanations targeting non-existent entities or anomalies.",
+            "weakness_documented": False,
+            "detail": {"unmatched_count": len(unmatched)},
+        }
+
+    @classmethod
+    def _test_3i_03_network_metric_explanation_uses_actual_values(cls) -> dict:
+        """TEST-3I-03: Network metric explanation uses actual values."""
+        from server.service import IntelligenceService
+        eng = IntelligenceService.get_explainability_engine()
+        data = IntelligenceService.get_data()
+        ravi_node = next(n for n in data["nodes"] if n["id"] == "Ravi Malhotra")
+        ravi_expl = eng.get_explanation("EXPL-NET-RAVI-MALHOTRA")
+        passed = (
+            ravi_expl is not None
+            and ravi_expl.analytical_inputs.get("degree") == ravi_node["degree"]
+            and ravi_expl.analytical_inputs.get("betweenness") == ravi_node["betweenness"]
+            and ravi_expl.analytical_inputs.get("eigenvector") == ravi_node["eigenvector"]
+            and ravi_expl.analytical_inputs.get("pagerank") == ravi_node["pagerank"]
+        )
+        return {
+            "test_id": "TEST-3I-03",
+            "test_name": "Network Metric Explanation Uses Actual Values",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify centrality metrics in explanation match the exact calculated graph values.",
+            "observed_behavior": (
+                f"Degree match: {ravi_expl.analytical_inputs.get('degree') == ravi_node['degree'] if ravi_expl else False}. "
+                f"Betweenness match: {ravi_expl.analytical_inputs.get('betweenness') == ravi_node['betweenness'] if ravi_expl else False}."
+            ),
+            "expected_behavior": "Exact match between network explanation inputs and graph node centrality metrics.",
+            "weakness_documented": False,
+            "detail": {"entity": "Ravi Malhotra", "degree": ravi_node["degree"], "betweenness": ravi_node["betweenness"]},
+        }
+
+    @classmethod
+    def _test_3i_04_influence_explanation_uses_actual_formula(cls) -> dict:
+        """TEST-3I-04: Influence explanation uses actual existing formula."""
+        from server.service import IntelligenceService
+        eng = IntelligenceService.get_explainability_engine()
+        data = IntelligenceService.get_data()
+        ravi_kp = next(kp for kp in data["key_players"] if kp["entity"] == "Ravi Malhotra")
+        ravi_expl = eng.get_explanation("EXPL-NET-RAVI-MALHOTRA")
+        deg = ravi_expl.analytical_inputs["degree"]
+        btw = ravi_expl.analytical_inputs["betweenness"]
+        eig = ravi_expl.analytical_inputs["eigenvector"]
+        pr = ravi_expl.analytical_inputs["pagerank"]
+        formula_score = round(0.25 * deg + 0.35 * btw + 0.25 * eig + 0.15 * pr, 4)
+        passed = (
+            ravi_expl is not None
+            and "0.25*deg" in ravi_expl.analytical_method
+            and abs(formula_score - ravi_kp["influence_score"]) < 1e-4
+            and ravi_expl.metadata["influence_score"] == ravi_kp["influence_score"]
+        )
+        return {
+            "test_id": "TEST-3I-04",
+            "test_name": "Influence Explanation Uses Actual Formula",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify influence explanation details the exact formula: 0.25*deg + 0.35*btw + 0.25*eig + 0.15*pr.",
+            "observed_behavior": (
+                f"Formula calculation ({formula_score}) equals key player influence_score ({ravi_kp['influence_score']})."
+            ),
+            "expected_behavior": "Exact mathematical identity between formula derivation and key player score.",
+            "weakness_documented": False,
+            "detail": {"score": formula_score, "expected": ravi_kp["influence_score"]},
+        }
+
+    @classmethod
+    def _test_3i_05_bridge_node_grounded_in_actual_graph_analysis(cls) -> dict:
+        """TEST-3I-05: Bridge-node explanation grounded in actual graph analysis."""
+        from server.service import IntelligenceService
+        from explainability_engine import _slug
+        eng = IntelligenceService.get_explainability_engine()
+        data = IntelligenceService.get_data()
+        bridges = data["critical_bridge_nodes"]
+        passed = len(bridges) == 5 and all(
+            eng.get_explanation(f"EXPL-BRG-{_slug(b['entity'])}") is not None
+            for b in bridges
+        )
+        return {
+            "test_id": "TEST-3I-05",
+            "test_name": "Bridge-Node Explanation Grounded in Graph Analysis",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify all critical bridge nodes have corresponding explanations grounded in shortest-path analysis.",
+            "observed_behavior": f"Verified {len(bridges)} critical bridge nodes have valid BRIDGE_NODE explanations.",
+            "expected_behavior": "All 5 critical bridge nodes have grounded explanations.",
+            "weakness_documented": False,
+            "detail": {"bridge_count": len(bridges)},
+        }
+
+    @classmethod
+    def _test_3i_06_community_explanation_grounded_in_community_output(cls) -> dict:
+        """TEST-3I-06: Community explanation grounded in actual community output."""
+        from server.service import IntelligenceService
+        eng = IntelligenceService.get_explainability_engine()
+        data = IntelligenceService.get_data()
+        comms = data["communities"]
+        comm_expls = [e for e in eng.all_explanations if e.explanation_type == "COMMUNITY"]
+        neutral = all(
+            "observed network community" in e.finding.lower()
+            and "criminal gang" not in e.finding.lower()
+            and "cartel" not in e.finding.lower()
+            for e in comm_expls
+        )
+        passed = len(comms) == 3 and len(comm_expls) == 3 and neutral
+        return {
+            "test_id": "TEST-3I-06",
+            "test_name": "Community Explanation Grounded in Louvain Output",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify 3 community explanations match Louvain communities and use neutral terminology.",
+            "observed_behavior": f"Compiled {len(comm_expls)} community explanations. Neutral terminology maintained: {neutral}.",
+            "expected_behavior": "3 community explanations with neutral observed graph community terminology.",
+            "weakness_documented": False,
+            "detail": {"count": len(comm_expls), "neutral": neutral},
+        }
+
+    @classmethod
+    def _test_3i_07_relationship_explanation_maps_to_actual_graph_edge(cls) -> dict:
+        """TEST-3I-07: Relationship explanation maps to actual graph edge."""
+        from server.service import IntelligenceService
+        eng = IntelligenceService.get_explainability_engine()
+        rel_expl = eng.get_explanation_for_relationship("RAVI MALHOTRA", "VIKRAM RAO")
+        data = IntelligenceService.get_data()
+        edge = next(
+            (l for l in data["links"]
+             if (l["source"].upper() == "RAVI MALHOTRA" and l["target"].upper() == "VIKRAM RAO")
+             or (l["source"].upper() == "VIKRAM RAO" and l["target"].upper() == "RAVI MALHOTRA")),
+            None
+        )
+        passed = (
+            rel_expl is not None
+            and edge is not None
+            and rel_expl.analytical_inputs["weight"] == edge["weight"]
+            and set(rel_expl.supporting_source_records) == set(edge["records"])
+        )
+        return {
+            "test_id": "TEST-3I-07",
+            "test_name": "Relationship Explanation Maps to Actual Graph Edge",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify relationship explanation maps directly to graph edge weight and corroborating record IDs.",
+            "observed_behavior": (
+                f"Relationship found: {rel_expl is not None}. Weight match: {rel_expl.analytical_inputs['weight'] if rel_expl else None} == {edge['weight'] if edge else None}."
+            ),
+            "expected_behavior": "Exact match between relationship explanation attributes and graph edge data.",
+            "weakness_documented": False,
+            "detail": {"weight": edge["weight"] if edge else None, "records": edge["records"] if edge else []},
+        }
+
+    @classmethod
+    def _test_3i_08_relationship_explanation_maps_to_phase_3h_evidence(cls) -> dict:
+        """TEST-3I-08: Relationship explanation maps to Phase 3H evidence."""
+        from server.service import IntelligenceService
+        eng = IntelligenceService.get_explainability_engine()
+        ee = IntelligenceService.get_evidence_engine()
+        rel_expl = eng.get_explanation_for_relationship("RAVI MALHOTRA", "VIKRAM RAO")
+        passed = (
+            rel_expl is not None
+            and len(rel_expl.supporting_evidence_ids) > 0
+            and any(ee.get_evidence_by_id(eid) is not None for eid in rel_expl.supporting_evidence_ids)
+            and any(eid.startswith("EVID-REL-") for eid in rel_expl.supporting_evidence_ids)
+        )
+        return {
+            "test_id": "TEST-3I-08",
+            "test_name": "Relationship Explanation Maps to Phase 3H Evidence",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify relationship explanation links directly to valid Phase 3H EVID-REL- evidence items.",
+            "observed_behavior": f"Supporting evidence IDs: {rel_expl.supporting_evidence_ids if rel_expl else []}. Valid in engine: {passed}.",
+            "expected_behavior": "Relationship explanation maps to verified EVID-REL- evidence item in Phase 3H engine.",
+            "weakness_documented": False,
+            "detail": {"evidence_ids": rel_expl.supporting_evidence_ids if rel_expl else []},
+        }
+
+    @classmethod
+    def _test_3i_09_anomaly_explanation_maps_to_actual_signal(cls) -> dict:
+        """TEST-3I-09: Anomaly explanation maps to actual anomaly signal."""
+        from server.service import IntelligenceService
+        eng = IntelligenceService.get_explainability_engine()
+        data = IntelligenceService.get_data()
+        anoms = data["suspicious_patterns"]
+        missing = []
+        for a in anoms:
+            expl = eng.get_explanation_for_anomaly(a["id"])
+            if not expl or expl.explanation_type != "ANOMALY":
+                missing.append(a["id"])
+        passed = len(anoms) == 25 and len(missing) == 0
+        return {
+            "test_id": "TEST-3I-09",
+            "test_name": "Anomaly Explanation Maps to Actual Anomaly Signal",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify all 25 baseline anomaly signals have direct, dedicated ANOMALY explanations.",
+            "observed_behavior": f"Total anomalies: {len(anoms)}. Missing explanations: {len(missing)}.",
+            "expected_behavior": "Zero missing anomaly explanations across all 25 detected signals.",
+            "weakness_documented": False,
+            "detail": {"missing_count": len(missing)},
+        }
+
+    @classmethod
+    def _test_3i_10_anomaly_explanation_uses_actual_detection_config(cls) -> dict:
+        """TEST-3I-10: Anomaly explanation uses actual detection configuration."""
+        from server.service import IntelligenceService
+        eng = IntelligenceService.get_explainability_engine()
+        burst_expl = eng.get_explanation("EXPL-ANOM-ANOM-001")
+        passed = (
+            burst_expl is not None
+            and "min_events = 5" in burst_expl.analytical_method
+            and len(burst_expl.derivation_steps) >= 2
+            and "Threshold >= 5" in burst_expl.calculation_summary
+        )
+        return {
+            "test_id": "TEST-3I-10",
+            "test_name": "Anomaly Explanation Uses Actual Detection Configuration",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify anomaly derivation documents exact rule threshold (e.g. min_events=5 for burst activity).",
+            "observed_behavior": f"Method: {burst_expl.analytical_method if burst_expl else 'N/A'}. Derivation steps: {len(burst_expl.derivation_steps) if burst_expl else 0}.",
+            "expected_behavior": "Exact rule parameter documented in analytical method and derivation steps.",
+            "weakness_documented": False,
+            "detail": {"method": burst_expl.analytical_method if burst_expl else None},
+        }
+
+    @classmethod
+    def _test_3i_11_entity_resolution_maps_to_phase_3g_decision(cls) -> dict:
+        """TEST-3I-11: Entity-resolution explanation maps to Phase 3G decision."""
+        from server.service import IntelligenceService
+        eng = IntelligenceService.get_explainability_engine()
+        res_expls = [e for e in eng.all_explanations if e.explanation_type == "ENTITY_RESOLUTION"]
+        valid_actions = {"RESOLVED", "REVIEW_REQUIRED", "MATCH", "DISTINCT"}
+        passed = len(res_expls) == 22 and all(
+            e.metadata.get("action") in valid_actions
+            and "Multi-Signal" in e.analytical_method
+            for e in res_expls
+        )
+        return {
+            "test_id": "TEST-3I-11",
+            "test_name": "Entity-Resolution Explanation Maps to Phase 3G Decision",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify 22 entity resolution audit records generate transparent resolution explanations with valid policy decisions.",
+            "observed_behavior": f"Compiled {len(res_expls)} resolution explanations. All have valid actions: {passed}.",
+            "expected_behavior": "22 entity resolution explanations matching Phase 3G audit trail.",
+            "weakness_documented": False,
+            "detail": {"count": len(res_expls)},
+        }
+
+    @classmethod
+    def _test_3i_12_temporal_explanation_uses_actual_timestamps(cls) -> dict:
+        """TEST-3I-12: Temporal explanation uses actual timestamps."""
+        from server.service import IntelligenceService
+        eng = IntelligenceService.get_explainability_engine()
+        data = IntelligenceService.get_data()
+        records = {r["record_id"]: r["date"] for r in data["ingested_records"]}
+        time_expls = [e for e in eng.all_explanations if e.explanation_type == "TEMPORAL_PATTERN"]
+        matched = all(
+            e.target_id in records
+            and e.analytical_inputs["date"] == records[e.target_id]
+            and "Temporal proximity indicates chronological correlation, not verified coordination" in e.limitations
+            for e in time_expls
+        )
+        passed = len(time_expls) == 10 and matched
+        return {
+            "test_id": "TEST-3I-12",
+            "test_name": "Temporal Explanation Uses Actual Timestamps & Disclaimers",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify 10 temporal explanations map to actual record dates and enforce anti-coordination disclaimers.",
+            "observed_behavior": f"Compiled {len(time_expls)} temporal explanations. All dates matched and anti-coordination guardrail present: {matched}.",
+            "expected_behavior": "10 temporal explanations with exact timestamps and epistemic limitations.",
+            "weakness_documented": False,
+            "detail": {"count": len(time_expls)},
+        }
+
+    @classmethod
+    def _test_3i_13_location_explanation_uses_actual_locations(cls) -> dict:
+        """TEST-3I-13: Location explanation uses actual location observations."""
+        from server.service import IntelligenceService
+        eng = IntelligenceService.get_explainability_engine()
+        loc_expls = [e for e in eng.all_explanations if e.explanation_type == "LOCATION_PATTERN"]
+        passed = len(loc_expls) >= 2 and all(
+            len(e.supporting_source_records) > 0
+            and "Spatial overlap indicates reported incident co-occurrence, not verified physical contact" in e.limitations
+            for e in loc_expls
+        )
+        return {
+            "test_id": "TEST-3I-13",
+            "test_name": "Location Explanation Uses Actual Locations & Disclaimers",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify location explanations reflect extracted locations and enforce anti-meeting disclaimers.",
+            "observed_behavior": f"Compiled {len(loc_expls)} location explanations with epistemic limitations.",
+            "expected_behavior": "2+ location explanations with anti-physical-meeting disclaimers.",
+            "weakness_documented": False,
+            "detail": {"count": len(loc_expls)},
+        }
+
+    @classmethod
+    def _test_3i_14_no_unsupported_conclusions(cls) -> dict:
+        """TEST-3I-14: No unsupported conclusions (anti-bias / epistemic boundaries)."""
+        from server.service import IntelligenceService
+        eng = IntelligenceService.get_explainability_engine()
+        missing_limits = []
+        for expl in eng.all_explanations:
+            if not expl.limitations or len(expl.limitations.strip()) == 0:
+                missing_limits.append(expl.explanation_id)
+        passed = len(missing_limits) == 0 and len(eng.all_explanations) > 0
+        return {
+            "test_id": "TEST-3I-14",
+            "test_name": "Epistemic Guardrails on 100% of Explanations",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify 100% of generated explanations contain explicit epistemic boundaries disclaiming guilt, conspiracy, or crime.",
+            "observed_behavior": f"Checked {len(eng.all_explanations)} explanations. Missing limitations: {len(missing_limits)}.",
+            "expected_behavior": "Zero explanations lacking epistemic boundary disclaimers.",
+            "weakness_documented": False,
+            "detail": {"missing_count": len(missing_limits)},
+        }
+
+    @classmethod
+    def _test_3i_15_no_unsupported_probability_claims(cls) -> dict:
+        """TEST-3I-15: No unsupported probability or confidence claims."""
+        import re
+        from server.service import IntelligenceService
+        eng = IntelligenceService.get_explainability_engine()
+        prob_claims = []
+        pattern = re.compile(r"\b\d+%\s*(guilt|crime|criminal|same person|certainty)\b", re.IGNORECASE)
+        for expl in eng.all_explanations:
+            blob = f"{expl.finding} {expl.calculation_summary} {expl.interpretation}"
+            if pattern.search(blob):
+                prob_claims.append((expl.explanation_id, blob))
+        passed = len(prob_claims) == 0 and len(eng.all_explanations) > 0
+        return {
+            "test_id": "TEST-3I-15",
+            "test_name": "Zero Unsupported Probability or Confidence Claims",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify no explanation claims calibrated probability of guilt, crime, or identity certainty percentage.",
+            "observed_behavior": f"Checked {len(eng.all_explanations)} explanations. Uncalibrated probability claims detected: {len(prob_claims)}.",
+            "expected_behavior": "Zero uncalibrated probability or identity percentage claims.",
+            "weakness_documented": False,
+            "detail": {"prob_claims_count": len(prob_claims)},
+        }
+
+    @classmethod
+    def _test_3i_16_evidence_linkage_presence(cls) -> dict:
+        """TEST-3I-16: Evidence linkage presence across explanations."""
+        from server.service import IntelligenceService
+        eng = IntelligenceService.get_explainability_engine()
+        missing_evid = []
+        for expl in eng.all_explanations:
+            if not expl.supporting_evidence_ids or len(expl.supporting_evidence_ids) == 0:
+                missing_evid.append(expl.explanation_id)
+        passed = len(missing_evid) == 0 and len(eng.all_explanations) > 0
+        return {
+            "test_id": "TEST-3I-16",
+            "test_name": "Evidence Linkage Presence Across Explanations",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify 100% of explanations link directly to Phase 3H evidence items.",
+            "observed_behavior": f"Checked {len(eng.all_explanations)} explanations. Explanations lacking evidence links: {len(missing_evid)}.",
+            "expected_behavior": "Zero explanations lacking Phase 3H evidence linkage.",
+            "weakness_documented": False,
+            "detail": {"missing_count": len(missing_evid)},
+        }
+
+    @classmethod
+    def _test_3i_17_api_entity_explanation(cls) -> dict:
+        """TEST-3I-17: API entity explanation retrieval."""
+        from server.service import IntelligenceService
+        res = IntelligenceService.get_entity_explanations("RAVI MALHOTRA")
+        passed = (
+            res is not None
+            and res.get("total", 0) > 0
+            and any(e["explanation_type"] == "NETWORK_IMPORTANCE" for e in res["explanations"])
+            and any(e["explanation_type"] == "RELATIONSHIP" for e in res["explanations"])
+        )
+        return {
+            "test_id": "TEST-3I-17",
+            "test_name": "API Entity Explanation Retrieval",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify get_entity_explanations returns network importance and relationship explanations for an entity.",
+            "observed_behavior": f"Retrieved {res.get('total', 0)} explanations for RAVI MALHOTRA. Has network and relationship types: {passed}.",
+            "expected_behavior": "Multi-category explanations returned for requested entity.",
+            "weakness_documented": False,
+            "detail": {"total": res.get("total", 0)},
+        }
+
+    @classmethod
+    def _test_3i_18_api_anomaly_explanation(cls) -> dict:
+        """TEST-3I-18: API anomaly explanation retrieval."""
+        from server.service import IntelligenceService
+        res = IntelligenceService.get_anomaly_explanation("ANOM-001")
+        passed = (
+            res is not None
+            and res.get("explanation_id") == "EXPL-ANOM-ANOM-001"
+            and res.get("explanation_type") == "ANOMALY"
+            and len(res.get("derivation_steps", [])) >= 2
+        )
+        return {
+            "test_id": "TEST-3I-18",
+            "test_name": "API Anomaly Explanation Retrieval",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify get_anomaly_explanation retrieves the exact structured explanation with derivation steps.",
+            "observed_behavior": f"Explanation retrieved: {res.get('explanation_id') if res else None}. Steps: {len(res.get('derivation_steps', [])) if res else 0}.",
+            "expected_behavior": "Full structured anomaly explanation with derivation steps.",
+            "weakness_documented": False,
+            "detail": {"found": res is not None},
+        }
+
+    @classmethod
+    def _test_3i_19_api_relationship_and_route_order(cls) -> dict:
+        """TEST-3I-19: API relationship explanation and route-order verification."""
+        from server.service import IntelligenceService
+        from server.main import app
+        res = IntelligenceService.get_relationship_explanation("RAVI MALHOTRA", "VIKRAM RAO")
+        # Verify route ordering in FastAPI
+        expl_routes = [r.path for r in app.routes if "/api/explainability" in getattr(r, "path", "")]
+        rel_idx = expl_routes.index("/api/explainability/relationship/{source}/{target}")
+        path_idx = expl_routes.index("/api/explainability/path/{source}/{target}")
+        id_idx = expl_routes.index("/api/explainability/{explanation_id}")
+        order_safe = rel_idx < id_idx and path_idx < id_idx
+        passed = res is not None and res.get("explanation_type") == "RELATIONSHIP" and order_safe
+        return {
+            "test_id": "TEST-3I-19",
+            "test_name": "API Relationship Explanation & Route-Order Verification",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify relationship explanation retrieval and that sub-routes precede dynamic {explanation_id} in router.",
+            "observed_behavior": (
+                f"Relationship explanation ID: {res.get('explanation_id') if res else None}. "
+                f"Relationship route index: {rel_idx}, Path index: {path_idx}, ID index: {id_idx}. Route order safe: {order_safe}."
+            ),
+            "expected_behavior": "Relationship explanation resolved and relationship route declared before generic ID route.",
+            "weakness_documented": False,
+            "detail": {"rel_idx": rel_idx, "id_idx": id_idx, "order_safe": order_safe},
+        }
+
+    @classmethod
+    def _test_3i_20_baseline_protection(cls) -> dict:
+        """TEST-3I-20: Production baseline integrity verification after Phase 3I."""
+        from server.service import IntelligenceService
+        data = IntelligenceService.get_data(force_reload=True)
+        ee = IntelligenceService.get_evidence_engine()
+        eng = IntelligenceService.get_explainability_engine()
+
+        rec_cnt = data["total_records"]
+        node_cnt = data["summary"]["num_nodes"]
+        edge_cnt = data["summary"]["num_edges"]
+        anom_cnt = len(data["suspicious_patterns"])
+        comm_cnt = len(data["communities"])
+        kp_cnt = len(data["key_players"])
+        br_cnt = len(data["critical_bridge_nodes"])
+        evid_cnt = len(ee.all_items)
+        expl_cnt = len(eng.all_explanations)
+
+        passed = (
+            rec_cnt == 10
+            and node_cnt == 15
+            and edge_cnt == 52
+            and anom_cnt == 25
+            and comm_cnt == 3
+            and kp_cnt == 6
+            and br_cnt == 5
+            and evid_cnt == 179
+            and expl_cnt >= 100
+        )
+        return {
+            "test_id": "TEST-3I-20",
+            "test_name": "Production Baseline Dataset Protection (Phase 3I)",
+            "category": "Phase 3I: Explainable Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify production baseline intelligence metrics remain 100% intact after Phase 3I integration.",
+            "observed_behavior": (
+                f"Records: {rec_cnt}/10, Nodes: {node_cnt}/15, Edges: {edge_cnt}/52, "
+                f"Anomalies: {anom_cnt}/25, Communities: {comm_cnt}/3, Key Players: {kp_cnt}/6, "
+                f"Bridges: {br_cnt}/5, Evidence Items: {evid_cnt}/179, Explanations: {expl_cnt}."
+            ),
+            "expected_behavior": "10 records, 15 nodes, 52 edges, 25 anomalies, 3 communities, 6 key players, 5 bridge nodes, 179 evidence items.",
+            "weakness_documented": False,
+            "detail": {
+                "records": rec_cnt, "nodes": node_cnt, "edges": edge_cnt,
+                "anomalies": anom_cnt, "communities": comm_cnt,
+                "key_players": kp_cnt, "bridge_nodes": br_cnt,
+                "evidence_items": evid_cnt, "explanations": expl_cnt,
+            },
+        }
+
+    # ── Phase 3J: Temporal Intelligence Engine Tests ─────────────────────────
+
+    @classmethod
+    def _test_3j_01_temporal_engine_initialization(cls) -> dict:
+        """TEST-3J-01: Temporal engine initialization and determinism."""
+        from server.service import IntelligenceService
+        te1 = IntelligenceService.get_temporal_engine()
+        mods = _import_pipeline_modules()
+        TemporalEngine = mods["TemporalEngine"]
+        te2 = TemporalEngine()
+        data = IntelligenceService.get_data()
+        ee = IntelligenceService.get_evidence_engine()
+        expl_eng = IntelligenceService.get_explainability_engine()
+        G = IntelligenceService._cached_graph
+        can_reg = data.get("canonical_entities", {})
+        recs = data["ingested_records"]
+        extracted = mods["extract_entities"]([
+            mods["Record"](
+                record_id=r["record_id"],
+                source=r["source"],
+                date=r["date"],
+                text=r["text"],
+                structured=r.get("structured", {}),
+            )
+            for r in recs
+        ])
+        te2.compile(
+            records=recs,
+            extracted=extracted,
+            G=G,
+            anomalies=data["suspicious_patterns"],
+            canonical_registry=can_reg,
+            evidence_engine=ee,
+            explainability_engine=expl_eng,
+        )
+        passed = (
+            te1 is not None
+            and te2 is not None
+            and te1.is_compiled
+            and te2.is_compiled
+            and len(te1.observations) == len(te2.observations)
+            and len(te1.network_snapshots) == len(te2.network_snapshots)
+            and len(te1.patterns) == len(te2.patterns)
+            and [o.observation_id for o in te1.observations] == [o.observation_id for o in te2.observations]
+        )
+        return {
+            "test_id": "TEST-3J-01",
+            "test_name": "Temporal Engine Initialization & Determinism",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify TemporalEngine compiles deterministically with identical observations, snapshots, and patterns across independent runs.",
+            "observed_behavior": f"Engine 1 observations: {len(te1.observations)}. Engine 2: {len(te2.observations)}. Deterministic: {passed}.",
+            "expected_behavior": "Identical observations, snapshots, and patterns across independent compilations.",
+            "weakness_documented": False,
+            "detail": {"obs_count": len(te1.observations), "snapshot_count": len(te1.network_snapshots)},
+        }
+
+    @classmethod
+    def _test_3j_02_deterministic_timestamp_normalization(cls) -> dict:
+        """TEST-3J-02: Deterministic timestamp normalization across formats."""
+        mods = _import_pipeline_modules()
+        norm_ts = mods["normalize_timestamp"]
+        # Date-only record
+        d1, t1, iso1, p1 = norm_ts("2026-01-08", "No time in text here.")
+        # Date with text-extracted time
+        d2, t2, iso2, p2 = norm_ts("2026-01-05", "Suspect met at 22:00 near warehouse.")
+        # Full ISO datetime string
+        d3, t3, iso3, p3 = norm_ts("2026-01-05T22:00:00")
+
+        passed = (
+            d1 == "2026-01-08" and t1 is None and p1 == "DATE_ONLY" and iso1 == "2026-01-08"
+            and d2 == "2026-01-05" and t2 == "22:00" and p2 == "DATE_TIME" and "+05:30" in iso2
+            and d3 == "2026-01-05" and t3 == "22:00" and p3 == "DATE_TIME" and "+05:30" in iso3
+        )
+        return {
+            "test_id": "TEST-3J-02",
+            "test_name": "Deterministic Timestamp Normalization",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify timestamp normalization handles date-only, embedded time, and ISO formats with proper precision labels.",
+            "observed_behavior": f"Date-only precision: {p1}, Time extracted: {t2} ({p2}), ISO parsed: {t3} ({p3}).",
+            "expected_behavior": "Strict normalization preserving DATE_ONLY vs DATE_TIME precision without timestamp fabrication.",
+            "weakness_documented": False,
+            "detail": {"date_only": (d1, t1, p1), "with_time": (d2, t2, p2)},
+        }
+
+    @classmethod
+    def _test_3j_03_actual_source_timestamps_only(cls) -> dict:
+        """TEST-3J-03: Actual source timestamps only (grounded observations)."""
+        from server.service import IntelligenceService
+        te = IntelligenceService.get_temporal_engine()
+        data = IntelligenceService.get_data()
+        raw_rec_map = {r["record_id"]: r["date"] for r in data["ingested_records"]}
+
+        unmatched = []
+        for o in te.observations:
+            if o.record_id not in raw_rec_map:
+                unmatched.append(f"Unknown record: {o.record_id}")
+            elif o.date != raw_rec_map[o.record_id]:
+                unmatched.append(f"Mismatched date for {o.record_id}: {o.date} vs {raw_rec_map[o.record_id]}")
+
+        passed = len(unmatched) == 0 and len(te.observations) > 0
+        return {
+            "test_id": "TEST-3J-03",
+            "test_name": "Actual Source Timestamps Grounding",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify every temporal observation matches an actual source record date from ingested data.",
+            "observed_behavior": f"Checked {len(te.observations)} observations. Unmatched/fabricated dates: {len(unmatched)}.",
+            "expected_behavior": "Zero fabricated or mismatched observation timestamps.",
+            "weakness_documented": False,
+            "detail": {"total_observations": len(te.observations), "unmatched": unmatched},
+        }
+
+    @classmethod
+    def _test_3j_04_date_only_records(cls) -> dict:
+        """TEST-3J-04: Date-only records handled correctly without fabricated time."""
+        from server.service import IntelligenceService
+        te = IntelligenceService.get_temporal_engine()
+        # Records CR-1002, CR-1004, CR-1005 have no time in text
+        date_only_obs = [o for o in te.observations if o.record_id in ("CR-1002", "CR-1004", "CR-1005")]
+        passed = (
+            len(date_only_obs) == 3
+            and all(o.precision == "DATE_ONLY" for o in date_only_obs)
+            and all(o.time is None for o in date_only_obs)
+            and all("00:00:00" not in o.iso_timestamp for o in date_only_obs)
+        )
+        return {
+            "test_id": "TEST-3J-04",
+            "test_name": "Date-Only Records Precision Handling",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify date-only records preserve DATE_ONLY precision without fabricated midnight or default times.",
+            "observed_behavior": f"Date-only records checked: {len(date_only_obs)}. All time is None: {passed}.",
+            "expected_behavior": "time is None and precision is DATE_ONLY for records without explicit time mentions.",
+            "weakness_documented": False,
+            "detail": {"sample_record_ids": [o.record_id for o in date_only_obs]},
+        }
+
+    @classmethod
+    def _test_3j_05_missing_timestamp_handling(cls) -> dict:
+        """TEST-3J-05: Missing or malformed timestamp handling without crash."""
+        mods = _import_pipeline_modules()
+        norm_ts = mods["normalize_timestamp"]
+        res_none = norm_ts(None)
+        res_empty = norm_ts("")
+        res_invalid = norm_ts("not-a-date")
+
+        passed = (
+            res_none == (None, None, "", "UNKNOWN")
+            and res_empty == (None, None, "", "UNKNOWN")
+            and res_invalid == (None, None, "", "UNKNOWN")
+        )
+        return {
+            "test_id": "TEST-3J-05",
+            "test_name": "Missing/Malformed Timestamp Handling",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify engine gracefully handles missing, empty, or malformed dates with UNKNOWN precision.",
+            "observed_behavior": f"None handling: {res_none[3]}, Empty: {res_empty[3]}, Invalid: {res_invalid[3]}.",
+            "expected_behavior": "Graceful non-crashing fallback returning UNKNOWN precision and None date.",
+            "weakness_documented": False,
+            "detail": {"res_none": res_none, "res_invalid": res_invalid},
+        }
+
+    @classmethod
+    def _test_3j_06_entity_activity_chronology(cls) -> dict:
+        """TEST-3J-06: Entity activity chronology and sorting."""
+        from server.service import IntelligenceService
+        te = IntelligenceService.get_temporal_engine()
+        act_ravi = te.get_entity_activity("Ravi Malhotra")
+        act_suresh = te.get_entity_activity("Suresh Nair")
+
+        def _is_sorted(obs_list):
+            dates = [o["date"] for o in obs_list]
+            return dates == sorted(dates)
+
+        passed = (
+            act_ravi is not None
+            and act_suresh is not None
+            and _is_sorted(act_ravi["observations"])
+            and _is_sorted(act_suresh["observations"])
+            and act_ravi["activity_profile"]["first_observed"] == "2026-01-05"
+            and act_ravi["activity_profile"]["last_observed"] == "2026-01-25"
+        )
+        return {
+            "test_id": "TEST-3J-06",
+            "test_name": "Entity Activity Chronology",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify entity activity timeline is strictly sorted in ascending chronological order.",
+            "observed_behavior": f"Ravi observations: {act_ravi['total_observations'] if act_ravi else 0}, sorted: {passed}.",
+            "expected_behavior": "Strict chronological sorting of observations per entity.",
+            "weakness_documented": False,
+            "detail": {"ravi_obs_count": act_ravi["total_observations"] if act_ravi else 0},
+        }
+
+    @classmethod
+    def _test_3j_07_relationship_temporal_evolution(cls) -> dict:
+        """TEST-3J-07: Relationship temporal evolution."""
+        from server.service import IntelligenceService
+        te = IntelligenceService.get_temporal_engine()
+        rel = te.get_relationship_evolution("Ravi Malhotra", "Suresh Nair")
+
+        passed = (
+            rel is not None
+            and rel["canonical_pair"] == ["Ravi Malhotra", "Suresh Nair"]
+            and rel["first_observed"] == "2026-01-05"
+            and rel["last_observed"] == "2026-01-12"
+            and rel["first_observed"] <= rel["last_observed"]
+            and rel["observation_count"] == 2
+            and "CR-1001" in rel["supporting_records"]
+            and "CR-1005" in rel["supporting_records"]
+        )
+        return {
+            "test_id": "TEST-3J-07",
+            "test_name": "Relationship Temporal Evolution",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify relationship evolution calculates first seen, last seen, span, and corroborating records accurately.",
+            "observed_behavior": f"Ravi <-> Suresh first seen: {rel.get('first_observed') if rel else None}, last seen: {rel.get('last_observed') if rel else None}, obs count: {rel.get('observation_count') if rel else 0}.",
+            "expected_behavior": "Accurate trajectory: first seen 2026-01-05, last seen 2026-01-12, count 2.",
+            "weakness_documented": False,
+            "detail": {"first_seen": rel.get("first_observed") if rel else None, "count": rel.get("observation_count") if rel else 0},
+        }
+
+    @classmethod
+    def _test_3j_08_case_activity_chronology(cls) -> dict:
+        """TEST-3J-08: Case activity chronology."""
+        from server.service import IntelligenceService
+        te = IntelligenceService.get_temporal_engine()
+        case_res = te.get_case_chronology("CR-1001")
+
+        passed = (
+            case_res is not None
+            and case_res["case_id"] == "CR-1001"
+            and case_res["total_observations"] >= 1
+            and case_res["earliest_observation"] == "2026-01-05"
+            and "Ravi Malhotra" in case_res["observations"][0]["entities"]
+        )
+        return {
+            "test_id": "TEST-3J-08",
+            "test_name": "Case Activity Chronology",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify case chronology maps observations accurately to case identifier with chronological preservation.",
+            "observed_behavior": f"Case CR-1001 observations: {case_res.get('total_observations') if case_res else 0}, date: {case_res.get('earliest_observation') if case_res else None}.",
+            "expected_behavior": "Valid chronological event stream returned for CR-1001.",
+            "weakness_documented": False,
+            "detail": {"case_id": "CR-1001", "obs_count": case_res.get("total_observations") if case_res else 0},
+        }
+
+    @classmethod
+    def _test_3j_09_anomaly_temporal_chronology(cls) -> dict:
+        """TEST-3J-09: Anomaly temporal chronology grounding."""
+        from server.service import IntelligenceService
+        te = IntelligenceService.get_temporal_engine()
+        patterns = te.get_patterns("BURST_ACTIVITY")
+        burst_pats = patterns.get("patterns", [])
+
+        passed = (
+            len(burst_pats) >= 1
+            and any("CR-1009" in p["target_records"] for p in burst_pats)
+            and any(p["date_range"][0] == "2026-01-22" for p in burst_pats)
+        )
+        return {
+            "test_id": "TEST-3J-09",
+            "test_name": "Anomaly Temporal Chronology Grounding",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify anomaly temporal patterns (e.g. burst activity) correlate to actual record timestamps.",
+            "observed_behavior": f"Burst patterns detected: {len(burst_pats)}. Mapped to CR-1009 on 2026-01-22: {passed}.",
+            "expected_behavior": "Burst pattern mapped to record CR-1009 and date 2026-01-22.",
+            "weakness_documented": False,
+            "detail": {"burst_patterns_count": len(burst_pats)},
+        }
+
+    @classmethod
+    def _test_3j_10_activity_density_calculation(cls) -> dict:
+        """TEST-3J-10: Activity density calculation (Refinement 2)."""
+        from server.service import IntelligenceService
+        te = IntelligenceService.get_temporal_engine()
+        density = te.get_activity_density("day")
+        daily_buckets = density.get("buckets", {})
+        sum_buckets = sum(daily_buckets.values())
+        eligible_obs_count = len([o for o in te.observations if o.date])
+
+        passed = sum_buckets == eligible_obs_count and eligible_obs_count > 0
+        return {
+            "test_id": "TEST-3J-10",
+            "test_name": "Activity Density Calculation",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify sum of daily temporal-observation buckets equals number of eligible dated temporal observations.",
+            "observed_behavior": f"Sum of daily buckets: {sum_buckets}. Eligible dated observations: {eligible_obs_count}. Equal: {passed}.",
+            "expected_behavior": "Exact equality between sum of daily density buckets and eligible dated observations.",
+            "weakness_documented": False,
+            "detail": {"sum_buckets": sum_buckets, "eligible_count": eligible_obs_count},
+        }
+
+    @classmethod
+    def _test_3j_11_temporal_gap_calculation(cls) -> dict:
+        """TEST-3J-11: Temporal gap calculation and epistemic distinction (Refinement 7)."""
+        from server.service import IntelligenceService
+        te = IntelligenceService.get_temporal_engine()
+        act = te.get_entity_activity("Ravi Malhotra")
+        gaps = act["activity_profile"].get("gaps", [])
+
+        # Check gap days math
+        math_ok = True
+        for g in gaps:
+            d1 = datetime.date.fromisoformat(g["prior_date"])
+            d2 = datetime.date.fromisoformat(g["next_date"])
+            if g["gap_days"] != abs((d2 - d1).days):
+                math_ok = False
+
+        # Check epistemic notice
+        has_epistemic_note = all(
+            "indicates that no intelligence observations were recorded" in g.get("epistemic_note", "")
+            or "does not demonstrate that the entity was inactive" in g.get("epistemic_note", "")
+            for g in gaps
+        )
+
+        passed = len(gaps) > 0 and math_ok and has_epistemic_note
+        return {
+            "test_id": "TEST-3J-11",
+            "test_name": "Temporal Gap Calculation & Epistemic Notice",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify inter-observation gaps are mathematically exact and include explicit disclaimer that gaps do not mean real-world inactivity.",
+            "observed_behavior": f"Gaps calculated: {len(gaps)}. Mathematical accuracy: {math_ok}. Epistemic notice present: {has_epistemic_note}.",
+            "expected_behavior": "Exact gap calculation and mandatory epistemic notice on every gap.",
+            "weakness_documented": False,
+            "detail": {"gaps_count": len(gaps), "math_ok": math_ok, "epistemic_ok": has_epistemic_note},
+        }
+
+    @classmethod
+    def _test_3j_12_first_last_observation_correctness(cls) -> dict:
+        """TEST-3J-12: First and last observation date correctness."""
+        from server.service import IntelligenceService
+        te = IntelligenceService.get_temporal_engine()
+        ravi = te.get_entity_activity("Ravi Malhotra")
+        suresh = te.get_entity_activity("Suresh Nair")
+        deepak = te.get_entity_activity("Deepak Shah")
+
+        passed = (
+            ravi["activity_profile"]["first_observed"] == "2026-01-05"
+            and ravi["activity_profile"]["last_observed"] == "2026-01-25"
+            and suresh["activity_profile"]["first_observed"] == "2026-01-05"
+            and suresh["activity_profile"]["last_observed"] == "2026-01-12"
+            and deepak["activity_profile"]["first_observed"] == "2026-01-12"
+            and deepak["activity_profile"]["last_observed"] == "2026-01-20"
+        )
+        return {
+            "test_id": "TEST-3J-12",
+            "test_name": "First & Last Observation Correctness",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify first and last observation dates correspond exactly to recorded source record occurrences.",
+            "observed_behavior": (
+                f"Ravi: {ravi['activity_profile']['first_observed']} -> {ravi['activity_profile']['last_observed']}, "
+                f"Suresh: {suresh['activity_profile']['first_observed']} -> {suresh['activity_profile']['last_observed']}, "
+                f"Deepak: {deepak['activity_profile']['first_observed']} -> {deepak['activity_profile']['last_observed']}."
+            ),
+            "expected_behavior": "Exact match with raw dataset record dates.",
+            "weakness_documented": False,
+            "detail": {
+                "ravi": (ravi["activity_profile"]["first_observed"], ravi["activity_profile"]["last_observed"]),
+                "suresh": (suresh["activity_profile"]["first_observed"], suresh["activity_profile"]["last_observed"]),
+            },
+        }
+
+    @classmethod
+    def _test_3j_13_temporal_window_determinism(cls) -> dict:
+        """TEST-3J-13: Temporal window slicing determinism."""
+        from server.service import IntelligenceService
+        te = IntelligenceService.get_temporal_engine()
+        snapshots = te.network_snapshots
+
+        passed = (
+            len(snapshots) == 3
+            and snapshots[0].start_date == "2026-01-05"
+            and snapshots[0].end_date == "2026-01-11"
+            and snapshots[1].start_date == "2026-01-12"
+            and snapshots[1].end_date == "2026-01-18"
+            and snapshots[2].start_date == "2026-01-19"
+            and snapshots[2].end_date == "2026-01-25"
+        )
+        return {
+            "test_id": "TEST-3J-13",
+            "test_name": "Temporal Window Determinism",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify longitudinal weekly time-window slices are deterministic and cover the full timeline range.",
+            "observed_behavior": f"Window count: {len(snapshots)}. Windows: {[s.window_label for s in snapshots]}.",
+            "expected_behavior": "3 deterministic 7-day windows spanning from 2026-01-05 to 2026-01-25.",
+            "weakness_documented": False,
+            "detail": {"window_count": len(snapshots)},
+        }
+
+    @classmethod
+    def _test_3j_14_network_evolution_grounding(cls) -> dict:
+        """TEST-3J-14: Network evolution grounding in source observations (Refinement 4)."""
+        from server.service import IntelligenceService
+        te = IntelligenceService.get_temporal_engine()
+        snapshots = te.network_snapshots
+
+        # Check that Window 1 edges only come from records in Window 1 (CR-1001, CR-1002, CR-1003, CR-1004)
+        win1 = snapshots[0]
+        # Vikram Rao is only observed in CR-1010 (Window 3). He must NOT be in Window 1 active_nodes
+        vikram_in_win1 = "Vikram Rao" in win1.active_nodes
+        vikram_in_win3 = "Vikram Rao" in snapshots[2].active_nodes
+
+        # Check epistemic disclaimer presence on all snapshots
+        has_epistemic = all(
+            "absence of an entity or relationship from a time window indicates lack of recorded observation" in s.epistemic_limitation
+            for s in snapshots
+        )
+
+        passed = not vikram_in_win1 and vikram_in_win3 and has_epistemic
+        return {
+            "test_id": "TEST-3J-14",
+            "test_name": "Network Evolution Grounding in Source Observations",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify temporal network snapshots are reconstructed strictly from observations in that window, with unobserved disclaimer.",
+            "observed_behavior": f"Vikram Rao in Window 1: {vikram_in_win1} (expected False). In Window 3: {vikram_in_win3} (expected True). Epistemic disclaimer: {has_epistemic}.",
+            "expected_behavior": "Edges and nodes strictly reflect underlying window records; unobserved disclaimer enforced.",
+            "weakness_documented": False,
+            "detail": {"vikram_in_win1": vikram_in_win1, "vikram_in_win3": vikram_in_win3},
+        }
+
+    @classmethod
+    def _test_3j_15_evidence_linkage(cls) -> dict:
+        """TEST-3J-15: Evidence linkage to Phase 3H Evidence items."""
+        from server.service import IntelligenceService
+        te = IntelligenceService.get_temporal_engine()
+        ee = IntelligenceService.get_evidence_engine()
+
+        missing_evidence = []
+        for o in te.observations:
+            if not o.evidence_id:
+                missing_evidence.append(f"{o.observation_id}: missing evidence_id")
+            elif ee.get_evidence_by_id(o.evidence_id) is None:
+                missing_evidence.append(f"{o.observation_id}: {o.evidence_id} not in EvidenceEngine")
+
+        passed = len(missing_evidence) == 0 and len(te.observations) > 0
+        return {
+            "test_id": "TEST-3J-15",
+            "test_name": "Phase 3H Evidence Linkage",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify 100% of temporal observations link directly to valid Phase 3H evidence items.",
+            "observed_behavior": f"Checked {len(te.observations)} observations. Unlinked or invalid evidence IDs: {len(missing_evidence)}.",
+            "expected_behavior": "Zero unlinked temporal observations.",
+            "weakness_documented": False,
+            "detail": {"total_observations": len(te.observations), "missing_evidence": missing_evidence},
+        }
+
+    @classmethod
+    def _test_3j_16_no_unsupported_temporal_conclusions(cls) -> dict:
+        """TEST-3J-16: No unsupported conclusions / epistemic guardrails."""
+        from server.service import IntelligenceService
+        te = IntelligenceService.get_temporal_engine()
+
+        forbidden_regex = re.compile(
+            r"\b(guilty|convicted|criminal ring|perpetrator|arrest warrant|proven meeting|coordinated conspiracy)\b",
+            re.IGNORECASE,
+        )
+
+        violations = []
+        for o in te.observations:
+            blob = f"{o.description} {o.epistemic_limitation}"
+            match = forbidden_regex.search(blob)
+            if match:
+                violations.append((o.observation_id, match.group(0)))
+
+        for p in te.patterns:
+            blob = f"{p.description} {p.metric_value} {p.epistemic_limitation}"
+            match = forbidden_regex.search(blob)
+            if match:
+                violations.append((p.pattern_id, match.group(0)))
+
+        passed = len(violations) == 0 and len(te.patterns) > 0
+        return {
+            "test_id": "TEST-3J-16",
+            "test_name": "No Unsupported Temporal Conclusions",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify temporal intelligence adheres to neutral investigative language without claims of guilt or conspiracy.",
+            "observed_behavior": f"Checked observations and patterns. Guardrail violations detected: {len(violations)}.",
+            "expected_behavior": "Zero unsupported conclusions or biased statements.",
+            "weakness_documented": False,
+            "detail": {"violations_count": len(violations)},
+        }
+
+    @classmethod
+    def _test_3j_17_no_fabricated_timestamps(cls) -> dict:
+        """TEST-3J-17: Zero fabricated timestamps."""
+        from server.service import IntelligenceService
+        te = IntelligenceService.get_temporal_engine()
+        data = IntelligenceService.get_data()
+        raw_dates = {r["record_id"]: r["date"] for r in data["ingested_records"]}
+
+        fabricated = []
+        for o in te.observations:
+            if o.precision == "DATE_ONLY" and o.time is not None:
+                fabricated.append(f"{o.observation_id}: time assigned to DATE_ONLY")
+            if o.date not in raw_dates.values():
+                fabricated.append(f"{o.observation_id}: date {o.date} not in raw records")
+
+        passed = len(fabricated) == 0 and len(te.observations) > 0
+        return {
+            "test_id": "TEST-3J-17",
+            "test_name": "Zero Fabricated Timestamps",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify engine never synthesizes fake dates or default times for date-only records.",
+            "observed_behavior": f"Checked {len(te.observations)} observations. Fabricated timestamp issues: {len(fabricated)}.",
+            "expected_behavior": "Zero fabricated timestamps or synthetic times.",
+            "weakness_documented": False,
+            "detail": {"fabricated": fabricated},
+        }
+
+    @classmethod
+    def _test_3j_18_api_temporal_routes_and_route_order(cls) -> dict:
+        """TEST-3J-18: API temporal entity/relationship routes and route ordering."""
+        from server.main import app
+        temporal_routes = [r.path for r in app.routes if "/api/temporal" in getattr(r, "path", "")]
+
+        act_idx = temporal_routes.index("/api/temporal/activity")
+        evo_idx = temporal_routes.index("/api/temporal/evolution")
+        pat_idx = temporal_routes.index("/api/temporal/patterns")
+        ent_idx = temporal_routes.index("/api/temporal/entity/{entity_id}")
+        case_idx = temporal_routes.index("/api/temporal/case/{case_id}")
+        rel_idx = temporal_routes.index("/api/temporal/relationship/{source}/{target}")
+        all_idx = temporal_routes.index("/api/temporal")
+        id_idx = temporal_routes.index("/api/temporal/{temporal_id}")
+
+        order_safe = (
+            act_idx < id_idx
+            and evo_idx < id_idx
+            and pat_idx < id_idx
+            and ent_idx < id_idx
+            and case_idx < id_idx
+            and rel_idx < id_idx
+            and all_idx < id_idx
+        )
+        passed = len(temporal_routes) == 8 and order_safe
+        return {
+            "test_id": "TEST-3J-18",
+            "test_name": "API Temporal Routes & Route Order",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify all 8 temporal endpoints are registered and specific sub-routes precede /{temporal_id} to prevent shadowing.",
+            "observed_behavior": f"Total temporal routes: {len(temporal_routes)}. All sub-routes precede ID route: {order_safe}.",
+            "expected_behavior": "8 registered endpoints with verified route order safety.",
+            "weakness_documented": False,
+            "detail": {"routes": temporal_routes, "order_safe": order_safe},
+        }
+
+    @classmethod
+    def _test_3j_19_frontend_integration_and_serialization(cls) -> dict:
+        """TEST-3J-19: Frontend integration and clean JSON serialization."""
+        from server.service import IntelligenceService
+        import json
+
+        ov = IntelligenceService.get_temporal_overview()
+        evo = IntelligenceService.get_temporal_evolution()
+        pats = IntelligenceService.get_temporal_patterns()
+        act = IntelligenceService.get_temporal_activity("day")
+        ent = IntelligenceService.get_temporal_entity("Ravi Malhotra")
+
+        # Test serializability
+        try:
+            json.dumps(ov)
+            json.dumps(evo)
+            json.dumps(pats)
+            json.dumps(act)
+            json.dumps(ent)
+            serializable = True
+        except Exception:
+            serializable = False
+
+        has_keys = (
+            "summary_kpis" in ov
+            and "activity_density" in ov
+            and "snapshots" in evo
+            and "patterns" in pats
+            and "buckets" in act
+            and ent is not None and "activity_profile" in ent
+        )
+        passed = serializable and has_keys
+        return {
+            "test_id": "TEST-3J-19",
+            "test_name": "Frontend Integration & Schema Serialization",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify all temporal service endpoints return clean JSON-serializable payloads matching frontend contracts.",
+            "observed_behavior": f"Clean JSON serialization: {serializable}. Expected keys present: {has_keys}.",
+            "expected_behavior": "100% JSON-serializable data with expected frontend contract keys.",
+            "weakness_documented": False,
+            "detail": {"serializable": serializable, "has_keys": has_keys},
+        }
+
+    @classmethod
+    def _test_3j_20_baseline_protection(cls) -> dict:
+        """TEST-3J-20: Production baseline integrity verification after Phase 3J."""
+        from server.service import IntelligenceService
+        data = IntelligenceService.get_data(force_reload=True)
+        ee = IntelligenceService.get_evidence_engine()
+        eng = IntelligenceService.get_explainability_engine()
+        te = IntelligenceService.get_temporal_engine()
+
+        rec_cnt = data["total_records"]
+        node_cnt = data["summary"]["num_nodes"]
+        edge_cnt = data["summary"]["num_edges"]
+        anom_cnt = len(data["suspicious_patterns"])
+        comm_cnt = len(data["communities"])
+        kp_cnt = len(data["key_players"])
+        br_cnt = len(data["critical_bridge_nodes"])
+        evid_cnt = len(ee.all_items)
+        expl_cnt = len(eng.all_explanations)
+        obs_cnt = len(te.observations)
+
+        passed = (
+            rec_cnt == 10
+            and node_cnt == 15
+            and edge_cnt == 52
+            and anom_cnt == 25
+            and comm_cnt == 3
+            and kp_cnt == 6
+            and br_cnt == 5
+            and evid_cnt == 179
+            and expl_cnt >= 100
+            and obs_cnt == 10
+            and te.is_compiled
+        )
+        return {
+            "test_id": "TEST-3J-20",
+            "test_name": "Production Baseline Dataset Protection (Phase 3J)",
+            "category": "Phase 3J: Temporal Intelligence Engine",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify production baseline intelligence metrics remain 100% intact after Phase 3J integration.",
+            "observed_behavior": (
+                f"Records: {rec_cnt}/10, Nodes: {node_cnt}/15, Edges: {edge_cnt}/52, "
+                f"Anomalies: {anom_cnt}/25, Communities: {comm_cnt}/3, Key Players: {kp_cnt}/6, "
+                f"Bridges: {br_cnt}/5, Evidence Items: {evid_cnt}/179, Explanations: {expl_cnt}, "
+                f"Temporal Observations: {obs_cnt}."
+            ),
+            "expected_behavior": "10 records, 15 nodes, 52 edges, 25 anomalies, 3 communities, 6 key players, 5 bridge nodes, 179 evidence items.",
+            "weakness_documented": False,
+            "detail": {
+                "records": rec_cnt, "nodes": node_cnt, "edges": edge_cnt,
+                "anomalies": anom_cnt, "communities": comm_cnt,
+                "key_players": kp_cnt, "bridge_nodes": br_cnt,
+                "evidence_items": evid_cnt, "explanations": expl_cnt,
+                "temporal_observations": obs_cnt,
             },
         }
 

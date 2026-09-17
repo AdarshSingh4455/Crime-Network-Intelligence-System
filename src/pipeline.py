@@ -23,6 +23,8 @@ from anomaly_detection import (
     detect_burst_activity, detect_structuring, detect_new_entity_spikes,
     isolation_forest_outliers,
 )
+from evidence_engine import EvidenceEngine
+from explainability_engine import ExplainabilityEngine
 from visualize import export_interactive_html, plot_top_players
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -72,7 +74,45 @@ def run_pipeline():
         + detect_new_entity_spikes(extracted)
         + isolation_forest_outliers(centrality)
     )
+    for i, a in enumerate(anomalies):
+        if not a.get("id"):
+            a["id"] = f"ANOM-{i+1:03d}"
     print(f"[5/6] Flagged {len(anomalies)} suspicious pattern(s).")
+
+    # 5b. EVIDENCE ENGINE & PROVENANCE COMPILATION (Phase 3H) ----------------
+    evidence_engine = EvidenceEngine()
+    evidence_engine.compile_corpus(
+        records=records,
+        extracted=extracted,
+        G=G,
+        centrality=centrality,
+        key_players=key_players,
+        bridges=bridges,
+        anomalies=anomalies,
+        resolution_engine=resolution_engine,
+        canonical_registry=canonical_registry,
+    )
+    evidence_summary = evidence_engine.get_summary()
+    print(f"[5b/6] Evidence Engine: {evidence_summary['total_evidence_items']} evidence items compiled across "
+          f"{evidence_summary['indexed_relationships']} relationships and {evidence_summary['indexed_anomalies']} anomalies.")
+
+    # 5c. EXPLAINABILITY ENGINE COMPILATION (Phase 3I) ----------------------
+    explainability_engine = ExplainabilityEngine()
+    explainability_engine.compile(
+        records=records,
+        extracted=extracted,
+        G=G,
+        centrality=centrality,
+        key_players=key_players,
+        bridges=bridges,
+        communities=communities,
+        anomalies=anomalies,
+        resolution_engine=resolution_engine,
+        canonical_registry=canonical_registry,
+        evidence_engine=evidence_engine,
+    )
+    explainability_summary = explainability_engine.get_summary()
+    print(f"[5c/6] Explainability Engine: {explainability_summary['total_explanations']} explanations compiled.")
 
     # 6. EXPORT INVESTIGATOR OUTPUTS ---------------------------------------
     influence_lookup = {p["entity"]: p["influence_score"] for p in key_players}
@@ -87,6 +127,8 @@ def run_pipeline():
         "critical_bridge_nodes": [{"entity": n, "betweenness": round(v, 4)} for n, v in bridges],
         "suspicious_patterns": anomalies,
         "entity_resolution": resolution_summary,
+        "evidence_provenance": evidence_summary,
+        "explainability": explainability_summary,
     }
     with open(os.path.join(OUT_DIR, "intelligence_report.json"), "w") as f:
         json.dump(report, f, indent=2)

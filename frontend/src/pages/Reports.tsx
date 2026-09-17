@@ -7,9 +7,11 @@ import {
   Calendar, Activity, RefreshCw, ExternalLink, ArrowRight,
   TrendingUp, CheckCircle2, Info, ChevronRight, Layers,
   Zap, DollarSign, ShieldAlert, Clock, Eye, AlertCircle,
-  HelpCircle, ChevronDown, ChevronUp, Phone, Car, Building2, Circle, Briefcase
+  HelpCircle, ChevronDown, ChevronUp, Phone, Car, Building2, Circle, Briefcase,
+  Lightbulb
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { EvidenceDrawer } from "../components/EvidenceDrawer";
 
 // ─── Entity Type Configuration ──────────────────────────────────────────────
 interface EntityCfg {
@@ -49,6 +51,7 @@ export const Reports: React.FC = () => {
 
   // Methodology accordion
   const [showMethodology, setShowMethodology] = useState(false);
+  const [drawerEvidenceId, setDrawerEvidenceId] = useState<string | null>(null);
 
   // Load report data
   const loadReport = useCallback(async () => {
@@ -299,6 +302,15 @@ export const Reports: React.FC = () => {
                         }`}>
                           {f.priority} PRIORITY
                         </span>
+                        {f.evidence_id && (
+                          <button
+                            onClick={() => setDrawerEvidenceId(f.evidence_id!)}
+                            className="px-2 py-0.5 text-[11px] font-medium text-cyan-800 bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 rounded transition-colors inline-flex items-center gap-1 cursor-pointer"
+                          >
+                            <Shield className="w-3 h-3 text-cyan-600" />
+                            Evidence Trace
+                          </button>
+                        )}
                       </div>
                       <span className="text-[10px] font-mono font-semibold uppercase text-slate-400">
                         {f.category}
@@ -332,6 +344,16 @@ export const Reports: React.FC = () => {
                           {rec}
                         </button>
                       ))}
+
+                      {/* Explain Finding Action */}
+                      <button
+                        onClick={() => navigate(`/explainability?q=${encodeURIComponent(f.title)}`)}
+                        className="font-mono text-[11px] font-medium bg-amber-50 text-amber-900 border border-amber-200 px-2 py-0.5 rounded hover:bg-amber-100 transition-colors inline-flex items-center gap-1 cursor-pointer"
+                        title="Explain finding derivation"
+                      >
+                        <Lightbulb className="w-2.5 h-2.5 text-amber-700" />
+                        Explain Finding
+                      </button>
 
                       {/* Entities */}
                       {f.related_entities.map(ent => (
@@ -404,6 +426,24 @@ export const Reports: React.FC = () => {
                           <MapPin className="w-3 h-3" /> {lead.location}
                         </button>
                       )}
+                      {lead.supporting_records.length > 0 && (
+                        <button
+                          onClick={() => setDrawerEvidenceId(`EVID-REC-${lead.supporting_records[0]}`)}
+                          className="px-2 py-0.5 text-[11px] font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded transition-colors inline-flex items-center gap-1 cursor-pointer"
+                          title="Inspect primary source record evidence"
+                        >
+                          <Shield className="w-3 h-3 text-emerald-600" />
+                          Source Evidence
+                        </button>
+                      )}
+                      <button
+                        onClick={() => navigate(`/explainability?q=${encodeURIComponent(lead.lead_id)}`)}
+                        className="px-2 py-0.5 text-[11px] font-medium text-cyan-900 bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 rounded transition-colors inline-flex items-center gap-1 cursor-pointer"
+                        title="Explain lead derivation"
+                      >
+                        <Lightbulb className="w-3 h-3 text-cyan-700" />
+                        Explain Lead
+                      </button>
                     </div>
                   </div>
 
@@ -804,6 +844,12 @@ export const Reports: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Evidence & Provenance Trace Drawer */}
+      <EvidenceDrawer
+        evidenceId={drawerEvidenceId}
+        onClose={() => setDrawerEvidenceId(null)}
+      />
     </div>
   );
 };

@@ -49,6 +49,16 @@ from anomaly_detection import (
     detect_burst_activity, detect_structuring, detect_new_entity_spikes,
     isolation_forest_outliers,
 )
+from evidence_engine import (
+    EvidenceEngine, EvidenceClassification, EpistemicStatus,
+    canonical_pair, _slug, EvidenceItem,
+    LIMITATIONS_NETWORK_METRIC, LIMITATIONS_ANOMALY, LIMITATIONS_RELATIONSHIP,
+)
+from explainability_engine import (
+    ExplainabilityEngine, ExplainabilityType, ExplanationStatus,
+    IntelligenceExplanation, ExplanationStep,
+)
+from temporal_engine import TemporalEngine
 
 DATA_PATH = os.path.join(BASE_DIR, "data", "sample_records.json")
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
@@ -389,6 +399,9 @@ class IntelligenceService:
     _cached_graph: Any | None = None
     _cached_resolution_engine: Any | None = None
     _cached_canonical_registry: Dict[str, Any] | None = None
+    _cached_evidence_engine: Any | None = None
+    _cached_explainability_engine: Any | None = None
+    _cached_temporal_engine: Any | None = None
     _last_ingestion_time: str = datetime.now(timezone.utc).isoformat()
 
     @classmethod
@@ -439,13 +452,60 @@ class IntelligenceService:
             ent_type = a.get("type")
             if not ent_type and ent and G.has_node(ent):
                 ent_type = G.nodes[ent].get("type")
+            anom_id = f"ANOM-{idx+1:03d}"
             anom_dict = {
-                "id": f"ANOM-{idx+1:03d}",
+                "id": anom_id,
+                "evidence_id": f"EVID-ANOM-{_slug(anom_id)}",
                 **a,
             }
             if ent_type:
                 anom_dict["entity_type"] = ent_type
             anomalies.append(anom_dict)
+
+        # 5b. Evidence & Provenance Engine (Phase 3H)
+        evidence_engine = EvidenceEngine()
+        evidence_engine.compile_corpus(
+            records=records,
+            extracted=extracted,
+            G=G,
+            centrality=centrality,
+            key_players=key_players,
+            bridges=bridges,
+            anomalies=anomalies,
+            resolution_engine=resolution_engine,
+            canonical_registry=canonical_registry,
+        )
+        cls._cached_evidence_engine = evidence_engine
+
+        # 5c. Explainable Intelligence Engine (Phase 3I)
+        explainability_engine = ExplainabilityEngine()
+        explainability_engine.compile(
+            records=records,
+            extracted=extracted,
+            G=G,
+            centrality=centrality,
+            key_players=key_players,
+            bridges=bridges,
+            communities=communities,
+            anomalies=anomalies,
+            resolution_engine=resolution_engine,
+            canonical_registry=canonical_registry,
+            evidence_engine=evidence_engine,
+        )
+        cls._cached_explainability_engine = explainability_engine
+
+        # 5d. Temporal Intelligence Engine (Phase 3J)
+        temporal_engine = TemporalEngine()
+        temporal_engine.compile(
+            records=records,
+            extracted=extracted,
+            G=G,
+            anomalies=anomalies,
+            canonical_registry=canonical_registry,
+            evidence_engine=evidence_engine,
+            explainability_engine=explainability_engine,
+        )
+        cls._cached_temporal_engine = temporal_engine
 
         # Build community lookup per node
         community_map = {}
@@ -459,7 +519,7 @@ class IntelligenceService:
         bridge_lookup = {b[0]: round(b[1], 4) for b in bridges}
         key_player_set = {kp["entity"] for kp in key_players}
 
-        # Build node list for API enriched with Entity Resolution metadata
+        # Build node list for API enriched with Entity Resolution & Evidence metadata
         nodes = []
         for node, data in G.nodes(data=True):
             c_info = centrality.get(node, {})
@@ -486,6 +546,7 @@ class IntelligenceService:
                 "is_bridge_node": node in bridge_lookup,
                 "bridge_betweenness": bridge_lookup.get(node, 0.0),
                 "anomaly_count": len(entity_anomalies),
+                "evidence_id": f"EVID-METRIC-{_slug(node)}-CENTRALITY",
                 "canonical_id": ce.canonical_id if ce else f"ENT-{data.get('type', 'UNKNOWN')}-{node}",
                 "canonical_name": ce.canonical_name if ce else node,
                 "resolution_status": ce.review_status if ce else "RESOLVED",
@@ -495,15 +556,17 @@ class IntelligenceService:
                 "associated_identifiers": ce.associated_identifiers if ce else {"phones": [], "vehicles": []},
             })
 
-        # Build edge list for API
+        # Build edge list for API enriched with Canonical Relationship Evidence IDs
         links = []
         for u, v, d in G.edges(data=True):
+            cp = canonical_pair(u, v)
             links.append({
                 "source": u,
                 "target": v,
                 "weight": d.get("weight", 1),
                 "records": d.get("records", []),
                 "dates": d.get("dates", []),
+                "evidence_id": f"EVID-REL-{_slug(cp[0])}--{_slug(cp[1])}",
             })
 
         # Format records
@@ -513,6 +576,7 @@ class IntelligenceService:
                 "source": r.source,
                 "date": r.date,
                 "text": r.text,
+                "evidence_id": f"EVID-REC-{_slug(r.record_id)}",
                 "extracted_entities": [
                     {"text": e.text, "label": e.label}
                     for e in next((ex.entities for ex in extracted if ex.record_id == r.record_id), [])
@@ -532,8 +596,12 @@ class IntelligenceService:
             "nodes": nodes,
             "links": links,
             "records": formatted_records,
+            "network_nodes": nodes,
+            "network_edges": links,
+            "ingested_records": formatted_records,
             "entity_resolution": resolution_engine.get_summary(),
             "canonical_entities": {k: ce.to_dict() for k, ce in canonical_registry.items()},
+            "evidence_provenance": evidence_engine.get_summary(),
             "status": "ACTIVE_INVESTIGATION",
         }
         return cls._cached_data
@@ -646,12 +714,19 @@ class IntelligenceService:
                     }
                     break
 
+        # Phase 3H: Evidence items for this entity
+        evidence_items = []
+        if hasattr(cls, "_cached_evidence_engine") and cls._cached_evidence_engine:
+            ev_items = cls._cached_evidence_engine.get_by_entity(actual_id)
+            evidence_items = [it.to_dict() for it in ev_items]
+
         return {
             **target_node,
             "connected_entities": connected_entities,
             "associated_records": associated_records,
             "detected_anomalies": associated_anomalies,
             "resolution": res_info,
+            "evidence_items": evidence_items,
         }
 
     @classmethod
@@ -709,6 +784,324 @@ class IntelligenceService:
             "governance_notice": "Entity resolution is an analytical aid. Ambiguous identity resolution requires authorized human review.",
         }
 
+    # ── Phase 3H: Evidence & Provenance Engine Services ──────────────────────
+
+    @classmethod
+    def get_evidence_engine(cls):
+        """Returns the cached EvidenceEngine instance, initializing data if needed."""
+        cls.get_data()
+        return cls._cached_evidence_engine
+
+    @classmethod
+    def get_evidence_overview(
+        cls,
+        params: Dict[str, str] = None,
+        classification: str = None,
+        epistemic_status: str = None,
+        record_id: str = None,
+        entity: str = None,
+        anomaly: str = None,
+        **kwargs
+    ) -> Dict[str, Any]:
+        """Returns overview metrics and filtered evidence items."""
+        cls.get_data()
+        ee = cls._cached_evidence_engine
+        if not ee:
+            return {"summary": {}, "total_items": 0, "items": []}
+
+        if params is None:
+            params = {}
+
+        entity = entity or params.get("entity")
+        record = record_id or params.get("record") or params.get("record_id")
+        anomaly = anomaly or params.get("anomaly")
+        etype = classification or params.get("classification") or params.get("type")
+        ep_status = epistemic_status or params.get("epistemic_status") or params.get("status")
+
+        items = list(ee.items.values())
+        if entity:
+            items = ee.get_by_entity(entity)
+        if record:
+            items = [it for it in items if record in it.source_records]
+        if anomaly:
+            items = [it for it in items if it.metadata.get("anomaly_id") == anomaly]
+        if etype:
+            items = [it for it in items if it.evidence_type == etype]
+        if ep_status:
+            items = [it for it in items if it.epistemic_status == ep_status]
+
+        return {
+            "summary": ee.get_summary(),
+            "total_items": len(items),
+            "items": [it.to_dict() for it in items],
+            "governance_notice": (
+                "Every evidence item is deterministically traceable to source records or explicit analytical methods. "
+                "Co-occurrence does not equal confirmed partnership. Anomaly signals do not constitute proof of crime. "
+                "Network metrics do not denote guilt."
+            ),
+        }
+
+    @classmethod
+    def get_evidence_item(cls, evidence_id: str) -> Dict[str, Any] | None:
+        """Retrieves a single evidence item and its hierarchical provenance trace."""
+        cls.get_data()
+        ee = cls._cached_evidence_engine
+        if not ee:
+            return None
+
+        item = ee.get_item(evidence_id)
+        if not item:
+            # Flexible lookups if raw entity name, record ID, or anomaly ID passed
+            if evidence_id.startswith("ANOM-"):
+                item = ee.get_by_anomaly(evidence_id)
+            elif evidence_id.startswith("CR-"):
+                item = ee.get_item(f"EVID-REC-{_slug(evidence_id)}")
+            elif ee.index_by_entity.get(evidence_id):
+                items = ee.get_by_entity(evidence_id)
+                item = items[0] if items else None
+
+        if not item:
+            return None
+
+        trace = ee.compile_trace(item.evidence_id)
+        return {
+            "item": item.to_dict(),
+            "trace": trace.to_dict() if trace else None,
+        }
+
+    @classmethod
+    def get_relationship_evidence(cls, source: str, target: str) -> Dict[str, Any] | None:
+        """Average-case O(1) canonical relationship evidence retrieval."""
+        cls.get_data()
+        ee = cls._cached_evidence_engine
+        if not ee:
+            return None
+
+        item = ee.get_by_relationship(source, target)
+        if not item:
+            return None
+
+        trace = ee.compile_trace(item.evidence_id)
+        return {
+            "evidence_id": item.evidence_id,
+            "item": item.to_dict(),
+            "trace": trace.to_dict() if trace else None,
+            "source": source,
+            "target": target,
+        }
+
+    @classmethod
+    def get_evidence_by_entity(cls, entity_id: str) -> List[Dict[str, Any]]:
+        """Average-case O(1) entity evidence list."""
+        cls.get_data()
+        ee = cls._cached_evidence_engine
+        if not ee:
+            return []
+        items = ee.get_by_entity(entity_id)
+        return [it.to_dict() for it in items]
+
+    @classmethod
+    def get_evidence_by_record(cls, record_id: str) -> List[Dict[str, Any]]:
+        """Average-case O(1) record evidence list."""
+        cls.get_data()
+        ee = cls._cached_evidence_engine
+        if not ee:
+            return []
+        items = ee.get_by_record(record_id)
+        return [it.to_dict() for it in items]
+
+    @classmethod
+    def get_evidence_by_anomaly(cls, anomaly_id: str) -> Dict[str, Any] | None:
+        """Average-case O(1) anomaly evidence item."""
+        cls.get_data()
+        ee = cls._cached_evidence_engine
+        if not ee:
+            return None
+        item = ee.get_by_anomaly(anomaly_id)
+        if not item:
+            return None
+        trace = ee.compile_trace(item.evidence_id)
+        return {
+            "item": item.to_dict(),
+            "trace": trace.to_dict() if trace else None,
+        }
+
+    # ── Phase 3I: Explainable Intelligence Services ──────────────────────────
+
+    @classmethod
+    def get_explainability_engine(cls):
+        """Returns the cached ExplainabilityEngine instance, initializing data if needed."""
+        cls.get_data()
+        return getattr(cls, "_cached_explainability_engine", None)
+
+    @classmethod
+    def get_explainability_overview(
+        cls,
+        params: Dict[str, str] = None,
+        type: str = None,
+        entity: str = None,
+        record_id: str = None,
+        status: str = None,
+        **kwargs
+    ) -> Dict[str, Any]:
+        """Returns overview summary and filtered list of intelligence explanations."""
+        cls.get_data()
+        eng = getattr(cls, "_cached_explainability_engine", None)
+        if not eng:
+            return {"summary": {}, "total_explanations": 0, "explanations": []}
+
+        if params is None:
+            params = {}
+
+        etype = type or params.get("type") or params.get("explanation_type")
+        ent = entity or params.get("entity")
+        rec = record_id or params.get("record") or params.get("record_id")
+        st = status or params.get("status")
+
+        filtered = eng.filter_explanations(
+            explanation_type=etype,
+            entity=ent,
+            record_id=rec,
+            status=st,
+        )
+
+        return {
+            "summary": eng.get_summary(),
+            "total_explanations": len(filtered),
+            "explanations": [e.to_dict() for e in filtered],
+            "governance_notice": (
+                "Explanations document deterministic calculations and Phase 3H evidence linkage. "
+                "Network centrality describes graph position and does not establish guilt, criminal responsibility, or hierarchy. "
+                "Co-occurrence does not prove conspiracy. Anomaly signals are investigative leads only."
+            ),
+        }
+
+    @classmethod
+    def get_explanation(cls, explanation_id: str) -> Dict[str, Any] | None:
+        """Retrieves a single intelligence explanation by ID."""
+        cls.get_data()
+        eng = getattr(cls, "_cached_explainability_engine", None)
+        if not eng:
+            return None
+        expl = eng.get_explanation(explanation_id)
+        return expl.to_dict() if expl else None
+
+    @classmethod
+    def get_entity_explanations(cls, entity_id: str) -> Dict[str, Any]:
+        """Average-case O(1) retrieval of all explanations touching a specific entity."""
+        cls.get_data()
+        eng = getattr(cls, "_cached_explainability_engine", None)
+        if not eng:
+            return {"entity": entity_id, "total": 0, "explanations": []}
+        expls = eng.get_explanations_for_entity(entity_id)
+        return {
+            "entity": entity_id,
+            "total": len(expls),
+            "explanations": [e.to_dict() for e in expls],
+        }
+
+    @classmethod
+    def get_anomaly_explanation(cls, anomaly_id: str) -> Dict[str, Any] | None:
+        """Average-case O(1) retrieval of explanation for a specific anomaly signal."""
+        cls.get_data()
+        eng = getattr(cls, "_cached_explainability_engine", None)
+        if not eng:
+            return None
+        expl = eng.get_explanation_for_anomaly(anomaly_id)
+        return expl.to_dict() if expl else None
+
+    @classmethod
+    def get_relationship_explanation(cls, source: str, target: str) -> Dict[str, Any] | None:
+        """Average-case O(1) canonical relationship explanation retrieval."""
+        cls.get_data()
+        eng = getattr(cls, "_cached_explainability_engine", None)
+        if not eng:
+            return None
+        expl = eng.get_explanation_for_relationship(source, target)
+        return expl.to_dict() if expl else None
+
+    @classmethod
+    def get_path_explanation(cls, source: str, target: str) -> Dict[str, Any] | None:
+        """Dynamic shortest-path explanation between two entities in the graph."""
+        cls.get_data()
+        eng = getattr(cls, "_cached_explainability_engine", None)
+        if not eng:
+            return None
+        expl = eng.explain_path(source, target)
+        return expl.to_dict() if expl else None
+
+    # ── Phase 3J: Temporal Intelligence Services ─────────────────────────────
+
+    @classmethod
+    def get_temporal_engine(cls):
+        """Returns the cached TemporalEngine instance, compiling data if needed."""
+        cls.get_data()
+        return getattr(cls, "_cached_temporal_engine", None)
+
+    @classmethod
+    def get_temporal_overview(cls) -> Dict[str, Any]:
+        """Returns overall temporal intelligence overview with KPIs, patterns, and density."""
+        te = cls.get_temporal_engine()
+        if not te:
+            return {"summary_kpis": {}, "activity_density": {}, "patterns_summary": []}
+        return te.get_overview()
+
+    @classmethod
+    def get_temporal_activity(cls, granularity: str = "day") -> Dict[str, Any]:
+        """Returns activity density buckets (day, week, or month)."""
+        te = cls.get_temporal_engine()
+        if not te:
+            return {"granularity": granularity, "total_buckets": 0, "buckets": {}}
+        return te.get_activity_density(granularity)
+
+    @classmethod
+    def get_temporal_evolution(cls) -> Dict[str, Any]:
+        """Returns longitudinal network evolution snapshots reconstructed from observations."""
+        te = cls.get_temporal_engine()
+        if not te:
+            return {"total_snapshots": 0, "snapshots": []}
+        return te.get_network_evolution()
+
+    @classmethod
+    def get_temporal_patterns(cls, pattern_type: Optional[str] = None) -> Dict[str, Any]:
+        """Returns detected temporal patterns optionally filtered by pattern_type."""
+        te = cls.get_temporal_engine()
+        if not te:
+            return {"total_patterns": 0, "patterns": []}
+        return te.get_patterns(pattern_type)
+
+    @classmethod
+    def get_temporal_entity(cls, entity_id: str) -> Optional[Dict[str, Any]]:
+        """Average-case O(1) retrieval of entity activity chronology, gaps, and milestones."""
+        te = cls.get_temporal_engine()
+        if not te:
+            return None
+        return te.get_entity_activity(entity_id)
+
+    @classmethod
+    def get_temporal_case(cls, case_id: str) -> Optional[Dict[str, Any]]:
+        """Average-case O(1) retrieval of case chronological event stream."""
+        te = cls.get_temporal_engine()
+        if not te:
+            return None
+        return te.get_case_chronology(case_id)
+
+    @classmethod
+    def get_temporal_relationship(cls, source: str, target: str) -> Optional[Dict[str, Any]]:
+        """Average-case O(1) canonical relationship temporal evolution retrieval."""
+        te = cls.get_temporal_engine()
+        if not te:
+            return None
+        return te.get_relationship_evolution(source, target)
+
+    @classmethod
+    def get_temporal_observation(cls, observation_id: str) -> Optional[Dict[str, Any]]:
+        """Average-case O(1) observation retrieval by ID."""
+        te = cls.get_temporal_engine()
+        if not te:
+            return None
+        return te.get_observation(observation_id)
+
     @classmethod
     def get_anomalies(cls) -> List[Dict[str, Any]]:
         data = cls.get_data()
@@ -754,6 +1147,15 @@ class IntelligenceService:
             ])
 
         detail["associated_records"] = associated_records
+
+        # Phase 3H: Evidence item and trace
+        if hasattr(cls, "_cached_evidence_engine") and cls._cached_evidence_engine:
+            ev_item = cls._cached_evidence_engine.get_by_anomaly(target.get("id"))
+            if ev_item:
+                detail["evidence_item"] = ev_item.to_dict()
+                trace = cls._cached_evidence_engine.compile_trace(ev_item.evidence_id)
+                detail["evidence_trace"] = trace.to_dict() if trace else None
+
         return detail
 
     @classmethod
@@ -907,6 +1309,7 @@ class IntelligenceService:
         key_findings = [
             {
                 "finding_id": "KF-001",
+                "evidence_id": "EVID-REL-RAVI-MALHOTRA--VIKRAM-RAO",
                 "category": "NETWORK",
                 "priority": "HIGH",
                 "title": "Core Suspect Coordination Cluster Identified",
@@ -917,6 +1320,7 @@ class IntelligenceService:
             },
             {
                 "finding_id": "KF-002",
+                "evidence_id": "EVID-LOC-ANDHERI",
                 "category": "LOCATION",
                 "priority": "HIGH",
                 "title": "Andheri and Andheri Warehouse Act as Critical Strategic Hubs",
@@ -927,6 +1331,7 @@ class IntelligenceService:
             },
             {
                 "finding_id": "KF-003",
+                "evidence_id": "EVID-ANOM-ANOM-013",
                 "category": "ANOMALY",
                 "priority": "HIGH",
                 "title": "Deliberate Financial Structuring in Cash Deposits Flagged",
@@ -937,6 +1342,7 @@ class IntelligenceService:
             },
             {
                 "finding_id": "KF-004",
+                "evidence_id": "EVID-ANOM-ANOM-001",
                 "category": "ANOMALY",
                 "priority": "MEDIUM",
                 "title": "Burst Calling Signatures Preceding Operations",
@@ -947,6 +1353,7 @@ class IntelligenceService:
             },
             {
                 "finding_id": "KF-005",
+                "evidence_id": "EVID-METRIC-SURESH-NAIR-CENTRALITY",
                 "category": "NETWORK",
                 "priority": "MEDIUM",
                 "title": "Girvan-Newman Edge Betweenness Identifies 5 Critical Bridge Nodes",
@@ -957,6 +1364,7 @@ class IntelligenceService:
             },
             {
                 "finding_id": "KF-006",
+                "evidence_id": "EVID-ANOM-ANOM-014",
                 "category": "ENTITY",
                 "priority": "MEDIUM",
                 "title": "Rapid Integration Spikes for Unregistered Entities",

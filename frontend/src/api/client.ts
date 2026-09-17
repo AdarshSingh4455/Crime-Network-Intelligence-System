@@ -28,6 +28,20 @@ import {
   InvestigationPathResponse,
   FixtureCatalogue,
   DataQualityResults,
+  EvidenceOverviewResponse,
+  SingleEvidenceResponse,
+  RelationshipEvidenceResponse,
+  ExplainabilityOverviewResponse,
+  IntelligenceExplanation,
+  EntityExplanationsResponse,
+  TemporalOverviewResponse,
+  TemporalActivityResponse,
+  TemporalEvolutionResponse,
+  TemporalPatternsResponse,
+  TemporalEntityResponse,
+  TemporalCaseResponse,
+  TemporalRelationshipEvolution,
+  TemporalObservation,
 } from '../types';
 
 const API_BASE = '/api';
@@ -208,6 +222,119 @@ export const api = {
     const res = await apiClient.get<DataQualityResults>('/data-quality/results');
     return res.data;
   },
+
+  // ─── Phase 3H: Evidence & Provenance Engine ───────────────────────────────
+
+  getEvidenceOverview: async (params?: Record<string, string>): Promise<EvidenceOverviewResponse> => {
+    const res = await apiClient.get<EvidenceOverviewResponse>('/evidence', { params });
+    return res.data;
+  },
+
+  getEvidenceItem: async (evidenceId: string): Promise<SingleEvidenceResponse> => {
+    const res = await apiClient.get<SingleEvidenceResponse>(`/evidence/${encodeURIComponent(evidenceId)}`);
+    return res.data;
+  },
+
+  getRelationshipEvidence: async (source: string, target: string): Promise<RelationshipEvidenceResponse> => {
+    const res = await apiClient.get<RelationshipEvidenceResponse>(
+      `/evidence/relationship/${encodeURIComponent(source)}/${encodeURIComponent(target)}`
+    );
+    return res.data;
+  },
+
+  // ─── Phase 3I: Explainable Intelligence Engine ─────────────────────────────
+
+  getExplainabilityOverview: async (params?: Record<string, string>): Promise<ExplainabilityOverviewResponse> => {
+    const res = await apiClient.get<ExplainabilityOverviewResponse>('/explainability', { params });
+    return res.data;
+  },
+
+  getExplanation: async (explanationId: string): Promise<IntelligenceExplanation> => {
+    const res = await apiClient.get<IntelligenceExplanation>(`/explainability/${encodeURIComponent(explanationId)}`);
+    return res.data;
+  },
+
+  getEntityExplanations: async (entityId: string): Promise<EntityExplanationsResponse> => {
+    const res = await apiClient.get<EntityExplanationsResponse>(`/explainability/entity/${encodeURIComponent(entityId)}`);
+    return res.data;
+  },
+
+  getAnomalyExplanation: async (anomalyId: string): Promise<IntelligenceExplanation> => {
+    const res = await apiClient.get<IntelligenceExplanation>(`/explainability/anomaly/${encodeURIComponent(anomalyId)}`);
+    return res.data;
+  },
+
+  getRelationshipExplanation: async (source: string, target: string): Promise<IntelligenceExplanation> => {
+    const res = await apiClient.get<IntelligenceExplanation>(
+      `/explainability/relationship/${encodeURIComponent(source)}/${encodeURIComponent(target)}`
+    );
+    return res.data;
+  },
+
+  getPathExplanation: async (source: string, target: string): Promise<IntelligenceExplanation> => {
+    const res = await apiClient.get<IntelligenceExplanation>(
+      `/explainability/path/${encodeURIComponent(source)}/${encodeURIComponent(target)}`
+    );
+    return res.data;
+  },
+
+  // ─── Phase 3J: Temporal Intelligence ───────────────────────────────────────
+
+  getTemporalOverview: async (): Promise<TemporalOverviewResponse> => {
+    const res = await apiClient.get<TemporalOverviewResponse>('/temporal');
+    return res.data;
+  },
+
+  getTemporalActivity: async (granularity: string = 'day'): Promise<TemporalActivityResponse> => {
+    const res = await apiClient.get<TemporalActivityResponse>('/temporal/activity', {
+      params: { granularity },
+    });
+    return res.data;
+  },
+
+  getTemporalEvolution: async (): Promise<TemporalEvolutionResponse> => {
+    const res = await apiClient.get<TemporalEvolutionResponse>('/temporal/evolution');
+    return res.data;
+  },
+
+  getTemporalPatterns: async (type?: string): Promise<TemporalPatternsResponse> => {
+    const res = await apiClient.get<TemporalPatternsResponse>('/temporal/patterns', {
+      params: type ? { type } : {},
+    });
+    return res.data;
+  },
+
+  getTemporalEntity: async (entityId: string): Promise<TemporalEntityResponse> => {
+    const res = await apiClient.get<TemporalEntityResponse>(
+      `/temporal/entity/${encodeURIComponent(entityId)}`
+    );
+    return res.data;
+  },
+
+  getTemporalCase: async (caseId: string): Promise<TemporalCaseResponse> => {
+    const res = await apiClient.get<TemporalCaseResponse>(
+      `/temporal/case/${encodeURIComponent(caseId)}`
+    );
+    return res.data;
+  },
+
+  getTemporalRelationship: async (
+    source: string,
+    target: string
+  ): Promise<TemporalRelationshipEvolution> => {
+    const res = await apiClient.get<TemporalRelationshipEvolution>(
+      `/temporal/relationship/${encodeURIComponent(source)}/${encodeURIComponent(target)}`
+    );
+    return res.data;
+  },
+
+  getTemporalObservation: async (temporalId: string): Promise<TemporalObservation> => {
+    const res = await apiClient.get<TemporalObservation>(
+      `/temporal/${encodeURIComponent(temporalId)}`
+    );
+    return res.data;
+  },
 };
+
 
 

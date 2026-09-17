@@ -86,6 +86,202 @@ def get_entity_resolution_detail(entity_id: str):
     return detail
 
 
+# ── Phase 3H: Evidence & Provenance Endpoints ─────────────────────────────────
+
+@app.get("/api/evidence")
+def get_evidence_overview(
+    entity: Optional[str] = None,
+    record: Optional[str] = None,
+    anomaly: Optional[str] = None,
+    type: Optional[str] = None,
+    status: Optional[str] = None,
+):
+    """Phase 3H: Returns evidence corpus summary and filtered evidence items."""
+    params = {}
+    if entity:
+        params["entity"] = entity
+    if record:
+        params["record"] = record
+    if anomaly:
+        params["anomaly"] = anomaly
+    if type:
+        params["type"] = type
+    if status:
+        params["status"] = status
+    return IntelligenceService.get_evidence_overview(params)
+
+
+@app.get("/api/evidence/relationship/{source}/{target}")
+def get_relationship_evidence(source: str, target: str):
+    """Phase 3H: Returns canonical co-occurrence evidence and trace between two entities."""
+    evidence = IntelligenceService.get_relationship_evidence(source, target)
+    if not evidence:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No co-occurrence relationship evidence found between '{source}' and '{target}'"
+        )
+    return evidence
+
+
+@app.get("/api/evidence/{evidence_id}")
+def get_evidence_item(evidence_id: str):
+    """Phase 3H: Returns a single evidence item with full hierarchical provenance trace."""
+    evidence = IntelligenceService.get_evidence_item(evidence_id)
+    if not evidence:
+        raise HTTPException(status_code=404, detail=f"Evidence item '{evidence_id}' not found")
+    return evidence
+
+
+# ── Phase 3I: Explainable Intelligence Endpoints ──────────────────────────────
+
+@app.get("/api/explainability")
+def get_explainability_overview(
+    entity: Optional[str] = None,
+    record: Optional[str] = None,
+    type: Optional[str] = None,
+    status: Optional[str] = None,
+):
+    """Phase 3I: Returns explainability corpus summary and filtered explanations."""
+    params = {}
+    if entity:
+        params["entity"] = entity
+    if record:
+        params["record"] = record
+    if type:
+        params["type"] = type
+    if status:
+        params["status"] = status
+    return IntelligenceService.get_explainability_overview(params)
+
+
+@app.get("/api/explainability/entity/{entity_id}")
+def get_entity_explanations(entity_id: str):
+    """Phase 3I: Returns all explanations directly involving an entity."""
+    return IntelligenceService.get_entity_explanations(entity_id)
+
+
+@app.get("/api/explainability/anomaly/{anomaly_id}")
+def get_anomaly_explanation(anomaly_id: str):
+    """Phase 3I: Returns derivation and rule trigger explanation for an anomaly signal."""
+    explanation = IntelligenceService.get_anomaly_explanation(anomaly_id)
+    if not explanation:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No explanation found for anomaly signal '{anomaly_id}'"
+        )
+    return explanation
+
+
+@app.get("/api/explainability/relationship/{source}/{target}")
+def get_relationship_explanation(source: str, target: str):
+    """Phase 3I: Returns co-occurrence derivation explanation for a relationship pair."""
+    explanation = IntelligenceService.get_relationship_explanation(source, target)
+    if not explanation:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No relationship explanation found between '{source}' and '{target}'"
+        )
+    return explanation
+
+
+@app.get("/api/explainability/path/{source}/{target}")
+def get_path_explanation(source: str, target: str):
+    """Phase 3I: Returns shortest-path traversal explanation between two entities."""
+    explanation = IntelligenceService.get_path_explanation(source, target)
+    if not explanation:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No graph connection path found between '{source}' and '{target}'"
+        )
+    return explanation
+
+
+@app.get("/api/explainability/{explanation_id}")
+def get_explanation(explanation_id: str):
+    """Phase 3I: Returns a single intelligence explanation by its deterministic ID."""
+    explanation = IntelligenceService.get_explanation(explanation_id)
+    if not explanation:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Explanation '{explanation_id}' not found"
+        )
+    return explanation
+
+
+# ── Phase 3J: Temporal Intelligence Endpoints ─────────────────────────────────
+
+@app.get("/api/temporal/activity")
+def get_temporal_activity(granularity: str = "day"):
+    """Phase 3J: Returns activity density buckets grouped by day, week, or month."""
+    return IntelligenceService.get_temporal_activity(granularity)
+
+
+@app.get("/api/temporal/evolution")
+def get_temporal_evolution():
+    """Phase 3J: Returns longitudinal network evolution snapshots reconstructed from observations."""
+    return IntelligenceService.get_temporal_evolution()
+
+
+@app.get("/api/temporal/patterns")
+def get_temporal_patterns(type: Optional[str] = None):
+    """Phase 3J: Returns detected deterministic temporal patterns, optionally filtered by type."""
+    return IntelligenceService.get_temporal_patterns(type)
+
+
+@app.get("/api/temporal/entity/{entity_id}")
+def get_temporal_entity(entity_id: str):
+    """Phase 3J: Returns chronological activity profile, observation history, and gaps for an entity."""
+    res = IntelligenceService.get_temporal_entity(entity_id)
+    if not res:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No temporal activity recorded for entity '{entity_id}'"
+        )
+    return res
+
+
+@app.get("/api/temporal/case/{case_id}")
+def get_temporal_case(case_id: str):
+    """Phase 3J: Returns chronological event stream for a case."""
+    res = IntelligenceService.get_temporal_case(case_id)
+    if not res:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No temporal observations recorded for case '{case_id}'"
+        )
+    return res
+
+
+@app.get("/api/temporal/relationship/{source}/{target}")
+def get_temporal_relationship(source: str, target: str):
+    """Phase 3J: Returns chronological trajectory and milestones for relationship between two entities."""
+    res = IntelligenceService.get_temporal_relationship(source, target)
+    if not res:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No temporal relationship trajectory found between '{source}' and '{target}'"
+        )
+    return res
+
+
+@app.get("/api/temporal")
+def get_temporal_overview():
+    """Phase 3J: Returns overall temporal intelligence summary, KPIs, and recent observations."""
+    return IntelligenceService.get_temporal_overview()
+
+
+@app.get("/api/temporal/{temporal_id}")
+def get_temporal_observation(temporal_id: str):
+    """Phase 3J: Returns a single temporal observation by its deterministic ID or record ID."""
+    obs = IntelligenceService.get_temporal_observation(temporal_id)
+    if not obs:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Temporal observation '{temporal_id}' not found"
+        )
+    return obs
+
+
 @app.get("/api/anomalies")
 def get_anomalies():
     return IntelligenceService.get_anomalies()

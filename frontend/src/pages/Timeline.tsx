@@ -6,9 +6,10 @@ import {
   Clock, Calendar, Search, X, RefreshCw, ExternalLink, Share2,
   Users, Phone, Car, MapPin, Building2, DollarSign, Circle,
   AlertTriangle, ShieldAlert, Zap, Activity, ArrowUpDown,
-  Filter, FileText, CheckCircle2, ChevronRight, Hash, Eye, Tag, Briefcase
+  Filter, FileText, CheckCircle2, ChevronRight, Hash, Eye, Tag, Briefcase, Shield, Lightbulb
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { EvidenceDrawer } from "../components/EvidenceDrawer";
 
 // ─── Entity Type Configuration ──────────────────────────────────────────────
 interface EntityCfg {
@@ -150,6 +151,7 @@ export const Timeline: React.FC = () => {
   const [patternFilter, setPatternFilter] = useState<string>("all");
   const [anomalyOnly, setAnomalyOnly] = useState(false);
   const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
+  const [drawerEvidenceId, setDrawerEvidenceId] = useState<string | null>(null);
 
   useEffect(() => {
     if (paramRecordId) {
@@ -555,14 +557,24 @@ export const Timeline: React.FC = () => {
                           {/* Quick Action Buttons */}
                           <div className="flex items-center gap-2">
                             {event.record_id && (
-                              <button
-                                onClick={() => navigate(`/cases?id=${encodeURIComponent(event.record_id)}`)}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-cyan-800 bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 rounded-lg transition-colors"
-                                title={`Open Case Dossier ${event.record_id}`}
-                              >
-                                <Briefcase className="w-3 h-3 text-cyan-700" />
-                                Case File
-                              </button>
+                              <>
+                                <button
+                                  onClick={() => setDrawerEvidenceId(`EVID-TEMPORAL-${event.record_id}`)}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors cursor-pointer"
+                                  title={`Inspect temporal evidence for ${event.record_id}`}
+                                >
+                                  <Shield className="w-3 h-3 text-emerald-600" />
+                                  Evidence Trace
+                                </button>
+                                <button
+                                  onClick={() => navigate(`/cases?id=${encodeURIComponent(event.record_id)}`)}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-cyan-800 bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 rounded-lg transition-colors"
+                                  title={`Open Case Dossier ${event.record_id}`}
+                                >
+                                  <Briefcase className="w-3 h-3 text-cyan-700" />
+                                  Case File
+                                </button>
+                              </>
                             )}
                             {primaryEntity && (
                               <>
@@ -581,6 +593,14 @@ export const Timeline: React.FC = () => {
                                 >
                                   <Share2 className="w-3 h-3 text-slate-500" />
                                   View in Network
+                                </button>
+                                <button
+                                  onClick={() => navigate(`/explainability?q=${encodeURIComponent(event.record_id || primaryEntity || "")}`)}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-cyan-800 bg-cyan-50/70 hover:bg-cyan-100 border border-cyan-200 rounded-lg transition-colors cursor-pointer"
+                                  title="Explain intelligence findings for this record"
+                                >
+                                  <Lightbulb className="w-3 h-3 text-cyan-700" />
+                                  Explain
                                 </button>
                               </>
                             )}
@@ -707,6 +727,12 @@ export const Timeline: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Evidence & Provenance Trace Drawer */}
+      <EvidenceDrawer
+        evidenceId={drawerEvidenceId}
+        onClose={() => setDrawerEvidenceId(null)}
+      />
     </div>
   );
 };

@@ -16,6 +16,8 @@ import {
   CheckCircle2,
   Compass,
   FlaskConical,
+  Lightbulb,
+  History,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -36,7 +38,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { name: 'Anomalies', path: '/anomalies', icon: AlertTriangle, badge: anomalyCount ? String(anomalyCount) : undefined, alert: true },
     { name: 'Timeline', path: '/timeline', icon: Clock },
     { name: 'Locations', path: '/locations', icon: MapPin },
+    { name: 'Temporal Intelligence', path: '/temporal', icon: History, badge: 'Phase 3J' },
     { name: 'Intelligence Reports', path: '/reports', icon: FileText },
+    { name: 'Explainability', path: '/explainability', icon: Lightbulb, badge: 'Phase 3I' },
   ];
 
   const secondaryNav = [

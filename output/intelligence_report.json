@@ -3,10 +3,10 @@
     "num_nodes": 15,
     "num_edges": 52,
     "nodes_by_type": {
-      "PHONE": 4,
-      "PERSON": 5,
       "VEHICLE": 2,
       "LOCATION": 2,
+      "PERSON": 5,
+      "PHONE": 4,
       "ORG": 1,
       "MONEY": 1
     },
@@ -115,175 +115,200 @@
   ],
   "suspicious_patterns": [
     {
-      "entity": "9876543210",
-      "date": "2026-01-05",
-      "event_count": 5,
-      "pattern": "burst_activity",
-      "note": "9876543210 involved in 5 linked events on 2026-01-05 - possible coordination or operational spike."
-    },
-    {
-      "entity": "Suresh Nair",
-      "date": "2026-01-05",
-      "event_count": 5,
-      "pattern": "burst_activity",
-      "note": "Suresh Nair involved in 5 linked events on 2026-01-05 - possible coordination or operational spike."
-    },
-    {
       "entity": "MH12AB1234",
       "date": "2026-01-05",
       "event_count": 5,
       "pattern": "burst_activity",
-      "note": "MH12AB1234 involved in 5 linked events on 2026-01-05 - possible coordination or operational spike."
+      "note": "MH12AB1234 involved in 5 linked events on 2026-01-05 - possible coordination or operational spike.",
+      "id": "ANOM-001"
     },
     {
       "entity": "Andheri Warehouse",
       "date": "2026-01-05",
       "event_count": 5,
       "pattern": "burst_activity",
-      "note": "Andheri Warehouse involved in 5 linked events on 2026-01-05 - possible coordination or operational spike."
-    },
-    {
-      "entity": "Ravi Malhotra",
-      "date": "2026-01-05",
-      "event_count": 5,
-      "pattern": "burst_activity",
-      "note": "Ravi Malhotra involved in 5 linked events on 2026-01-05 - possible coordination or operational spike."
+      "note": "Andheri Warehouse involved in 5 linked events on 2026-01-05 - possible coordination or operational spike.",
+      "id": "ANOM-002"
     },
     {
       "entity": "Andheri",
       "date": "2026-01-05",
       "event_count": 5,
       "pattern": "burst_activity",
-      "note": "Andheri involved in 5 linked events on 2026-01-05 - possible coordination or operational spike."
-    },
-    {
-      "entity": "Ajay Kulkarni",
-      "date": "2026-01-12",
-      "event_count": 5,
-      "pattern": "burst_activity",
-      "note": "Ajay Kulkarni involved in 5 linked events on 2026-01-12 - possible coordination or operational spike."
+      "note": "Andheri involved in 5 linked events on 2026-01-05 - possible coordination or operational spike.",
+      "id": "ANOM-003"
     },
     {
       "entity": "Suresh Nair",
-      "date": "2026-01-12",
+      "date": "2026-01-05",
       "event_count": 5,
       "pattern": "burst_activity",
-      "note": "Suresh Nair involved in 5 linked events on 2026-01-12 - possible coordination or operational spike."
+      "note": "Suresh Nair involved in 5 linked events on 2026-01-05 - possible coordination or operational spike.",
+      "id": "ANOM-004"
     },
     {
-      "entity": "Deepak Shah",
-      "date": "2026-01-12",
+      "entity": "9876543210",
+      "date": "2026-01-05",
       "event_count": 5,
       "pattern": "burst_activity",
-      "note": "Deepak Shah involved in 5 linked events on 2026-01-12 - possible coordination or operational spike."
+      "note": "9876543210 involved in 5 linked events on 2026-01-05 - possible coordination or operational spike.",
+      "id": "ANOM-005"
+    },
+    {
+      "entity": "Ravi Malhotra",
+      "date": "2026-01-05",
+      "event_count": 5,
+      "pattern": "burst_activity",
+      "note": "Ravi Malhotra involved in 5 linked events on 2026-01-05 - possible coordination or operational spike.",
+      "id": "ANOM-006"
     },
     {
       "entity": "MH12AB1234",
       "date": "2026-01-12",
       "event_count": 5,
       "pattern": "burst_activity",
-      "note": "MH12AB1234 involved in 5 linked events on 2026-01-12 - possible coordination or operational spike."
+      "note": "MH12AB1234 involved in 5 linked events on 2026-01-12 - possible coordination or operational spike.",
+      "id": "ANOM-007"
+    },
+    {
+      "entity": "Deepak Shah",
+      "date": "2026-01-12",
+      "event_count": 5,
+      "pattern": "burst_activity",
+      "note": "Deepak Shah involved in 5 linked events on 2026-01-12 - possible coordination or operational spike.",
+      "id": "ANOM-008"
     },
     {
       "entity": "Global Traders Pvt Ltd",
       "date": "2026-01-12",
       "event_count": 5,
       "pattern": "burst_activity",
-      "note": "Global Traders Pvt Ltd involved in 5 linked events on 2026-01-12 - possible coordination or operational spike."
+      "note": "Global Traders Pvt Ltd involved in 5 linked events on 2026-01-12 - possible coordination or operational spike.",
+      "id": "ANOM-009"
+    },
+    {
+      "entity": "Suresh Nair",
+      "date": "2026-01-12",
+      "event_count": 5,
+      "pattern": "burst_activity",
+      "note": "Suresh Nair involved in 5 linked events on 2026-01-12 - possible coordination or operational spike.",
+      "id": "ANOM-010"
+    },
+    {
+      "entity": "Ajay Kulkarni",
+      "date": "2026-01-12",
+      "event_count": 5,
+      "pattern": "burst_activity",
+      "note": "Ajay Kulkarni involved in 5 linked events on 2026-01-12 - possible coordination or operational spike.",
+      "id": "ANOM-011"
     },
     {
       "entity": "Ravi Malhotra",
       "date": "2026-01-12",
       "event_count": 5,
       "pattern": "burst_activity",
-      "note": "Ravi Malhotra involved in 5 linked events on 2026-01-12 - possible coordination or operational spike."
+      "note": "Ravi Malhotra involved in 5 linked events on 2026-01-12 - possible coordination or operational spike.",
+      "id": "ANOM-012"
     },
     {
       "record_id": "CR-1004",
       "date": "2026-01-10",
       "pattern": "structuring",
-      "note": "Language indicates transactions may have been split to evade reporting thresholds - flag for financial review."
+      "note": "Language indicates transactions may have been split to evade reporting thresholds - flag for financial review.",
+      "id": "ANOM-013"
     },
     {
       "entity": "Global Traders Pvt Ltd",
       "record_id": "CR-1002",
       "date": "2026-01-08",
       "pattern": "new_entity_spike",
-      "note": "'Global Traders Pvt Ltd' first appears already linked to 3 known entities (Suresh Nair, Andheri, MH12AB1234)."
+      "note": "'Global Traders Pvt Ltd' first appears already linked to 3 known entities (Suresh Nair, MH12AB1234, Andheri).",
+      "id": "ANOM-014"
     },
     {
       "entity": "9123456789",
       "record_id": "CR-1003",
       "date": "2026-01-09",
       "pattern": "new_entity_spike",
-      "note": "'9123456789' first appears already linked to 2 known entities (9876543210, Suresh Nair)."
+      "note": "'9123456789' first appears already linked to 2 known entities (9876543210, Suresh Nair).",
+      "id": "ANOM-015"
     },
     {
       "entity": "INR 950000",
       "record_id": "CR-1004",
       "date": "2026-01-10",
       "pattern": "new_entity_spike",
-      "note": "'INR 950000' first appears already linked to 2 known entities (Suresh Nair, Andheri)."
+      "note": "'INR 950000' first appears already linked to 2 known entities (Suresh Nair, Andheri).",
+      "id": "ANOM-016"
     },
     {
       "entity": "Deepak Shah",
       "record_id": "CR-1005",
       "date": "2026-01-12",
       "pattern": "new_entity_spike",
-      "note": "'Deepak Shah' first appears already linked to 4 known entities (Global Traders Pvt Ltd, Ravi Malhotra, Suresh Nair, MH12AB1234)."
+      "note": "'Deepak Shah' first appears already linked to 4 known entities (MH12AB1234, Global Traders Pvt Ltd, Suresh Nair, Ravi Malhotra).",
+      "id": "ANOM-017"
     },
     {
       "entity": "Ajay Kulkarni",
       "record_id": "CR-1005",
       "date": "2026-01-12",
       "pattern": "new_entity_spike",
-      "note": "'Ajay Kulkarni' first appears already linked to 4 known entities (Global Traders Pvt Ltd, Ravi Malhotra, Suresh Nair, MH12AB1234)."
+      "note": "'Ajay Kulkarni' first appears already linked to 4 known entities (MH12AB1234, Global Traders Pvt Ltd, Suresh Nair, Ravi Malhotra).",
+      "id": "ANOM-018"
     },
     {
       "entity": "9988776655",
       "record_id": "CR-1006",
       "date": "2026-01-15",
       "pattern": "new_entity_spike",
-      "note": "'9988776655' first appears already linked to 2 known entities (9876543210, Deepak Shah)."
+      "note": "'9988776655' first appears already linked to 2 known entities (9876543210, Deepak Shah).",
+      "id": "ANOM-019"
     },
     {
       "entity": "MH14CD5678",
       "record_id": "CR-1007",
       "date": "2026-01-18",
       "pattern": "new_entity_spike",
-      "note": "'MH14CD5678' first appears already linked to 3 known entities (Deepak Shah, Ajay Kulkarni, Global Traders Pvt Ltd)."
+      "note": "'MH14CD5678' first appears already linked to 3 known entities (Ajay Kulkarni, Global Traders Pvt Ltd, Deepak Shah).",
+      "id": "ANOM-020"
     },
     {
       "entity": "9871234567",
       "record_id": "CR-1009",
       "date": "2026-01-22",
       "pattern": "new_entity_spike",
-      "note": "'9871234567' first appears already linked to 3 known entities (9876543210, 9988776655, 9123456789)."
+      "note": "'9871234567' first appears already linked to 3 known entities (9876543210, 9123456789, 9988776655).",
+      "id": "ANOM-021"
     },
     {
       "entity": "Vikram Rao",
       "record_id": "CR-1010",
       "date": "2026-01-25",
       "pattern": "new_entity_spike",
-      "note": "'Vikram Rao' first appears already linked to 4 known entities (9871234567, Andheri, Andheri Warehouse, Ravi Malhotra)."
+      "note": "'Vikram Rao' first appears already linked to 4 known entities (9871234567, Andheri, Andheri Warehouse, Ravi Malhotra).",
+      "id": "ANOM-022"
     },
     {
       "entity": "INR 950000",
       "type": "MONEY",
       "pattern": "statistical_outlier",
-      "note": "Centrality profile is a statistical outlier relative to the rest of the network."
+      "note": "Centrality profile is a statistical outlier relative to the rest of the network.",
+      "id": "ANOM-023"
     },
     {
       "entity": "Deepak Shah",
       "type": "PERSON",
       "pattern": "statistical_outlier",
-      "note": "Centrality profile is a statistical outlier relative to the rest of the network."
+      "note": "Centrality profile is a statistical outlier relative to the rest of the network.",
+      "id": "ANOM-024"
     },
     {
       "entity": "9871234567",
       "type": "PHONE",
       "pattern": "statistical_outlier",
-      "note": "Centrality profile is a statistical outlier relative to the rest of the network."
+      "note": "Centrality profile is a statistical outlier relative to the rest of the network.",
+      "id": "ANOM-025"
     }
   ],
   "entity_resolution": {
@@ -306,5 +331,48 @@
       "guardrail_3_baseline_topology_intact": true,
       "guardrail_4_analytical_scores_not_probabilities": true
     }
+  },
+  "evidence_provenance": {
+    "total_evidence_items": 179,
+    "indexed_entities": 15,
+    "indexed_records": 10,
+    "indexed_relationships": 52,
+    "indexed_anomalies": 25,
+    "counts_by_classification": {
+      "SOURCE_RECORD": 10,
+      "ENTITY_OBSERVATION": 43,
+      "RELATIONSHIP": 52,
+      "NETWORK_METRIC": 15,
+      "ANOMALY_SIGNAL": 25,
+      "ENTITY_RESOLUTION": 22,
+      "LOCATION_OBSERVATION": 2,
+      "TEMPORAL_OBSERVATION": 10
+    },
+    "counts_by_epistemic_status": {
+      "OBSERVED": 65,
+      "DERIVED": 78,
+      "SIGNAL": 25,
+      "REVIEW_REQUIRED": 11
+    },
+    "epistemic_guardrails_enforced": true
+  },
+  "explainability": {
+    "total_explanations": 112,
+    "by_type": {
+      "NETWORK_IMPORTANCE": 15,
+      "COMMUNITY": 3,
+      "LOCATION_PATTERN": 2,
+      "ANOMALY": 25,
+      "BRIDGE_NODE": 5,
+      "REPORT_FINDING": 0,
+      "TEMPORAL_PATTERN": 10,
+      "ENTITY_RESOLUTION": 0,
+      "PATH_ANALYSIS": 0,
+      "RELATIONSHIP": 52
+    },
+    "indexed_entities": 15,
+    "indexed_anomalies": 25,
+    "indexed_relationships": 52,
+    "epistemic_disclaimer": "All explanations are compiled deterministically from existing analytical calculations and Phase 3H evidence items. Centrality does not denote guilt. Co-occurrence does not prove conspiracy. Anomaly signals are investigative leads only."
   }
 }

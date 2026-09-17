@@ -6,9 +6,10 @@ import {
   AlertTriangle, Search, X, RefreshCw, ExternalLink, Users, Phone,
   Car, MapPin, Building2, DollarSign, Circle, ChevronUp, ChevronDown,
   ChevronsUpDown, FileText, Share2, Activity, Zap, ShieldAlert,
-  ArrowRight, CheckCircle2, Info, Eye, Briefcase
+  ArrowRight, CheckCircle2, Info, Eye, Briefcase, Shield, Lightbulb
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { EvidenceDrawer, EpistemicBadge } from "../components/EvidenceDrawer";
 
 // ─── Entity configuration ───────────────────────────────────────────────────
 interface EntityCfg { color: string; border: string; bg: string; label: string; icon: LucideIcon; }
@@ -99,6 +100,7 @@ export const Anomalies: React.FC = () => {
   const [detail, setDetail] = useState<AnomalyDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState<string | null>(null);
+  const [drawerEvidenceId, setDrawerEvidenceId] = useState<string | null>(null);
 
   useEffect(() => {
     if (paramId) {
@@ -572,12 +574,15 @@ export const Anomalies: React.FC = () => {
               onClose={() => setSelectedId(null)}
               onNavigateEntity={(id) => navigate(`/entities?id=${encodeURIComponent(id)}`)}
               onNavigateNetwork={(id) => navigate(`/network?focus=${encodeURIComponent(id)}`)}
+              onInspectEvidence={(eid) => setDrawerEvidenceId(eid)}
             />
           ) : null
         ) : (
           <AnomalyHintPanel totalSignals={anomalies.length} patternCounts={patternCounts} />
         )}
       </div>
+
+      <EvidenceDrawer evidenceId={drawerEvidenceId} onClose={() => setDrawerEvidenceId(null)} />
     </div>
   );
 };
@@ -656,12 +661,14 @@ interface AnomalyDetailViewProps {
   onClose: () => void;
   onNavigateEntity: (id: string) => void;
   onNavigateNetwork: (id: string) => void;
+  onInspectEvidence: (evidenceId: string) => void;
 }
 const AnomalyDetailView: React.FC<AnomalyDetailViewProps> = ({
   detail,
   onClose,
   onNavigateEntity,
   onNavigateNetwork,
+  onInspectEvidence,
 }) => {
   const navigate = useNavigate();
   const pcfg = getPatternCfg(detail.pattern);
@@ -669,6 +676,8 @@ const AnomalyDetailView: React.FC<AnomalyDetailViewProps> = ({
   const ecfg = getEntityCfg(detail.entity_type);
   const EIcon = ecfg.icon;
   const entDetails = detail.entity_details;
+
+  const eid = detail.evidence_id || `EVID-ANOM-${detail.id}`;
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -718,6 +727,44 @@ const AnomalyDetailView: React.FC<AnomalyDetailViewProps> = ({
               <span>Trigger record: <strong className="text-cyan-700 font-mono">{detail.record_id}</strong></span>
             )}
           </div>
+        </div>
+
+        {/* Phase 3H Evidence & Provenance Section */}
+        <div className="p-3.5 rounded-xl border border-cyan-200 bg-cyan-50/40 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-cyan-900 flex items-center gap-1.5">
+              <Shield className="w-3.5 h-3.5 text-cyan-600" />
+              Evidence &amp; Provenance Trace
+            </span>
+            <EpistemicBadge status="SIGNAL" />
+          </div>
+          <p className="text-xs text-slate-700 leading-relaxed">
+            Linked to deterministic anomaly detectors and verbatim source records. Flags represent investigative leads and do not constitute legal proof.
+          </p>
+          <div className="p-2.5 rounded bg-white border border-cyan-100 space-y-1 text-xs">
+            <div className="flex items-center justify-between text-[11px] text-slate-500">
+              <span className="font-semibold text-slate-700">Analytical Detector:</span>
+              <span className="font-mono text-cyan-800 font-bold">{detail.pattern}</span>
+            </div>
+            <p className="text-[11px] text-slate-600 font-mono">
+              {detail.pattern === "burst_activity" ? "Temporal event clustering (min_events=5, window_hours=2)"
+                : detail.pattern === "structuring" ? "Text heuristic (threshold=INR 200,000 / split deposits)"
+                : detail.pattern === "new_entity_spike" ? "Topological graph integration (first appearance with >=2 known entities)"
+                : "Scikit-Learn IsolationForest (contamination=0.15, random_state=42)"}
+            </p>
+          </div>
+          <button
+            onClick={() => onInspectEvidence(eid)}
+            className="w-full py-2 text-xs font-semibold text-white bg-cyan-700 hover:bg-cyan-800 rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+          >
+            <Eye className="w-3.5 h-3.5" /> Inspect Evidence Trace &amp; Raw Records
+          </button>
+          <button
+            onClick={() => navigate(`/explainability?q=${encodeURIComponent(detail.id)}`)}
+            className="w-full py-2 text-xs font-semibold text-cyan-900 bg-cyan-100 hover:bg-cyan-200 border border-cyan-300 rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+          >
+            <Lightbulb className="w-3.5 h-3.5 text-cyan-700" /> Explain Anomaly Derivation (6 Stages)
+          </button>
         </div>
 
         {/* Affected Entity Section */}

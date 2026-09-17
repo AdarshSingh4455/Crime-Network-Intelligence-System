@@ -15,6 +15,8 @@ import { Cases } from './pages/Cases';
 import { Settings } from './pages/Settings';
 import { Investigation } from './pages/Investigation';
 import { DataQuality } from './pages/DataQuality';
+import { Explainability } from './pages/Explainability';
+import { TemporalIntelligence } from './pages/TemporalIntelligence';
 import { api } from './api/client';
 import { OverviewMetrics } from './types';
 
@@ -82,6 +84,8 @@ export const App: React.FC = () => {
               <Route path="/sources" element={<Sources />} />
               <Route path="/cases" element={<Cases />} />
               <Route path="/investigation" element={<Investigation />} />
+              <Route path="/explainability" element={<Explainability />} />
+              <Route path="/temporal" element={<TemporalIntelligence />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/data-quality" element={<DataQuality />} />
               <Route path="*" element={<Navigate to="/" replace />} />

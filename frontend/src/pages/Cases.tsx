@@ -13,7 +13,9 @@ import {
   FollowUpStatus,
   ActivityEvent,
   RelatedCaseItem,
+  EvidenceItem,
 } from "../types";
+import { EvidenceDrawer, EpistemicBadge, ClassificationBadge } from "../components/EvidenceDrawer";
 import {
   Briefcase,
   Search,
@@ -191,8 +193,12 @@ export const Cases: React.FC = () => {
 
   // Detail workspace active tab
   const [detailTab, setDetailTab] = useState<
-    "records" | "related_cases" | "checklist" | "followups" | "activity" | "entities" | "anomalies" | "timeline" | "locations" | "network" | "references" | "notes"
+    "records" | "related_cases" | "checklist" | "followups" | "activity" | "entities" | "anomalies" | "timeline" | "locations" | "network" | "references" | "notes" | "evidence"
   >("records");
+
+  const [caseEvidence, setCaseEvidence] = useState<EvidenceItem[]>([]);
+  const [loadingEvidence, setLoadingEvidence] = useState(false);
+  const [drawerEvidenceId, setDrawerEvidenceId] = useState<string | null>(null);
 
   // Follow-up creation form state
   const [showAddFollowup, setShowAddFollowup] = useState(false);
@@ -236,6 +242,7 @@ export const Cases: React.FC = () => {
   useEffect(() => {
     if (!activeCaseId) {
       setSelectedCaseDetail(null);
+      setCaseEvidence([]);
       return;
     }
     const fetchDetail = async () => {
@@ -249,7 +256,19 @@ export const Cases: React.FC = () => {
         setLoadingDetail(false);
       }
     };
+    const fetchEvidence = async () => {
+      setLoadingEvidence(true);
+      try {
+        const ev = await api.getEvidenceOverview({ record_id: activeCaseId });
+        setCaseEvidence(ev.items || []);
+      } catch (err) {
+        console.error("Failed to load case evidence:", err);
+      } finally {
+        setLoadingEvidence(false);
+      }
+    };
     fetchDetail();
+    fetchEvidence();
   }, [activeCaseId]);
 
   // Open a case workspace
@@ -896,6 +915,17 @@ export const Cases: React.FC = () => {
                 }`}
               >
                 Investigator Notes
+              </button>
+              <button
+                onClick={() => setDetailTab("evidence")}
+                className={`px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
+                  detailTab === "evidence"
+                    ? "border-cyan-600 text-cyan-900 bg-white rounded-t-md"
+                    : "border-transparent text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                <Shield className="w-3 h-3 text-emerald-600" />
+                Evidence & Provenance ({caseEvidence.length})
               </button>
             </div>
 
@@ -1976,6 +2006,89 @@ export const Cases: React.FC = () => {
                   </div>
                 </div>
               )}
+
+              {/* TAB 13: Evidence & Provenance */}
+              {detailTab === "evidence" && (
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                        <Shield className="w-4 h-4 text-emerald-600" />
+                        Evidence &amp; Provenance Corpus ({caseEvidence.length} Items)
+                      </h4>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Deterministic evidence items and provenance traces linked to this case file and its source records.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-600 flex items-start gap-2">
+                    <Info className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
+                    <span>
+                      Every evidence item is strictly grounded in verbatim source record text or explicit deterministic graph transformations. Source reporting reflects observed evidence, not proof of criminal guilt.
+                    </span>
+                  </div>
+
+                  {loadingEvidence ? (
+                    <div className="py-12 text-center text-xs text-slate-500">
+                      Loading case evidence items...
+                    </div>
+                  ) : caseEvidence.length === 0 ? (
+                    <div className="py-12 text-center text-xs text-slate-400 italic">
+                      No compiled evidence items found for this record ID.
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {caseEvidence.map((item) => (
+                        <div
+                          key={item.evidence_id}
+                          className="p-4 bg-white rounded-xl border border-slate-200 hover:border-slate-300 transition-colors shadow-2xs space-y-2.5"
+                        >
+                          <div className="flex items-center justify-between gap-2 flex-wrap">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-mono text-xs font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded">
+                                {item.evidence_id}
+                              </span>
+                              <ClassificationBadge classification={item.evidence_type} />
+                              <EpistemicBadge status={item.epistemic_status} />
+                            </div>
+                            <button
+                              onClick={() => setDrawerEvidenceId(item.evidence_id)}
+                              className="px-2.5 py-1 text-xs font-medium text-cyan-700 bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
+                            >
+                              <Shield className="w-3 h-3 text-cyan-600" />
+                              Inspect Provenance Trace
+                            </button>
+                          </div>
+
+                          <div>
+                            <p className="text-xs font-semibold text-slate-900">{item.finding}</p>
+                            <p className="text-xs text-slate-600 mt-0.5">{item.rationale}</p>
+                          </div>
+
+                          {item.raw_excerpts && item.raw_excerpts.length > 0 && (
+                            <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-[11px] text-slate-700 font-mono space-y-1">
+                              <span className="text-[10px] uppercase font-bold text-slate-400 block font-sans">
+                                Verbatim Source Excerpt ({item.raw_excerpts[0].record_id} • {item.raw_excerpts[0].date}):
+                              </span>
+                              <p className="italic">"{item.raw_excerpts[0].verbatim_text}"</p>
+                            </div>
+                          )}
+
+                          <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-100">
+                            <span className="font-mono text-[10px]">
+                              Method: {item.analytical_method}
+                            </span>
+                            <span className="text-slate-400">
+                              Entities: {item.entities.join(", ") || "None"}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -2314,6 +2427,12 @@ export const Cases: React.FC = () => {
           )}
         </div>
       )}
+
+      {/* Evidence & Provenance Trace Drawer */}
+      <EvidenceDrawer
+        evidenceId={drawerEvidenceId}
+        onClose={() => setDrawerEvidenceId(null)}
+      />
     </div>
   );
 };

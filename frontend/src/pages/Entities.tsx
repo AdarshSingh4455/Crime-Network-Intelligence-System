@@ -5,9 +5,11 @@ import { NetworkNode, EntityDetail, SuspiciousPattern, ConnectedEntity } from ".
 import {
   Search, X, Users, Phone, Car, MapPin, Building2, DollarSign,
   Circle, AlertTriangle, Shield, Star, ChevronUp, ChevronDown,
-  ChevronsUpDown, ExternalLink, Share2, FileText, ChevronRight, Info, Briefcase
+  ChevronsUpDown, ExternalLink, Share2, FileText, ChevronRight, Info, Briefcase,
+  Lightbulb
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { EvidenceDrawer, EpistemicBadge } from "../components/EvidenceDrawer";
 
 interface EntityCfg { color: string; border: string; bg: string; label: string; icon: LucideIcon; }
 const ENTITY_CFG: Record<string, EntityCfg> = {
@@ -363,13 +365,64 @@ const ResolutionTab: React.FC<{
   );
 };
 
+const EvidenceTab: React.FC<{
+  detail: EntityDetail;
+  onSelectEvidence: (eid: string) => void;
+}> = ({ detail, onSelectEvidence }) => {
+  const items = detail.evidence_items || [];
+  return (
+    <div className="space-y-4">
+      <div className="p-3 rounded-lg border border-cyan-200 bg-cyan-50/60 space-y-1">
+        <p className="text-[11px] font-bold text-cyan-900 flex items-center gap-1.5">
+          <Shield className="w-3.5 h-3.5 text-cyan-600" />
+          Deterministic Evidence Layer
+        </p>
+        <p className="text-xs text-cyan-800 leading-relaxed">
+          Every item below is linked to verbatim source records or explicit mathematical graph computations.
+          Co-occurrence does not denote criminal partnership; centrality does not denote guilt.
+        </p>
+      </div>
+
+      <div className="space-y-2.5">
+        {items.length === 0 ? (
+          <p className="text-xs text-slate-400 italic">No direct evidence items indexed for this entity.</p>
+        ) : (
+          items.map(it => (
+            <div key={it.evidence_id} className="p-3 rounded-lg border border-slate-200 bg-white shadow-xs space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-mono text-[10px] text-slate-400 font-bold">{it.evidence_id}</span>
+                <EpistemicBadge status={it.epistemic_status} />
+              </div>
+              <p className="text-xs font-bold text-slate-900 leading-snug">{it.finding}</p>
+              <p className="text-[11px] text-slate-600 line-clamp-2">{it.rationale}</p>
+              <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
+                <span className="text-slate-400 font-mono">
+                  {it.source_records.length} record{it.source_records.length === 1 ? "" : "s"}
+                </span>
+                <button
+                  onClick={() => onSelectEvidence(it.evidence_id)}
+                  className="text-cyan-600 hover:text-cyan-800 font-semibold inline-flex items-center gap-1"
+                >
+                  View Trace <ChevronRight className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+};
+
 const EntityDetailPanel: React.FC<{
   detail: EntityDetail; onClose: () => void;
   onNavigateToNetwork: () => void; onSelectEntity: (id: string) => void;
 }> = ({ detail, onClose, onNavigateToNetwork, onSelectEntity }) => {
+  const navigate = useNavigate();
   const cfg = getCfg(detail.type);
   const Icon = cfg.icon;
-  const [tab, setTab] = useState<"resolution" | "connections" | "anomalies" | "records">("resolution");
+  const [tab, setTab] = useState<"evidence" | "resolution" | "connections" | "anomalies" | "records">("evidence");
+  const [drawerEvidenceId, setDrawerEvidenceId] = useState<string | null>(null);
   const metrics = [
     { label: "Degree Centrality", value: fmt4(detail.degree), pct: detail.degree, desc: "Normalised share of connections" },
     { label: "Betweenness", value: fmt4(detail.betweenness), pct: detail.betweenness * 5, desc: "Control over information flow" },
@@ -378,6 +431,8 @@ const EntityDetailPanel: React.FC<{
     { label: "Influence Score", value: fmt4(detail.influence_score), pct: detail.influence_score * 3, desc: "Composite investigative ranking" },
   ];
   const isReviewReq = (detail.resolution_status || detail.resolution?.review_status) === "REVIEW_REQUIRED";
+  const evidenceCount = (detail.evidence_items || []).length;
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <div className="p-4 border-b border-slate-100 flex items-start justify-between flex-shrink-0">
@@ -441,18 +496,23 @@ const EntityDetailPanel: React.FC<{
             ))}
           </div>
         </div>
-        <div className="px-4 py-3 border-b border-slate-100">
+        <div className="px-4 py-3 border-b border-slate-100 flex flex-col gap-2">
           <button onClick={onNavigateToNetwork}
-            className="w-full py-2 text-sm font-medium border border-slate-200 text-slate-700 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors flex items-center justify-center gap-2">
+            className="w-full py-2 text-sm font-medium border border-slate-200 text-slate-700 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors flex items-center justify-center gap-2 cursor-pointer">
             <ExternalLink className="w-3.5 h-3.5" />View in Network Graph
+          </button>
+          <button onClick={() => navigate(`/explainability?q=${encodeURIComponent(detail.id)}`)}
+            className="w-full py-2 text-sm font-medium border border-cyan-200 text-cyan-800 bg-cyan-50/70 hover:bg-cyan-100 rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer">
+            <Lightbulb className="w-3.5 h-3.5 text-cyan-700" />Explain Intelligence Derivations
           </button>
         </div>
         <div className="flex border-b border-slate-100">
-          {(["resolution", "connections", "anomalies", "records"] as const).map(t => (
+          {(["evidence", "resolution", "connections", "anomalies", "records"] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={"flex-1 py-2 text-xs font-semibold transition-colors " +
                 (tab === t ? "border-b-2 border-cyan-500 text-cyan-700 bg-cyan-50/50" : "text-slate-500 hover:text-slate-700")}>
-              {t === "resolution" ? "Resolution"
+              {t === "evidence" ? `Evidence (${evidenceCount})`
+               : t === "resolution" ? "Resolution"
                : t === "connections" ? `Links (${detail.connected_entities.length})`
                : t === "anomalies" ? `Anom (${detail.detected_anomalies.length})`
                : `Recs (${detail.associated_records.length})`}
@@ -460,12 +520,15 @@ const EntityDetailPanel: React.FC<{
           ))}
         </div>
         <div className="p-4">
+          {tab === "evidence" && <EvidenceTab detail={detail} onSelectEvidence={id => setDrawerEvidenceId(id)} />}
           {tab === "resolution" && <ResolutionTab detail={detail} onSelectEntity={onSelectEntity} />}
           {tab === "connections" && <ConnectionsTab entities={detail.connected_entities} onSelect={onSelectEntity} />}
           {tab === "anomalies" && <AnomaliesTab anomalies={detail.detected_anomalies} />}
           {tab === "records" && <RecordsTab records={detail.associated_records} />}
         </div>
       </div>
+
+      <EvidenceDrawer evidenceId={drawerEvidenceId} onClose={() => setDrawerEvidenceId(null)} />
     </div>
   );
 };
