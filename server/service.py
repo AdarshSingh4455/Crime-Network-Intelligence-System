@@ -59,6 +59,7 @@ from explainability_engine import (
     IntelligenceExplanation, ExplanationStep,
 )
 from temporal_engine import TemporalEngine
+from graph_intelligence_engine import GraphIntelligenceEngine
 
 DATA_PATH = os.path.join(BASE_DIR, "data", "sample_records.json")
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
@@ -402,6 +403,7 @@ class IntelligenceService:
     _cached_evidence_engine: Any | None = None
     _cached_explainability_engine: Any | None = None
     _cached_temporal_engine: Any | None = None
+    _cached_graph_intelligence_engine: Any | None = None
     _last_ingestion_time: str = datetime.now(timezone.utc).isoformat()
 
     @classmethod
@@ -506,6 +508,19 @@ class IntelligenceService:
             explainability_engine=explainability_engine,
         )
         cls._cached_temporal_engine = temporal_engine
+
+        # 5e. Advanced Graph Intelligence Engine (Phase 3K)
+        graph_intelligence_engine = GraphIntelligenceEngine()
+        graph_intelligence_engine.compile(
+            G=G,
+            centrality=centrality,
+            key_players=key_players,
+            communities=communities,
+            bridges=bridges,
+            evidence_engine=evidence_engine,
+            explainability_engine=explainability_engine,
+        )
+        cls._cached_graph_intelligence_engine = graph_intelligence_engine
 
         # Build community lookup per node
         community_map = {}
@@ -1101,6 +1116,82 @@ class IntelligenceService:
         if not te:
             return None
         return te.get_observation(observation_id)
+
+    # ── Phase 3K: Advanced Graph Intelligence Services ───────────────────────
+
+    @classmethod
+    def get_graph_intelligence_engine(cls):
+        """Returns the cached GraphIntelligenceEngine instance, compiling data if needed."""
+        cls.get_data()
+        return getattr(cls, "_cached_graph_intelligence_engine", None)
+
+    @classmethod
+    def get_graph_intelligence_overview(cls) -> Dict[str, Any]:
+        """Returns graph-wide topological metrics and summary statistics."""
+        gie = cls.get_graph_intelligence_engine()
+        if not gie:
+            return {}
+        return gie.get_overview()
+
+    @classmethod
+    def get_graph_neighborhood(cls, entity_id: str) -> Optional[Dict[str, Any]]:
+        """Average-case O(1) ego-network neighborhood retrieval (1-hop and 2-hop)."""
+        gie = cls.get_graph_intelligence_engine()
+        if not gie:
+            return None
+        return gie.get_neighborhood(entity_id)
+
+    @classmethod
+    def get_graph_path(cls, source: str, target: str) -> Dict[str, Any]:
+        """Deterministic shortest-path trace with hop evidence links."""
+        gie = cls.get_graph_intelligence_engine()
+        if not gie:
+            return {"source": source, "target": target, "path_exists": False, "hops": []}
+        return gie.get_path(source, target)
+
+    @classmethod
+    def get_bridge_analysis(cls) -> Dict[str, Any]:
+        """Returns bridge nodes, articulation points, and biconnectivity breakdown."""
+        gie = cls.get_graph_intelligence_engine()
+        if not gie:
+            return {}
+        return gie.get_bridges()
+
+    @classmethod
+    def get_community_analysis(cls, community_id: Optional[int] = None) -> Dict[str, Any]:
+        """Returns community structures, internal densities, and boundary cross-links."""
+        gie = cls.get_graph_intelligence_engine()
+        if not gie:
+            return {}
+        res = gie.get_communities()
+        if community_id is not None:
+            filtered_comms = [c for c in res.get("communities", []) if c.get("community_id") == community_id]
+            res["communities"] = filtered_comms
+        return res
+
+    @classmethod
+    def get_centrality_comparison(cls) -> Dict[str, Any]:
+        """Returns unified centrality comparison matrix across all 15 nodes."""
+        gie = cls.get_graph_intelligence_engine()
+        if not gie:
+            return {}
+        return gie.get_centrality_matrix()
+
+    @classmethod
+    def get_graph_motifs(cls) -> Dict[str, Any]:
+        """Returns topological motifs (triangles, star-hubs, community bridges)."""
+        gie = cls.get_graph_intelligence_engine()
+        if not gie:
+            return {}
+        return gie.get_motifs()
+
+    @classmethod
+    def compare_entities(cls, entity_a: str, entity_b: str) -> Optional[Dict[str, Any]]:
+        """Factual side-by-side metric comparison of two entities."""
+        gie = cls.get_graph_intelligence_engine()
+        if not gie:
+            return None
+        return gie.compare_entities(entity_a, entity_b)
 
     @classmethod
     def get_anomalies(cls) -> List[Dict[str, Any]]:

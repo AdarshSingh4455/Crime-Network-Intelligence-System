@@ -42,6 +42,14 @@ import {
   TemporalCaseResponse,
   TemporalRelationshipEvolution,
   TemporalObservation,
+  GraphOverview,
+  GraphNeighborhood,
+  GraphPath,
+  BridgeAnalysis,
+  CommunityAnalysis,
+  GraphCentralityComparison,
+  MotifAnalysis,
+  GraphComparison,
 } from '../types';
 
 const API_BASE = '/api';
@@ -331,6 +339,60 @@ export const api = {
   getTemporalObservation: async (temporalId: string): Promise<TemporalObservation> => {
     const res = await apiClient.get<TemporalObservation>(
       `/temporal/${encodeURIComponent(temporalId)}`
+    );
+    return res.data;
+  },
+
+  // --------------------------------------------------------------------------
+  // Phase 3K: Advanced Graph Intelligence Methods
+  // --------------------------------------------------------------------------
+
+  getGraphOverview: async (): Promise<GraphOverview> => {
+    const res = await apiClient.get<GraphOverview>('/graph-intelligence/overview');
+    return res.data;
+  },
+
+  getGraphNeighborhood: async (entityId: string): Promise<GraphNeighborhood> => {
+    const res = await apiClient.get<GraphNeighborhood>(
+      `/graph-intelligence/neighborhood/${encodeURIComponent(entityId)}`
+    );
+    return res.data;
+  },
+
+  getGraphPath: async (source: string, target: string): Promise<GraphPath> => {
+    const res = await apiClient.get<GraphPath>(
+      `/graph-intelligence/path/${encodeURIComponent(source)}/${encodeURIComponent(target)}`
+    );
+    return res.data;
+  },
+
+  getBridgeAnalysis: async (): Promise<BridgeAnalysis> => {
+    const res = await apiClient.get<BridgeAnalysis>('/graph-intelligence/bridges');
+    return res.data;
+  },
+
+  getCommunityAnalysis: async (communityId?: number): Promise<CommunityAnalysis> => {
+    const res = await apiClient.get<CommunityAnalysis>('/graph-intelligence/communities', {
+      params: communityId !== undefined ? { community_id: communityId } : {},
+    });
+    return res.data;
+  },
+
+  getCentralityComparison: async (): Promise<GraphCentralityComparison> => {
+    const res = await apiClient.get<GraphCentralityComparison>('/graph-intelligence/centrality');
+    return res.data;
+  },
+
+  getGraphMotifs: async (motifType?: string): Promise<MotifAnalysis> => {
+    const res = await apiClient.get<MotifAnalysis>('/graph-intelligence/motifs', {
+      params: motifType ? { motif_type: motifType } : {},
+    });
+    return res.data;
+  },
+
+  compareEntities: async (entityA: string, entityB: string): Promise<GraphComparison> => {
+    const res = await apiClient.get<GraphComparison>(
+      `/graph-intelligence/compare/${encodeURIComponent(entityA)}/${encodeURIComponent(entityB)}`
     );
     return res.data;
   },

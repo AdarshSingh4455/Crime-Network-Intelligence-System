@@ -25,6 +25,7 @@ from anomaly_detection import (
 )
 from evidence_engine import EvidenceEngine
 from explainability_engine import ExplainabilityEngine
+from graph_intelligence_engine import GraphIntelligenceEngine
 from visualize import export_interactive_html, plot_top_players
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -114,6 +115,21 @@ def run_pipeline():
     explainability_summary = explainability_engine.get_summary()
     print(f"[5c/6] Explainability Engine: {explainability_summary['total_explanations']} explanations compiled.")
 
+    # 5d. ADVANCED GRAPH INTELLIGENCE ENGINE (Phase 3K) --------------------
+    graph_intelligence_engine = GraphIntelligenceEngine()
+    graph_intelligence_engine.compile(
+        G=G,
+        centrality=centrality,
+        key_players=key_players,
+        communities=communities,
+        bridges=bridges,
+        evidence_engine=evidence_engine,
+        explainability_engine=explainability_engine,
+    )
+    graph_intelligence_overview = graph_intelligence_engine.get_overview()
+    print(f"[5d/6] Graph Intelligence Engine: {graph_intelligence_overview['node_count']} nodes, "
+          f"{graph_intelligence_overview['edge_count']} edges analyzed.")
+
     # 6. EXPORT INVESTIGATOR OUTPUTS ---------------------------------------
     influence_lookup = {p["entity"]: p["influence_score"] for p in key_players}
     export_interactive_html(G, influence_lookup, os.path.join(OUT_DIR, "network_graph.html"))
@@ -129,6 +145,7 @@ def run_pipeline():
         "entity_resolution": resolution_summary,
         "evidence_provenance": evidence_summary,
         "explainability": explainability_summary,
+        "graph_intelligence": graph_intelligence_overview,
     }
     with open(os.path.join(OUT_DIR, "intelligence_report.json"), "w") as f:
         json.dump(report, f, indent=2)

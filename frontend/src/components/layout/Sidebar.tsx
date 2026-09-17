@@ -18,6 +18,7 @@ import {
   FlaskConical,
   Lightbulb,
   History,
+  GitFork,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -34,6 +35,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const mainNav = [
     { name: 'Overview', path: '/', icon: LayoutDashboard },
     { name: 'Network', path: '/network', icon: Share2, badge: 'Interactive' },
+    { name: 'Advanced Graph Intelligence', path: '/graph-intelligence', icon: GitFork, badge: 'Phase 3K' },
     { name: 'Entities', path: '/entities', icon: Users, badge: entitiesCount ? String(entitiesCount) : undefined },
     { name: 'Anomalies', path: '/anomalies', icon: AlertTriangle, badge: anomalyCount ? String(anomalyCount) : undefined, alert: true },
     { name: 'Timeline', path: '/timeline', icon: Clock },

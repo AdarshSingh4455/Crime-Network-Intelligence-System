@@ -17,6 +17,7 @@ import { Investigation } from './pages/Investigation';
 import { DataQuality } from './pages/DataQuality';
 import { Explainability } from './pages/Explainability';
 import { TemporalIntelligence } from './pages/TemporalIntelligence';
+import { GraphIntelligence } from './pages/GraphIntelligence';
 import { api } from './api/client';
 import { OverviewMetrics } from './types';
 
@@ -76,6 +77,7 @@ export const App: React.FC = () => {
             <Routes>
               <Route path="/" element={<Overview />} />
               <Route path="/network" element={<Network />} />
+              <Route path="/graph-intelligence" element={<GraphIntelligence />} />
               <Route path="/entities" element={<Entities />} />
               <Route path="/anomalies" element={<Anomalies />} />
               <Route path="/timeline" element={<Timeline />} />

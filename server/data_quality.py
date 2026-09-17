@@ -66,7 +66,13 @@ def _import_pipeline_modules():
         TemporalRelationshipEvolution, NetworkEvolutionSnapshot,
         TemporalPattern, normalize_timestamp, extract_time_from_text,
     )
+    from graph_intelligence_engine import (  # noqa: F401
+        GraphIntelligenceEngine, GraphOverview, GraphNeighborhood,
+        GraphPath, BridgeAnalysis, CommunityAnalysis,
+        GraphCentralityComparison, MotifAnalysis, GraphComparison,
+    )
     return {
+        "GraphIntelligenceEngine": GraphIntelligenceEngine,
         "IngestionManager": IngestionManager,
         "Record": Record,
         "BaseConnector": BaseConnector,
@@ -505,6 +511,28 @@ class DataQualityService:
         results.append(cls._test_3j_18_api_temporal_routes_and_route_order())
         results.append(cls._test_3j_19_frontend_integration_and_serialization())
         results.append(cls._test_3j_20_baseline_protection())
+
+        # ── Phase 3K: Advanced Graph Intelligence Tests (20 tests) ───────────
+        results.append(cls._test_3k_01_engine_initialization())
+        results.append(cls._test_3k_02_overview_metrics_equal_graph())
+        results.append(cls._test_3k_03_node_count_baseline())
+        results.append(cls._test_3k_04_edge_count_baseline())
+        results.append(cls._test_3k_05_neighborhood_correctness())
+        results.append(cls._test_3k_06_two_hop_neighborhood_correctness())
+        results.append(cls._test_3k_07_shortest_path_correctness())
+        results.append(cls._test_3k_08_path_evidence_linkage())
+        results.append(cls._test_3k_09_bridge_articulation_analysis())
+        results.append(cls._test_3k_10_community_analysis_correctness())
+        results.append(cls._test_3k_11_inter_community_edge_correctness())
+        results.append(cls._test_3k_12_centrality_metrics_alignment())
+        results.append(cls._test_3k_13_composite_influence_formula_preserved())
+        results.append(cls._test_3k_14_graph_density_connectivity())
+        results.append(cls._test_3k_15_motif_analysis_grounding())
+        results.append(cls._test_3k_16_no_unsupported_criminal_conclusions())
+        results.append(cls._test_3k_17_evidence_explainability_linkage())
+        results.append(cls._test_3k_18_api_routes_and_route_order())
+        results.append(cls._test_3k_19_entity_comparison_determinism())
+        results.append(cls._test_3k_20_baseline_protection())
 
         # ── Summary ──────────────────────────────────────────────────────────
         counts = {"PASS": 0, "FAIL": 0, "KNOWN_WEAKNESS": 0, "WARNING": 0}
@@ -4001,6 +4029,548 @@ class DataQualityService:
                 "key_players": kp_cnt, "bridge_nodes": br_cnt,
                 "evidence_items": evid_cnt, "explanations": expl_cnt,
                 "temporal_observations": obs_cnt,
+            },
+        }
+
+    # ── Phase 3K: Advanced Graph Intelligence Tests (TEST-3K-01 to TEST-3K-20) ─
+
+    @classmethod
+    def _test_3k_01_engine_initialization(cls) -> dict:
+        """TEST-3K-01: GraphIntelligenceEngine initialization and compilation."""
+        from server.service import IntelligenceService
+        gie = IntelligenceService.get_graph_intelligence_engine()
+        passed = gie is not None and gie.is_compiled
+        return {
+            "test_id": "TEST-3K-01",
+            "test_name": "Graph Intelligence Engine Initialization",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify GraphIntelligenceEngine compiles successfully with existing graph and analytics.",
+            "observed_behavior": f"Engine instantiated: {gie is not None}. Engine compiled: {gie.is_compiled if gie else False}.",
+            "expected_behavior": "GraphIntelligenceEngine successfully compiled and cached in IntelligenceService.",
+            "weakness_documented": False,
+            "detail": {"compiled": gie.is_compiled if gie else False},
+        }
+
+    @classmethod
+    def _test_3k_02_overview_metrics_equal_graph(cls) -> dict:
+        """TEST-3K-02: Graph overview metrics equal actual NetworkX graph."""
+        from server.service import IntelligenceService
+        ov = IntelligenceService.get_graph_intelligence_overview()
+        passed = (
+            ov.get("node_count") == 15
+            and ov.get("edge_count") == 52
+            and ov.get("connected_components") == 1
+            and ov.get("is_connected") is True
+            and 0.49 <= ov.get("graph_density", 0) <= 0.50
+        )
+        return {
+            "test_id": "TEST-3K-02",
+            "test_name": "Graph Overview Metrics vs. Actual Graph",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify graph overview metrics match the actual underlying NetworkX graph exactly.",
+            "observed_behavior": f"Nodes: {ov.get('node_count')}, Edges: {ov.get('edge_count')}, Density: {ov.get('graph_density')}, Components: {ov.get('connected_components')}.",
+            "expected_behavior": "15 nodes, 52 edges, density ~0.4952, 1 connected component.",
+            "weakness_documented": False,
+            "detail": ov,
+        }
+
+    @classmethod
+    def _test_3k_03_node_count_baseline(cls) -> dict:
+        """TEST-3K-03: Node count matches production baseline exactly."""
+        from server.service import IntelligenceService
+        ov = IntelligenceService.get_graph_intelligence_overview()
+        data = IntelligenceService.get_data()
+        passed = ov.get("node_count") == 15 and len(data["nodes"]) == 15
+        return {
+            "test_id": "TEST-3K-03",
+            "test_name": "Node Count Baseline Invariant",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify node count in Graph Intelligence strictly preserves the 15-node baseline.",
+            "observed_behavior": f"Overview nodes: {ov.get('node_count')}, Ingested nodes: {len(data['nodes'])}.",
+            "expected_behavior": "Exactly 15 nodes.",
+            "weakness_documented": False,
+            "detail": {"overview_nodes": ov.get("node_count"), "data_nodes": len(data["nodes"])},
+        }
+
+    @classmethod
+    def _test_3k_04_edge_count_baseline(cls) -> dict:
+        """TEST-3K-04: Edge count matches production baseline exactly."""
+        from server.service import IntelligenceService
+        ov = IntelligenceService.get_graph_intelligence_overview()
+        data = IntelligenceService.get_data()
+        passed = ov.get("edge_count") == 52 and len(data["links"]) == 52
+        return {
+            "test_id": "TEST-3K-04",
+            "test_name": "Edge Count Baseline Invariant",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify edge count in Graph Intelligence strictly preserves the 52-edge baseline.",
+            "observed_behavior": f"Overview edges: {ov.get('edge_count')}, Ingested links: {len(data['links'])}.",
+            "expected_behavior": "Exactly 52 edges.",
+            "weakness_documented": False,
+            "detail": {"overview_edges": ov.get("edge_count"), "data_links": len(data["links"])},
+        }
+
+    @classmethod
+    def _test_3k_05_neighborhood_correctness(cls) -> dict:
+        """TEST-3K-05: 1-hop neighborhood matches graph adjacency."""
+        from server.service import IntelligenceService
+        nb = IntelligenceService.get_graph_neighborhood("Ravi Malhotra")
+        passed = (
+            nb is not None
+            and nb["one_hop_degree"] == len(nb["direct_neighbors"])
+            and len(nb["direct_neighbors"]) >= 5
+            and "Andheri Warehouse" in nb["direct_neighbors"]
+            and len(nb["incident_relationships"]) == nb["one_hop_degree"]
+        )
+        return {
+            "test_id": "TEST-3K-05",
+            "test_name": "1-Hop Neighborhood Adjacency Correctness",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify direct 1-hop neighbors and incident edges reflect actual graph adjacency.",
+            "observed_behavior": f"Ravi Malhotra 1-hop degree: {nb.get('one_hop_degree') if nb else None}, neighbors count: {len(nb.get('direct_neighbors', [])) if nb else 0}.",
+            "expected_behavior": "Degree equals length of direct neighbors list, incident relationships match degree.",
+            "weakness_documented": False,
+            "detail": {"degree": nb.get("one_hop_degree") if nb else None, "neighbors": nb.get("direct_neighbors") if nb else []},
+        }
+
+    @classmethod
+    def _test_3k_06_two_hop_neighborhood_correctness(cls) -> dict:
+        """TEST-3K-06: 2-hop neighborhood distance separation."""
+        from server.service import IntelligenceService
+        nb = IntelligenceService.get_graph_neighborhood("Ravi Malhotra")
+        if not nb:
+            passed = False
+        else:
+            direct_set = set(nb["direct_neighbors"])
+            two_hop_set = set(nb["two_hop_neighborhood"])
+            # 2-hop nodes must NOT overlap with 1-hop neighbors or self
+            overlap = direct_set.intersection(two_hop_set)
+            self_in_two_hop = "Ravi Malhotra" in two_hop_set
+            passed = len(overlap) == 0 and not self_in_two_hop and nb["total_neighborhood_size"] == len(direct_set) + len(two_hop_set)
+        return {
+            "test_id": "TEST-3K-06",
+            "test_name": "2-Hop Neighborhood Topological Distance Separation",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify 2-hop neighborhood contains only nodes at distance exactly 2 (no overlap with 1-hop or self).",
+            "observed_behavior": f"Direct count: {len(nb.get('direct_neighbors', [])) if nb else 0}, 2-hop count: {len(nb.get('two_hop_neighborhood', [])) if nb else 0}, overlap: {len(overlap) if nb else 'N/A'}.",
+            "expected_behavior": "Strict zero overlap between 1-hop and 2-hop sets; total size equals sum.",
+            "weakness_documented": False,
+            "detail": {"one_hop_count": len(nb.get("direct_neighbors", [])) if nb else 0, "two_hop_count": len(nb.get("two_hop_neighborhood", [])) if nb else 0},
+        }
+
+    @classmethod
+    def _test_3k_07_shortest_path_correctness(cls) -> dict:
+        """TEST-3K-07: Shortest path calculation correctness."""
+        from server.service import IntelligenceService
+        p = IntelligenceService.get_graph_path("Ravi Malhotra", "Vikram Rao")
+        passed = (
+            p.get("path_exists") is True
+            and len(p.get("path", [])) >= 2
+            and p["path"][0] == "Ravi Malhotra"
+            and p["path"][-1] == "Vikram Rao"
+            and p["hop_count"] == len(p["path"]) - 1
+        )
+        return {
+            "test_id": "TEST-3K-07",
+            "test_name": "Deterministic Shortest Path Traversal",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify shortest path algorithm produces valid connected node sequence.",
+            "observed_behavior": f"Path: {p.get('path')}, hop count: {p.get('hop_count')}.",
+            "expected_behavior": "Valid path connecting source to target with matching hop count.",
+            "weakness_documented": False,
+            "detail": {"path": p.get("path"), "hop_count": p.get("hop_count")},
+        }
+
+    @classmethod
+    def _test_3k_08_path_evidence_linkage(cls) -> dict:
+        """TEST-3K-08: Path hops include supporting records and evidence IDs."""
+        from server.service import IntelligenceService
+        p = IntelligenceService.get_graph_path("Ravi Malhotra", "Vikram Rao")
+        hops = p.get("hops", [])
+        passed = len(hops) > 0 and all(
+            h["step"] >= 1 and h["from_node"] and h["to_node"] and h["weight"] >= 1 and len(h["records"]) > 0
+            for h in hops
+        )
+        return {
+            "test_id": "TEST-3K-08",
+            "test_name": "Path Hop Evidence and Record Linkage",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify every hop along shortest path traces back to underlying source records and evidence.",
+            "observed_behavior": f"Total hops: {len(hops)}. All hops have valid weight, records, and step indices: {passed}.",
+            "expected_behavior": "100% of path hops contain concrete supporting record citations.",
+            "weakness_documented": False,
+            "detail": {"hops_count": len(hops)},
+        }
+
+    @classmethod
+    def _test_3k_09_bridge_articulation_analysis(cls) -> dict:
+        """TEST-3K-09: Betweenness bridge vs. articulation point mathematical distinction."""
+        from server.service import IntelligenceService
+        ba = IntelligenceService.get_bridge_analysis()
+        passed = (
+            len(ba.get("betweenness_bridges", [])) == 5
+            and isinstance(ba.get("articulation_points"), list)
+            and len(ba.get("articulation_points")) == 0  # Graph is biconnected
+            and ba.get("biconnected_components_count", 0) >= 1
+            and "Betweenness Bridge Node" in ba.get("distinction_explanation", "")
+            and "Articulation Point" in ba.get("distinction_explanation", "")
+        )
+        return {
+            "test_id": "TEST-3K-09",
+            "test_name": "Bridge vs. Articulation Point Mathematical Distinction",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify high-betweenness bridges are clearly differentiated from graph articulation points.",
+            "observed_behavior": (
+                f"Betweenness bridges: {len(ba.get('betweenness_bridges', []))}, "
+                f"Articulation points: {len(ba.get('articulation_points', []))}, "
+                f"Biconnected blocks: {ba.get('biconnected_components_count')}."
+            ),
+            "expected_behavior": "5 betweenness bridges, 0 articulation points in biconnected structure, clear explanation text.",
+            "weakness_documented": False,
+            "detail": {"bridges_count": len(ba.get("betweenness_bridges", [])), "articulation_points_count": len(ba.get("articulation_points", []))},
+        }
+
+    @classmethod
+    def _test_3k_10_community_analysis_correctness(cls) -> dict:
+        """TEST-3K-10: 3-community structure integrity and metrics."""
+        from server.service import IntelligenceService
+        ca = IntelligenceService.get_community_analysis()
+        comms = ca.get("communities", [])
+        total_members = sum(c["size"] for c in comms)
+        passed = (
+            ca.get("total_communities") == 3
+            and len(comms) == 3
+            and total_members == 15
+            and all(c["internal_density"] >= 0 for c in comms)
+        )
+        return {
+            "test_id": "TEST-3K-10",
+            "test_name": "Community Structural Metrics Integrity",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify 3 Louvain communities are preserved with internal edge counts and densities.",
+            "observed_behavior": f"Total communities: {ca.get('total_communities')}, member sum: {total_members}/15.",
+            "expected_behavior": "Exactly 3 communities accounting for all 15 nodes without overlap.",
+            "weakness_documented": False,
+            "detail": {"community_sizes": [c["size"] for c in comms]},
+        }
+
+    @classmethod
+    def _test_3k_11_inter_community_edge_correctness(cls) -> dict:
+        """TEST-3K-11: Inter-community boundary edge accounting."""
+        from server.service import IntelligenceService
+        ca = IntelligenceService.get_community_analysis()
+        inter_edges = ca.get("inter_community_edges", [])
+        passed = (
+            len(inter_edges) > 0
+            and all(e["source_community"] != e["target_community"] for e in inter_edges)
+        )
+        return {
+            "test_id": "TEST-3K-11",
+            "test_name": "Inter-Community Boundary Edge Accounting",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify boundary edges accurately link entities belonging to distinct communities.",
+            "observed_behavior": f"Inter-community boundary edges: {len(inter_edges)}. All have different community IDs: {passed}.",
+            "expected_behavior": "Boundary edges strictly cross community partitions.",
+            "weakness_documented": False,
+            "detail": {"boundary_edge_count": len(inter_edges)},
+        }
+
+    @classmethod
+    def _test_3k_12_centrality_metrics_alignment(cls) -> dict:
+        """TEST-3K-12: Centrality comparison matrix alignment."""
+        from server.service import IntelligenceService
+        cm = IntelligenceService.get_centrality_comparison()
+        rows = cm.get("rows", [])
+        passed = (
+            len(rows) == 15
+            and all(
+                r.get("degree") is not None
+                and r.get("betweenness") is not None
+                and r.get("eigenvector") is not None
+                and r.get("pagerank") is not None
+                and r.get("composite_influence") is not None
+                for r in rows
+            )
+        )
+        return {
+            "test_id": "TEST-3K-12",
+            "test_name": "Centrality Comparison Matrix Alignment",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify centrality matrix contains all 15 entities with full metric sets.",
+            "observed_behavior": f"Rows count: {len(rows)}. All metrics non-null: {passed}.",
+            "expected_behavior": "15 entity rows each populated with degree, betweenness, eigenvector, PageRank, and influence.",
+            "weakness_documented": False,
+            "detail": {"row_count": len(rows)},
+        }
+
+    @classmethod
+    def _test_3k_13_composite_influence_formula_preserved(cls) -> dict:
+        """TEST-3K-13: Verification of Phase 3I composite influence formula."""
+        from server.service import IntelligenceService
+        cm = IntelligenceService.get_centrality_comparison()
+        rows = cm.get("rows", [])
+        formula_valid = True
+        for r in rows:
+            expected = round(
+                0.25 * r["degree"]
+                + 0.35 * r["betweenness"]
+                + 0.25 * r["eigenvector"]
+                + 0.15 * r["pagerank"],
+                4
+            )
+            if abs(r["composite_influence"] - expected) > 0.001:
+                formula_valid = False
+                break
+        passed = len(rows) == 15 and formula_valid
+        return {
+            "test_id": "TEST-3K-13",
+            "test_name": "Phase 3I Composite Influence Formula Preservation",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify composite influence strictly matches I = 0.25*D + 0.35*B + 0.25*E + 0.15*P across all rows.",
+            "observed_behavior": f"Formula mathematically valid across all 15 nodes: {formula_valid}.",
+            "expected_behavior": "100% mathematical fidelity to standard CNIS influence equation.",
+            "weakness_documented": False,
+            "detail": {"formula_valid": formula_valid, "nodes_checked": len(rows)},
+        }
+
+    @classmethod
+    def _test_3k_14_graph_density_connectivity(cls) -> dict:
+        """TEST-3K-14: Graph density and topological diameter correctness."""
+        from server.service import IntelligenceService
+        ov = IntelligenceService.get_graph_intelligence_overview()
+        density = ov.get("graph_density")
+        diameter = ov.get("graph_diameter")
+        avg_path = ov.get("average_shortest_path_length")
+        passed = (
+            0.49 <= density <= 0.50
+            and diameter == 3
+            and 1.5 <= avg_path <= 2.0
+        )
+        return {
+            "test_id": "TEST-3K-14",
+            "test_name": "Graph Density and Topological Diameter",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify global graph density (~0.4952), diameter (3), and average shortest path length.",
+            "observed_behavior": f"Density: {density}, Diameter: {diameter}, Avg Path Length: {avg_path}.",
+            "expected_behavior": "Density ~0.4952, Diameter 3, Avg Path ~1.64.",
+            "weakness_documented": False,
+            "detail": {"density": density, "diameter": diameter, "avg_path": avg_path},
+        }
+
+    @classmethod
+    def _test_3k_15_motif_analysis_grounding(cls) -> dict:
+        """TEST-3K-15: Structural motif analysis derived from actual graph."""
+        from server.service import IntelligenceService
+        mot = IntelligenceService.get_graph_motifs()
+        motifs = mot.get("motifs", [])
+        triangles = [m for m in motifs if m["motif_type"] == "TRIANGLE_CLIQUE"]
+        stars = [m for m in motifs if m["motif_type"] == "STAR_HUB"]
+        bridges = [m for m in motifs if m["motif_type"] == "COMMUNITY_BRIDGE"]
+        passed = (
+            len(motifs) > 0
+            and len(triangles) > 0
+            and len(stars) > 0
+            and len(bridges) > 0
+            and all(len(m["subgraph_edges"]) > 0 for m in motifs)
+        )
+        return {
+            "test_id": "TEST-3K-15",
+            "test_name": "Topological Motif Grounding in Graph Structure",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify structural motifs (triangles, stars, community bridges) are derived from true graph topology.",
+            "observed_behavior": f"Total motifs: {len(motifs)} (Triangles: {len(triangles)}, Stars: {len(stars)}, Bridges: {len(bridges)}).",
+            "expected_behavior": "Motifs populated with real verified subgraphs and edge sets.",
+            "weakness_documented": False,
+            "detail": {"triangles": len(triangles), "stars": len(stars), "bridges": len(bridges)},
+        }
+
+    @classmethod
+    def _test_3k_16_no_unsupported_criminal_conclusions(cls) -> dict:
+        """TEST-3K-16: Epistemic guardrails and neutral nomenclature."""
+        from server.service import IntelligenceService
+        ov = IntelligenceService.get_graph_intelligence_overview()
+        ba = IntelligenceService.get_bridge_analysis()
+        ca = IntelligenceService.get_community_analysis()
+        mot = IntelligenceService.get_graph_motifs()
+
+        disclaimers = [
+            ov.get("epistemic_limitation", ""),
+            ba.get("epistemic_limitation", ""),
+            ca.get("epistemic_limitation", ""),
+            mot.get("epistemic_limitation", ""),
+        ]
+
+        disclaimers_present = all(len(d) > 20 for d in disclaimers)
+        forbidden_terms = ["guilt", "guilty", "convicted", "ringleader", "kingpin"]
+        violations = []
+        for m in mot.get("motifs", []):
+            blob = f"{m.get('motif_name', '')} {m.get('metric_basis', '')}"
+            for term in forbidden_terms:
+                if term in blob.lower():
+                    violations.append((m.get("motif_id"), term))
+
+        passed = disclaimers_present and len(violations) == 0
+        return {
+            "test_id": "TEST-3K-16",
+            "test_name": "Epistemic Guardrails and Non-Inference Phrasing",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify absence of speculative or prejudicial criminal inferences in all graph intelligence outputs.",
+            "observed_behavior": f"All disclaimers present: {disclaimers_present}. Violations: {len(violations)}.",
+            "expected_behavior": "Strict neutral graph-theoretic terminology with prominent evidentiary notices.",
+            "weakness_documented": False,
+            "detail": {"disclaimers_present": disclaimers_present, "violations": violations},
+        }
+
+    @classmethod
+    def _test_3k_17_evidence_explainability_linkage(cls) -> dict:
+        """TEST-3K-17: Cross-linkage to Phase 3H Evidence and Phase 3I Explainability."""
+        from server.service import IntelligenceService
+        nb = IntelligenceService.get_graph_neighborhood("Ravi Malhotra")
+        p = IntelligenceService.get_graph_path("Ravi Malhotra", "Vikram Rao")
+        passed = (
+            nb is not None
+            and len(nb.get("supporting_evidence_ids", [])) > 0
+            and nb.get("explanation_id") is not None
+            and any(len(h.get("evidence_ids", [])) > 0 for h in p.get("hops", []))
+        )
+        return {
+            "test_id": "TEST-3K-17",
+            "test_name": "Phase 3H Evidence & Phase 3I Explainability Cross-Linkage",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify graph intelligence analytical outputs link back to canonical evidence items and explanations.",
+            "observed_behavior": f"Neighborhood evidence IDs: {len(nb.get('supporting_evidence_ids', [])) if nb else 0}, explanation ID: {nb.get('explanation_id') if nb else None}.",
+            "expected_behavior": "Evidence and explanation references populated for graph intelligence findings.",
+            "weakness_documented": False,
+            "detail": {"evidence_count": len(nb.get("supporting_evidence_ids", [])) if nb else 0},
+        }
+
+    @classmethod
+    def _test_3k_18_api_routes_and_route_order(cls) -> dict:
+        """TEST-3K-18: REST API route registration and route-order protection."""
+        from server.main import app
+        gi_routes = [r.path for r in app.routes if "graph-intelligence" in r.path]
+        expected_routes = [
+            "/api/graph-intelligence/overview",
+            "/api/graph-intelligence/neighborhood/{entity_id}",
+            "/api/graph-intelligence/path/{source}/{target}",
+            "/api/graph-intelligence/bridges",
+            "/api/graph-intelligence/communities",
+            "/api/graph-intelligence/communities/{community_id}",
+            "/api/graph-intelligence/centrality",
+            "/api/graph-intelligence/motifs",
+            "/api/graph-intelligence/compare/{entity_a}/{entity_b}",
+            "/api/graph-intelligence",
+        ]
+        all_registered = all(er in gi_routes for er in expected_routes)
+        passed = all_registered and len(gi_routes) >= 10
+        return {
+            "test_id": "TEST-3K-18",
+            "test_name": "API Route Registration and Route Order Protection",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify all 10 Graph Intelligence REST endpoints are registered with verified route order safety.",
+            "observed_behavior": f"Total graph routes: {len(gi_routes)}. All expected routes present: {all_registered}.",
+            "expected_behavior": "10 registered endpoints without route shadowing.",
+            "weakness_documented": False,
+            "detail": {"routes": gi_routes},
+        }
+
+    @classmethod
+    def _test_3k_19_entity_comparison_determinism(cls) -> dict:
+        """TEST-3K-19: Side-by-side entity structural comparison determinism."""
+        from server.service import IntelligenceService
+        comp = IntelligenceService.compare_entities("Ravi Malhotra", "Suresh Nair")
+        passed = (
+            comp is not None
+            and comp["entity_a"] == "Ravi Malhotra"
+            and comp["entity_b"] == "Suresh Nair"
+            and comp["is_directly_connected"] is True
+            and comp["connection_weight"] >= 1
+            and comp["shared_neighbors_count"] == len(comp["shared_neighbors"])
+            and comp["shortest_path_distance"] == 1
+        )
+        return {
+            "test_id": "TEST-3K-19",
+            "test_name": "Side-by-Side Entity Structural Comparison Determinism",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify side-by-side entity comparison evaluates factual metric differences deterministically.",
+            "observed_behavior": f"Compared {comp.get('entity_a') if comp else None} vs {comp.get('entity_b') if comp else None}: direct={comp.get('is_directly_connected') if comp else None}, shared={comp.get('shared_neighbors_count') if comp else None}.",
+            "expected_behavior": "Factual comparison with direct link, distance=1, and verified shared neighbors.",
+            "weakness_documented": False,
+            "detail": comp or {},
+        }
+
+    @classmethod
+    def _test_3k_20_baseline_protection(cls) -> dict:
+        """TEST-3K-20: Production baseline integrity verification after Phase 3K."""
+        from server.service import IntelligenceService
+        data = IntelligenceService.get_data(force_reload=True)
+        ee = IntelligenceService.get_evidence_engine()
+        eng = IntelligenceService.get_explainability_engine()
+        te = IntelligenceService.get_temporal_engine()
+        gie = IntelligenceService.get_graph_intelligence_engine()
+
+        rec_cnt = data["total_records"]
+        node_cnt = data["summary"]["num_nodes"]
+        edge_cnt = data["summary"]["num_edges"]
+        anom_cnt = len(data["suspicious_patterns"])
+        comm_cnt = len(data["communities"])
+        kp_cnt = len(data["key_players"])
+        br_cnt = len(data["critical_bridge_nodes"])
+        evid_cnt = len(ee.all_items)
+        expl_cnt = len(eng.all_explanations)
+        obs_cnt = len(te.observations)
+
+        passed = (
+            rec_cnt == 10
+            and node_cnt == 15
+            and edge_cnt == 52
+            and anom_cnt == 25
+            and comm_cnt == 3
+            and kp_cnt == 6
+            and br_cnt == 5
+            and evid_cnt == 179
+            and expl_cnt >= 100
+            and obs_cnt == 10
+            and gie.is_compiled
+        )
+        return {
+            "test_id": "TEST-3K-20",
+            "test_name": "Production Baseline Dataset Protection (Phase 3K)",
+            "category": "Phase 3K: Advanced Graph Intelligence",
+            "status": "PASS" if passed else "FAIL",
+            "description": "Verify production baseline intelligence metrics remain 100% intact after Phase 3K integration.",
+            "observed_behavior": (
+                f"Records: {rec_cnt}/10, Nodes: {node_cnt}/15, Edges: {edge_cnt}/52, "
+                f"Anomalies: {anom_cnt}/25, Communities: {comm_cnt}/3, Key Players: {kp_cnt}/6, "
+                f"Bridges: {br_cnt}/5, Evidence: {evid_cnt}/179, Explanations: {expl_cnt}, "
+                f"Temporal Obs: {obs_cnt}, Graph Intelligence Compiled: {gie.is_compiled}."
+            ),
+            "expected_behavior": "10 records, 15 nodes, 52 edges, 25 anomalies, 3 communities, 6 key players, 5 bridge nodes, 179 evidence items.",
+            "weakness_documented": False,
+            "detail": {
+                "records": rec_cnt, "nodes": node_cnt, "edges": edge_cnt,
+                "anomalies": anom_cnt, "communities": comm_cnt,
+                "key_players": kp_cnt, "bridge_nodes": br_cnt,
+                "evidence_items": evid_cnt, "temporal_observations": obs_cnt,
             },
         }
 

@@ -282,6 +282,93 @@ def get_temporal_observation(temporal_id: str):
     return obs
 
 
+# ── Phase 3K: Advanced Graph Intelligence Endpoints ──────────────────────────
+
+@app.get("/api/graph-intelligence/overview")
+def get_graph_intelligence_overview():
+    """Phase 3K: Returns comprehensive graph-wide topological metrics and summary statistics."""
+    return IntelligenceService.get_graph_intelligence_overview()
+
+
+@app.get("/api/graph-intelligence/neighborhood/{entity_id}")
+def get_graph_neighborhood(entity_id: str):
+    """Phase 3K: Returns 1-hop and 2-hop ego-network neighborhood for an entity."""
+    res = IntelligenceService.get_graph_neighborhood(entity_id)
+    if not res:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Entity '{entity_id}' not found in intelligence graph"
+        )
+    return res
+
+
+@app.get("/api/graph-intelligence/path/{source}/{target}")
+def get_graph_intelligence_path(source: str, target: str):
+    """Phase 3K: Returns deterministic shortest path with hop-by-hop evidence traces."""
+    res = IntelligenceService.get_graph_path(source, target)
+    if not res.get("path_exists"):
+        raise HTTPException(
+            status_code=404,
+            detail=f"No graph connection path found between '{source}' and '{target}'"
+        )
+    return res
+
+
+@app.get("/api/graph-intelligence/bridges")
+def get_bridge_analysis():
+    """Phase 3K: Returns betweenness-based bridge nodes, articulation points, and biconnectivity analysis."""
+    return IntelligenceService.get_bridge_analysis()
+
+
+@app.get("/api/graph-intelligence/communities")
+def get_community_analysis(community_id: Optional[int] = None):
+    """Phase 3K: Returns community structures, internal densities, and boundary cross-links."""
+    return IntelligenceService.get_community_analysis(community_id)
+
+
+@app.get("/api/graph-intelligence/communities/{community_id}")
+def get_single_community_analysis(community_id: int):
+    """Phase 3K: Returns structural metrics and members for a single community."""
+    res = IntelligenceService.get_community_analysis(community_id)
+    comms = res.get("communities", [])
+    if not comms:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Community '{community_id}' not found"
+        )
+    return comms[0]
+
+
+@app.get("/api/graph-intelligence/centrality")
+def get_centrality_comparison():
+    """Phase 3K: Returns unified multi-metric centrality comparison matrix for all nodes."""
+    return IntelligenceService.get_centrality_comparison()
+
+
+@app.get("/api/graph-intelligence/motifs")
+def get_graph_motifs():
+    """Phase 3K: Returns detected topological motifs (triangles, star-hubs, community bridges)."""
+    return IntelligenceService.get_graph_motifs()
+
+
+@app.get("/api/graph-intelligence/compare/{entity_a}/{entity_b}")
+def compare_graph_entities(entity_a: str, entity_b: str):
+    """Phase 3K: Returns factual side-by-side metric comparison of two entities."""
+    res = IntelligenceService.compare_entities(entity_a, entity_b)
+    if not res:
+        raise HTTPException(
+            status_code=404,
+            detail=f"One or both entities ('{entity_a}', '{entity_b}') not found in intelligence graph"
+        )
+    return res
+
+
+@app.get("/api/graph-intelligence")
+def get_graph_intelligence_root():
+    """Phase 3K: Returns graph intelligence overview as root endpoint."""
+    return IntelligenceService.get_graph_intelligence_overview()
+
+
 @app.get("/api/anomalies")
 def get_anomalies():
     return IntelligenceService.get_anomalies()
