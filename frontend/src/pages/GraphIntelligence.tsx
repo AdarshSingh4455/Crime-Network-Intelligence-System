@@ -1020,7 +1020,9 @@ export const GraphIntelligence: React.FC = () => {
                     <th className="px-3 py-3 text-center">Betweenness (Val/Rank)</th>
                     <th className="px-3 py-3 text-center">Closeness (Val/Rank)</th>
                     <th className="px-3 py-3 text-center">PageRank (Val/Rank)</th>
-                    <th className="px-3 py-3 text-center">Composite (Score/Rank)</th>
+                    <th className="px-3 py-3 text-center" title="0.25 × Degree + 0.35 × Betweenness + 0.25 × Eigenvector + 0.15 × PageRank">
+                      Composite Influence (Score/Rank)
+                    </th>
                     <th className="px-3 py-3 text-center">Divergence</th>
                     <th className="px-4 py-3">Structural Note</th>
                   </tr>
@@ -1096,6 +1098,14 @@ export const GraphIntelligence: React.FC = () => {
                     })}
                 </tbody>
               </table>
+            </div>
+            <div className="px-4 py-3 bg-slate-50 border-t border-slate-200 text-[11px] text-slate-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+              <span className="font-mono">
+                Formula: Composite Influence = 0.25×Degree + 0.35×Betweenness + 0.25×Eigenvector + 0.15×PageRank
+              </span>
+              <span className="italic text-slate-400">
+                Preserves Phase 3I standard formula. Indicates structural network prominence only; does not infer culpability, risk, or illicit hierarchy.
+              </span>
             </div>
           </div>
         </div>
