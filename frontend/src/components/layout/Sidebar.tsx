@@ -12,14 +12,15 @@ import {
   Database,
   Briefcase,
   Settings,
-  ChevronRight,
   CheckCircle2,
   Compass,
   FlaskConical,
   Lightbulb,
   History,
   GitFork,
+  FileSpreadsheet,
 } from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 
 interface SidebarProps {
   anomalyCount?: number;
@@ -27,39 +28,70 @@ interface SidebarProps {
   recordsCount?: number;
 }
 
+interface NavItem {
+  name: string;
+  path: string;
+  icon: LucideIcon;
+  badge?: string;
+  alert?: boolean;
+}
+
+interface NavSection {
+  title: string;
+  items: NavItem[];
+}
+
 export const Sidebar: React.FC<SidebarProps> = ({
   anomalyCount = 25,
   entitiesCount = 15,
   recordsCount = 10,
 }) => {
-  const mainNav = [
-    { name: 'Overview', path: '/', icon: LayoutDashboard },
-    { name: 'Network', path: '/network', icon: Share2, badge: 'Interactive' },
-    { name: 'Advanced Graph Intelligence', path: '/graph-intelligence', icon: GitFork, badge: 'Phase 3K' },
-    { name: 'Entities', path: '/entities', icon: Users, badge: entitiesCount ? String(entitiesCount) : undefined },
-    { name: 'Anomalies', path: '/anomalies', icon: AlertTriangle, badge: anomalyCount ? String(anomalyCount) : undefined, alert: true },
-    { name: 'Timeline', path: '/timeline', icon: Clock },
-    { name: 'Locations', path: '/locations', icon: MapPin },
-    { name: 'Temporal Intelligence', path: '/temporal', icon: History, badge: 'Phase 3J' },
-    { name: 'Intelligence Reports', path: '/reports', icon: FileText },
-    { name: 'Explainability', path: '/explainability', icon: Lightbulb, badge: 'Phase 3I' },
-  ];
-
-  const secondaryNav = [
-    { name: 'Investigation', path: '/investigation', icon: Compass, disabled: false, badge: 'Workspace' },
-    { name: 'Cases', path: '/cases', icon: Briefcase, disabled: false, badge: '10 Cases' },
-    { name: 'Data Sources', path: '/sources', icon: Database, disabled: false, badge: '4 Active' },
-    { name: 'Data Quality', path: '/data-quality', icon: FlaskConical, disabled: false, badge: 'Phase 3F' },
-    { name: 'Settings', path: '/settings', icon: Settings, disabled: false, badge: 'Config' },
+  const sections: NavSection[] = [
+    {
+      title: 'Investigator Workspace',
+      items: [
+        { name: 'Overview', path: '/', icon: LayoutDashboard },
+        { name: 'Cases', path: '/cases', icon: Briefcase, badge: '10 Cases' },
+        { name: 'Investigation', path: '/investigation', icon: Compass, badge: 'Workspace' },
+        { name: 'FIR', path: '/fir', icon: FileSpreadsheet, badge: 'Phase 4' },
+      ],
+    },
+    {
+      title: 'Intelligence',
+      items: [
+        { name: 'Network', path: '/network', icon: Share2, badge: 'Interactive' },
+        { name: 'Entities', path: '/entities', icon: Users, badge: entitiesCount ? String(entitiesCount) : undefined },
+        { name: 'Anomalies', path: '/anomalies', icon: AlertTriangle, badge: anomalyCount ? String(anomalyCount) : undefined, alert: true },
+        { name: 'Timeline', path: '/timeline', icon: Clock },
+        { name: 'Locations', path: '/locations', icon: MapPin },
+        { name: 'AGI', path: '/graph-intelligence', icon: GitFork, badge: 'Phase 3K' },
+        { name: 'Temporal Intelligence', path: '/temporal', icon: History, badge: 'Phase 3J' },
+      ],
+    },
+    {
+      title: 'Analysis & Explanation',
+      items: [
+        { name: 'Explainability', path: '/explainability', icon: Lightbulb, badge: 'Phase 3I' },
+        { name: 'Intelligence Reports', path: '/reports', icon: FileText },
+      ],
+    },
+    {
+      title: 'Data / System',
+      items: [
+        { name: 'Data Sources', path: '/sources', icon: Database, badge: '4 Active' },
+        { name: 'Data Quality', path: '/data-quality', icon: FlaskConical, badge: 'Phase 3F' },
+        { name: 'Settings', path: '/settings', icon: Settings, badge: 'Config' },
+      ],
+    },
   ];
 
   return (
-    <aside className="w-64 bg-slate-50 border-r border-slate-200 flex flex-col h-screen select-none z-20 shrink-0">
+    <aside className="w-64 bg-slate-50/80 backdrop-blur-lg border-r border-slate-200/80 flex flex-col h-screen select-none z-20 shrink-0">
       {/* Brand Header */}
-      <div className="p-4 border-b border-slate-200 bg-white flex items-center justify-between">
+      <div className="p-4 border-b border-slate-200/80 bg-white/70 backdrop-blur-md flex items-center justify-between shadow-2xs">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-cyan-700 text-white flex items-center justify-center shadow-sm">
-            <Shield className="w-5 h-5" />
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-700 to-slate-900 text-white flex items-center justify-center shadow-xs border border-cyan-600/30">
+            <Shield className="w-5 h-5 text-cyan-100" />
           </div>
           <div>
             <h1 className="font-bold text-sm text-slate-900 tracking-wider font-mono">CNIS PLATFORM</h1>
@@ -68,105 +100,59 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      {/* Main Navigation */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
-        <div>
-          <div className="px-3 mb-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">
-            Investigator Workspace
-          </div>
-          <nav className="space-y-1">
-            {mainNav.map((item) => {
-              const Icon = item.icon;
-              return (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  end={item.path === '/'}
-                  className={({ isActive }) =>
-                    `group flex items-center justify-between px-3 py-2 rounded-md text-xs font-medium transition-all duration-150 ${
-                      isActive
-                        ? 'bg-cyan-50 text-cyan-900 font-semibold border-l-2 border-cyan-600 shadow-2xs'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
-                    }`
-                  }
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className="w-4 h-4 text-slate-500 group-hover:text-cyan-700 transition-colors" />
-                    <span>{item.name}</span>
-                  </div>
-                  {item.badge && (
-                    <span
-                      className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${
-                        item.alert
-                          ? 'bg-rose-50 text-rose-700 border-rose-200 font-semibold'
-                          : 'bg-slate-100 text-slate-600 border-slate-200'
-                      }`}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
-                </NavLink>
-              );
-            })}
-          </nav>
-        </div>
-
-        {/* System & Sources */}
-        <div>
-          <div className="px-3 mb-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">
-            System & Sources
-          </div>
-          <nav className="space-y-1">
-            {secondaryNav.map((item) => {
-              const Icon = item.icon;
-              if (!item.disabled) {
+      {/* Glassmorphic Section-Wise Navigation */}
+      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
+        {sections.map((section) => (
+          <div
+            key={section.title}
+            className="bg-white/65 backdrop-blur-md border border-slate-200/70 rounded-xl p-1.5 shadow-2xs transition-all hover:border-slate-300/80 hover:bg-white/80"
+          >
+            <div className="px-2.5 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono flex items-center justify-between">
+              <span>{section.title}</span>
+              <span className="text-[9px] text-slate-300 font-mono font-normal">{section.items.length}</span>
+            </div>
+            <nav className="space-y-0.5 mt-1">
+              {section.items.map((item) => {
+                const Icon = item.icon;
                 return (
                   <NavLink
                     key={item.path}
                     to={item.path}
+                    end={item.path === '/'}
                     className={({ isActive }) =>
-                      `group flex items-center justify-between px-3 py-2 rounded-md text-xs font-medium transition-all duration-150 ${
+                      `group flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 ${
                         isActive
-                          ? 'bg-cyan-50 text-cyan-900 font-semibold border-l-2 border-cyan-600 shadow-2xs'
-                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                          ? 'bg-cyan-500/10 text-cyan-900 font-semibold border-l-2 border-cyan-600 shadow-2xs'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
                       }`
                     }
                   >
-                    <div className="flex items-center gap-3">
-                      <Icon className="w-4 h-4 text-slate-500 group-hover:text-cyan-700 transition-colors" />
-                      <span>{item.name}</span>
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <Icon className="w-4 h-4 text-slate-500 group-hover:text-cyan-700 transition-colors shrink-0" />
+                      <span className="truncate">{item.name}</span>
                     </div>
                     {item.badge && (
-                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border bg-emerald-50 text-emerald-800 border-emerald-200 font-medium">
+                      <span
+                        className={`text-[9px] font-mono px-1.5 py-0.5 rounded border ml-1 shrink-0 ${
+                          item.alert
+                            ? 'bg-rose-50 text-rose-700 border-rose-200 font-semibold'
+                            : 'bg-white/80 text-slate-600 border-slate-200/90'
+                        }`}
+                      >
                         {item.badge}
                       </span>
                     )}
                   </NavLink>
                 );
-              }
-              return (
-                <div
-                  key={item.name}
-                  className="flex items-center justify-between px-3 py-2 rounded-md text-xs font-medium text-slate-400 cursor-not-allowed opacity-75"
-                  title="Planned Expansion Module"
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className="w-4 h-4 text-slate-400" />
-                    <span>{item.name}</span>
-                  </div>
-                  <span className="text-[9px] font-mono uppercase bg-slate-200/70 text-slate-500 px-1.5 py-0.5 rounded border border-slate-300">
-                    {item.badge || 'Phase 3'}
-                  </span>
-                </div>
-              );
-            })}
-          </nav>
-        </div>
+              })}
+            </nav>
+          </div>
+        ))}
       </div>
 
       {/* Footer System Status */}
-      <div className="p-3 border-t border-slate-200 bg-white">
-        <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 flex items-center justify-between">
+      <div className="p-3 border-t border-slate-200/80 bg-white/70 backdrop-blur-md shadow-2xs">
+        <div className="bg-white/80 backdrop-blur-xs p-2.5 rounded-lg border border-slate-200 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>

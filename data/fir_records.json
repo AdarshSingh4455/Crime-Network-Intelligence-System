@@ -1,0 +1,7 @@
+{
+  "version": "1.0",
+  "storage_type": "file_backed_json",
+  "updated_at": "2026-09-18T06:16:39.747289+00:00",
+  "epistemic_limitation": "File-backed persistence layer for operational FIR intake records. Not equivalent to an ACID distributed enterprise database; does not support multi-process concurrent write locking.",
+  "records": []
+}

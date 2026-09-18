@@ -50,6 +50,11 @@ import {
   GraphCentralityComparison,
   MotifAnalysis,
   GraphComparison,
+  FIRRecord,
+  FIRListResponse,
+  FIRSearchResponse,
+  FIRKPIsResponse,
+  FIRLegalCatalogResponse,
 } from '../types';
 
 const API_BASE = '/api';
@@ -394,6 +399,48 @@ export const api = {
     const res = await apiClient.get<GraphComparison>(
       `/graph-intelligence/compare/${encodeURIComponent(entityA)}/${encodeURIComponent(entityB)}`
     );
+    return res.data;
+  },
+
+  // ─── Phase 4: FIR Module ──────────────────────────────────────────────────
+
+  listFirs: async (params?: Record<string, any>): Promise<FIRListResponse> => {
+    const res = await apiClient.get<FIRListResponse>('/fir', { params });
+    return res.data;
+  },
+
+  getFir: async (firId: string): Promise<FIRRecord> => {
+    const res = await apiClient.get<FIRRecord>(`/fir/${encodeURIComponent(firId)}`);
+    return res.data;
+  },
+
+  createFir: async (payload: Record<string, any>): Promise<FIRRecord> => {
+    const res = await apiClient.post<FIRRecord>('/fir', payload);
+    return res.data;
+  },
+
+  updateFir: async (firId: string, payload: Record<string, any>): Promise<FIRRecord> => {
+    const res = await apiClient.put<FIRRecord>(`/fir/${encodeURIComponent(firId)}`, payload);
+    return res.data;
+  },
+
+  deleteFir: async (firId: string): Promise<{ status: string; fir_id: string }> => {
+    const res = await apiClient.delete<{ status: string; fir_id: string }>(`/fir/${encodeURIComponent(firId)}`);
+    return res.data;
+  },
+
+  searchFirs: async (params: Record<string, any>): Promise<FIRSearchResponse> => {
+    const res = await apiClient.get<FIRSearchResponse>('/fir/search/query', { params });
+    return res.data;
+  },
+
+  getFirKPIs: async (): Promise<FIRKPIsResponse> => {
+    const res = await apiClient.get<FIRKPIsResponse>('/fir/kpis');
+    return res.data;
+  },
+
+  getFirLegalProvisions: async (): Promise<FIRLegalCatalogResponse> => {
+    const res = await apiClient.get<FIRLegalCatalogResponse>('/fir/reference/legal-provisions');
     return res.data;
   },
 };

@@ -60,6 +60,7 @@ from explainability_engine import (
 )
 from temporal_engine import TemporalEngine
 from graph_intelligence_engine import GraphIntelligenceEngine
+from fir_engine import FIREngine
 
 DATA_PATH = os.path.join(BASE_DIR, "data", "sample_records.json")
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
@@ -1192,6 +1193,109 @@ class IntelligenceService:
         if not gie:
             return None
         return gie.compare_entities(entity_a, entity_b)
+
+    # ── Phase 4: FIR Module Services ─────────────────────────────────────────
+
+    _cached_fir_engine: Optional[FIREngine] = None
+
+    @classmethod
+    def get_fir_engine(cls) -> FIREngine:
+        """Returns the singleton FIREngine instance."""
+        if cls._cached_fir_engine is None:
+            cls._cached_fir_engine = FIREngine()
+        return cls._cached_fir_engine
+
+    @classmethod
+    def create_fir(cls, data: Dict[str, Any]) -> Tuple[bool, Dict[str, Any], Optional[str]]:
+        """Creates a new FIR record in persistent storage."""
+        fe = cls.get_fir_engine()
+        return fe.create_fir(data)
+
+    @classmethod
+    def get_fir(cls, fir_id: str) -> Optional[Dict[str, Any]]:
+        """Retrieves an FIR record by ID."""
+        fe = cls.get_fir_engine()
+        return fe.get_fir(fir_id)
+
+    @classmethod
+    def update_fir(cls, fir_id: str, updates: Dict[str, Any]) -> Tuple[bool, Dict[str, Any], Optional[str]]:
+        """Updates an existing FIR record in persistent storage."""
+        fe = cls.get_fir_engine()
+        return fe.update_fir(fir_id, updates)
+
+    @classmethod
+    def delete_fir(cls, fir_id: str) -> bool:
+        """Deletes an FIR record from persistent storage."""
+        fe = cls.get_fir_engine()
+        return fe.delete_fir(fir_id)
+
+    @classmethod
+    def list_firs(
+        cls,
+        status: Optional[str] = None,
+        police_station: Optional[str] = None,
+        district: Optional[str] = None,
+        case_id: Optional[str] = None,
+        category: Optional[str] = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> Dict[str, Any]:
+        """Lists FIR records with optional exact filters and pagination."""
+        fe = cls.get_fir_engine()
+        return fe.list_firs(
+            status=status,
+            police_station=police_station,
+            district=district,
+            case_id=case_id,
+            category=category,
+            limit=limit,
+            offset=offset,
+        )
+
+    @classmethod
+    def search_firs(
+        cls,
+        query: Optional[str] = None,
+        police_station: Optional[str] = None,
+        district: Optional[str] = None,
+        accused_name: Optional[str] = None,
+        complainant_name: Optional[str] = None,
+        category: Optional[str] = None,
+        case_id: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        review_status: Optional[str] = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> Dict[str, Any]:
+        """Performs multi-field search and date-range bounded scan over FIR records."""
+        fe = cls.get_fir_engine()
+        return fe.search_firs(
+            query=query,
+            police_station=police_station,
+            district=district,
+            accused_name=accused_name,
+            complainant_name=complainant_name,
+            category=category,
+            case_id=case_id,
+            start_date=start_date,
+            end_date=end_date,
+            review_status=review_status,
+            limit=limit,
+            offset=offset,
+        )
+
+    @classmethod
+    def get_fir_kpis(cls) -> Dict[str, Any]:
+        """Returns KPI statistics for FIR workspace."""
+        fe = cls.get_fir_engine()
+        return fe.get_summary_kpis()
+
+    @classmethod
+    def get_fir_legal_provisions(cls) -> Dict[str, Any]:
+        """Returns canonical BNS/IPC legal provisions catalog."""
+        fe = cls.get_fir_engine()
+        return fe.get_legal_provisions_catalog()
 
     @classmethod
     def get_anomalies(cls) -> List[Dict[str, Any]]:

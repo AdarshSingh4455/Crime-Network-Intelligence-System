@@ -227,6 +227,28 @@ export const Network: React.FC = () => {
   }), []);
   const clearFilters = useCallback(() => setActiveFilters(new Set()), []);
 
+  useEffect(() => {
+    if (graphRef.current) {
+      // Repulsion force: strong enough to naturally scatter 15 nodes with 52 relationships
+      const charge = graphRef.current.d3Force("charge");
+      if (charge && typeof charge.strength === "function") {
+        charge.strength(-550);
+      }
+
+      // Link resting distance: increased from default 30px to 120px to prevent central clumping
+      const linkForce = graphRef.current.d3Force("link");
+      if (linkForce && typeof linkForce.distance === "function") {
+        linkForce.distance(120);
+      }
+
+      // Center force with moderate strength for bounded canvas centering
+      const center = graphRef.current.d3Force("center");
+      if (center && typeof center.strength === "function") {
+        center.strength(0.08);
+      }
+    }
+  }, [filteredGraphData]);
+
   const connectedEntities = useMemo(() => {
     if (!selectedNode || !networkData) return [] as Array<{ id: string; type: string; weight: number }>;
     return networkData.links
@@ -394,10 +416,21 @@ export const Network: React.FC = () => {
               }
             }}
             onBackgroundClick={() => { setSelectedNode(null); setFocusMode(false); }}
-            cooldownTicks={100}
-            d3VelocityDecay={0.3}
+            cooldownTicks={120}
+            d3VelocityDecay={0.35}
+            onEngineStop={() => {
+              if (graphRef.current && !selectedNode && !focusParam) {
+                graphRef.current.zoomToFit(400, 45);
+              }
+            }}
             backgroundColor="#F8FAFC"
           />
+          {/* Spatial layout disclaimer badge */}
+          <div className="absolute top-3 right-4 z-10 pointer-events-none">
+            <span className="text-[11px] font-mono text-slate-500 bg-white/95 backdrop-blur-xs px-2.5 py-1 rounded-md border border-slate-200 shadow-2xs">
+              Node positions are visualization layout only and do not represent geographic location.
+            </span>
+          </div>
           {/* Legend */}
           <div className="absolute bottom-4 left-4 bg-white/95 border border-slate-200 rounded-xl shadow-sm p-3 text-xs">
             <p className="text-slate-500 font-medium mb-2 uppercase tracking-wider text-[10px]">Legend</p>

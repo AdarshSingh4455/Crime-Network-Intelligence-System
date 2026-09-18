@@ -7,9 +7,9 @@ Exposes structured endpoints for the React dashboard.
 
 from __future__ import annotations
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Body
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Dict, Any
 from fastapi.middleware.cors import CORSMiddleware
 from server.service import IntelligenceService
 
@@ -592,6 +592,119 @@ def get_data_quality_result_detail(test_id: str):
     if not result:
         raise HTTPException(status_code=404, detail=f"Robustness test '{test_id}' not found")
     return result
+
+
+# ─── Phase 4: FIR Module REST Endpoints ─────────────────────────────────────
+
+@app.get("/api/fir")
+def list_firs(
+    status: Optional[str] = None,
+    police_station: Optional[str] = None,
+    district: Optional[str] = None,
+    case_id: Optional[str] = None,
+    category: Optional[str] = None,
+    limit: int = 50,
+    offset: int = 0,
+):
+    """Lists persistent FIR intake records with optional exact filters and pagination."""
+    return IntelligenceService.list_firs(
+        status=status,
+        police_station=police_station,
+        district=district,
+        case_id=case_id,
+        category=category,
+        limit=limit,
+        offset=offset,
+    )
+
+
+@app.post("/api/fir")
+def create_fir(payload: Dict[str, Any] = Body(...)):
+    """Registers a new FIR record with validation and atomic disk persistence."""
+    success, rec, err = IntelligenceService.create_fir(payload)
+    if not success:
+        raise HTTPException(status_code=400, detail=err)
+    return rec
+
+
+@app.get("/api/fir/search/query")
+def search_firs(
+    q: Optional[str] = None,
+    police_station: Optional[str] = None,
+    district: Optional[str] = None,
+    accused: Optional[str] = None,
+    complainant: Optional[str] = None,
+    category: Optional[str] = None,
+    case_id: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    review_status: Optional[str] = None,
+    limit: int = 50,
+    offset: int = 0,
+):
+    """
+    Multi-field search across persistent FIR records.
+    Registered BEFORE /api/fir/{fir_id} to prevent route shadowing.
+    """
+    return IntelligenceService.search_firs(
+        query=q,
+        police_station=police_station,
+        district=district,
+        accused_name=accused,
+        complainant_name=complainant,
+        category=category,
+        case_id=case_id,
+        start_date=start_date,
+        end_date=end_date,
+        review_status=review_status,
+        limit=limit,
+        offset=offset,
+    )
+
+
+@app.get("/api/fir/reference/legal-provisions")
+def get_fir_legal_provisions():
+    """
+    Returns canonical Bharatiya Nyaya Sanhita (BNS, 2023) catalog with legacy IPC mappings.
+    Registered BEFORE /api/fir/{fir_id} to prevent route shadowing.
+    """
+    return IntelligenceService.get_fir_legal_provisions()
+
+
+@app.get("/api/fir/kpis")
+def get_fir_kpis():
+    """
+    Returns summary KPI counts and category breakdowns for FIR workspace.
+    Registered BEFORE /api/fir/{fir_id} to prevent route shadowing.
+    """
+    return IntelligenceService.get_fir_kpis()
+
+
+@app.get("/api/fir/{fir_id}")
+def get_fir_detail(fir_id: str):
+    """Retrieves an individual FIR record by ID or FIR number."""
+    rec = IntelligenceService.get_fir(fir_id)
+    if not rec:
+        raise HTTPException(status_code=404, detail=f"FIR '{fir_id}' not found")
+    return rec
+
+
+@app.put("/api/fir/{fir_id}")
+def update_fir(fir_id: str, payload: Dict[str, Any] = Body(...)):
+    """Updates an existing FIR record and logs an audit trail entry."""
+    success, rec, err = IntelligenceService.update_fir(fir_id, payload)
+    if not success:
+        raise HTTPException(status_code=400, detail=err)
+    return rec
+
+
+@app.delete("/api/fir/{fir_id}")
+def delete_fir(fir_id: str):
+    """Deletes an FIR record from persistent storage."""
+    success = IntelligenceService.delete_fir(fir_id)
+    if not success:
+        raise HTTPException(status_code=404, detail=f"FIR '{fir_id}' not found")
+    return {"status": "deleted", "fir_id": fir_id}
 
 
 if __name__ == "__main__":

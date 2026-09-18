@@ -18,6 +18,7 @@ import { DataQuality } from './pages/DataQuality';
 import { Explainability } from './pages/Explainability';
 import { TemporalIntelligence } from './pages/TemporalIntelligence';
 import { GraphIntelligence } from './pages/GraphIntelligence';
+import { FIR } from './pages/FIR';
 import { api } from './api/client';
 import { OverviewMetrics } from './types';
 
@@ -86,6 +87,7 @@ export const App: React.FC = () => {
               <Route path="/sources" element={<Sources />} />
               <Route path="/cases" element={<Cases />} />
               <Route path="/investigation" element={<Investigation />} />
+              <Route path="/fir" element={<FIR />} />
               <Route path="/explainability" element={<Explainability />} />
               <Route path="/temporal" element={<TemporalIntelligence />} />
               <Route path="/settings" element={<Settings />} />

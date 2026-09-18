@@ -1631,3 +1631,156 @@ export interface GraphComparison {
   evidence_ids?: string[];
 }
 
+// ─── Phase 4: FIR Module Types ──────────────────────────────────────────────
+
+export interface FIRAdministrativeInfo {
+  fir_number: string;
+  police_station: string;
+  district: string;
+  state?: string;
+  registration_date?: string;
+  occurrence_date_from?: string;
+  occurrence_date_to?: string;
+  general_diary_ref?: string;
+  investigating_officer?: string;
+  officer_rank?: string;
+  officer_id?: string;
+}
+
+export interface FIRComplainant {
+  name: string;
+  contact_number?: string;
+  address?: string;
+  relationship_to_victim?: string;
+  complainant_role?: string;
+}
+
+export interface FIRAccusedPerson {
+  accused_id: string;
+  name: string;
+  alias?: string;
+  status: string;
+  identifiers?: Record<string, string>;
+  alleged_role?: string;
+  epistemic_notice?: string;
+}
+
+export interface FIRIncidentInfo {
+  incident_location: string;
+  jurisdiction: string;
+  incident_date: string;
+  incident_category: string;
+  summary: string;
+}
+
+export interface FIRVictim {
+  victim_id: string;
+  name: string;
+  contact?: string;
+  injuries_or_loss?: string;
+}
+
+export interface FIRWitness {
+  witness_id: string;
+  name: string;
+  contact?: string;
+  statement_summary?: string;
+}
+
+export interface FIRPropertyEvidence {
+  property_id: string;
+  item_type: string;
+  description: string;
+  seizure_memo_ref?: string;
+  linked_evidence_id?: string | null;
+}
+
+export interface FIRLegalProvision {
+  provision_id: string;
+  bns_section: string;
+  ipc_legacy_section: string;
+  offense_name: string;
+  review_status: string;
+  officer_notes?: string;
+  epistemic_notice?: string;
+}
+
+export interface FIRIntelligenceLinks {
+  case_id?: string | null;
+  linked_entity_ids?: string[];
+  linked_evidence_ids?: string[];
+  linked_record_ids?: string[];
+  provenance_note?: string;
+}
+
+export interface FIRAuditEntry {
+  timestamp: string;
+  action: string;
+  user: string;
+  summary: string;
+}
+
+export interface FIRRecord {
+  fir_id: string;
+  fir_number: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  administrative: FIRAdministrativeInfo;
+  complainant: FIRComplainant;
+  accused: FIRAccusedPerson[];
+  incident: FIRIncidentInfo;
+  victims: FIRVictim[];
+  witnesses: FIRWitness[];
+  property_evidence: FIRPropertyEvidence[];
+  narrative: string;
+  legal_provisions: FIRLegalProvision[];
+  intelligence_links: FIRIntelligenceLinks;
+  audit_trail: FIRAuditEntry[];
+  epistemic_guardrail?: string;
+}
+
+export interface FIRListResponse {
+  total: number;
+  limit: number;
+  offset: number;
+  firs: FIRRecord[];
+}
+
+export interface FIRSearchResponse {
+  total: number;
+  limit: number;
+  offset: number;
+  search_mode: string;
+  firs: FIRRecord[];
+}
+
+export interface FIRKPIsResponse {
+  total_firs: number;
+  by_status: Record<string, number>;
+  by_category: Record<string, number>;
+  linked_case_count: number;
+  total_accused_count: number;
+  pending_review_provisions: number;
+}
+
+export interface FIRLegalCatalogItem {
+  bns_section: string;
+  ipc_legacy_section: string;
+  offense_name: string;
+  category: string;
+  bailable: string;
+  cognizable: string;
+  description: string;
+}
+
+export interface FIRLegalCatalogResponse {
+  primary_framework: string;
+  legacy_framework: string;
+  statutory_effective_date: string;
+  total_provisions: number;
+  provisions: FIRLegalCatalogItem[];
+  epistemic_notice: string;
+}
+
+
