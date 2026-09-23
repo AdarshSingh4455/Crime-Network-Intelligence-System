@@ -21,6 +21,7 @@ import { GraphIntelligence } from './pages/GraphIntelligence';
 import { FIR } from './pages/FIR';
 import { api } from './api/client';
 import { OverviewMetrics } from './types';
+import { ThemeProvider } from './context/ThemeContext';
 
 export const App: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -55,55 +56,57 @@ export const App: React.FC = () => {
   }, []);
 
   return (
-    <Router>
-      <div className="flex h-screen w-screen overflow-hidden bg-[#F8FAFC] text-slate-900 font-sans">
-        {/* Sidebar Navigation Shell */}
-        <Sidebar
-          anomalyCount={metrics?.suspicious_patterns_count || 25}
-          entitiesCount={metrics?.total_entities || 15}
-          recordsCount={metrics?.total_records || 10}
-        />
-
-        {/* Main Application Container */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          {/* Top Header Shell */}
-          <Header
-            onOpenSearch={() => setIsSearchOpen(true)}
-            systemStatus={isConnected ? 'Active Investigation Mode' : 'Offline'}
-            isBackendConnected={isConnected}
+    <ThemeProvider>
+      <Router>
+        <div className="flex h-screen w-screen overflow-hidden bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 font-sans">
+          {/* Sidebar Navigation Shell */}
+          <Sidebar
+            anomalyCount={metrics?.suspicious_patterns_count || 25}
+            entitiesCount={metrics?.total_entities || 15}
+            recordsCount={metrics?.total_records || 10}
           />
 
-          {/* Page Viewport */}
-          <main className="flex-1 overflow-y-auto bg-[#F8FAFC]">
-            <Routes>
-              <Route path="/" element={<Overview />} />
-              <Route path="/network" element={<Network />} />
-              <Route path="/graph-intelligence" element={<GraphIntelligence />} />
-              <Route path="/entities" element={<Entities />} />
-              <Route path="/anomalies" element={<Anomalies />} />
-              <Route path="/timeline" element={<Timeline />} />
-              <Route path="/locations" element={<Locations />} />
-              <Route path="/reports" element={<Reports />} />
-              <Route path="/sources" element={<Sources />} />
-              <Route path="/cases" element={<Cases />} />
-              <Route path="/investigation" element={<Investigation />} />
-              <Route path="/fir" element={<FIR />} />
-              <Route path="/explainability" element={<Explainability />} />
-              <Route path="/temporal" element={<TemporalIntelligence />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/data-quality" element={<DataQuality />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </main>
-        </div>
+          {/* Main Application Container */}
+          <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+            {/* Top Header Shell */}
+            <Header
+              onOpenSearch={() => setIsSearchOpen(true)}
+              systemStatus={isConnected ? 'Active Investigation Mode' : 'Offline'}
+              isBackendConnected={isConnected}
+            />
 
-        {/* Global Search Modal */}
-        <GlobalSearchModal
-          isOpen={isSearchOpen}
-          onClose={() => setIsSearchOpen(false)}
-        />
-      </div>
-    </Router>
+            {/* Page Viewport */}
+            <main className="flex-1 overflow-y-auto bg-[#F8FAFC] dark:bg-[#0B0F19]">
+              <Routes>
+                <Route path="/" element={<Overview />} />
+                <Route path="/network" element={<Network />} />
+                <Route path="/graph-intelligence" element={<GraphIntelligence />} />
+                <Route path="/entities" element={<Entities />} />
+                <Route path="/anomalies" element={<Anomalies />} />
+                <Route path="/timeline" element={<Timeline />} />
+                <Route path="/locations" element={<Locations />} />
+                <Route path="/reports" element={<Reports />} />
+                <Route path="/sources" element={<Sources />} />
+                <Route path="/cases" element={<Cases />} />
+                <Route path="/investigation" element={<Investigation />} />
+                <Route path="/fir" element={<FIR />} />
+                <Route path="/explainability" element={<Explainability />} />
+                <Route path="/temporal" element={<TemporalIntelligence />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/data-quality" element={<DataQuality />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </main>
+          </div>
+
+          {/* Global Search Modal */}
+          <GlobalSearchModal
+            isOpen={isSearchOpen}
+            onClose={() => setIsSearchOpen(false)}
+          />
+        </div>
+      </Router>
+    </ThemeProvider>
   );
 };
 export default App;

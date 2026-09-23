@@ -4,11 +4,11 @@
 
 @layer base {
   body {
-    @apply bg-[#F8FAFC] text-slate-900 font-sans antialiased;
+    @apply bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 font-sans antialiased;
   }
 }
 
-/* Custom light scrollbars */
+/* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -18,8 +18,17 @@
   background: #F1F5F9;
 }
 
+.dark ::-webkit-scrollbar-track {
+  background: #0B0F19;
+}
+
 ::-webkit-scrollbar-thumb {
   background: #CBD5E1;
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
   border-radius: 3px;
 }
 
@@ -27,11 +36,21 @@
   background: #94A3B8;
 }
 
-/* Light theme panel utility */
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Theme panel utility */
 .ui-panel {
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
   box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03), 0 1px 2px -1px rgba(15, 23, 42, 0.03);
+}
+
+.dark .ui-panel {
+  background: #111827;
+  border-color: #1E293B;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25);
 }
 
 .ui-panel-hover {
@@ -43,6 +62,11 @@
   box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.06);
 }
 
+.dark .ui-panel-hover:hover {
+  border-color: #334155;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.4);
+}
+
 /* Badge pulse animation */
 @keyframes softPulse {
   0%, 100% { opacity: 1; }
@@ -52,3 +76,156 @@
 .animate-soft-pulse {
   animation: softPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CNIS Application-Wide Dark Theme System
+   Ensures uniform dark mode surfaces, typography contrast, borders, and forms
+   across all 16 pages and overlays without disrupting light mode aesthetics.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.dark {
+  color-scheme: dark;
+}
+
+/* Base surface overrides in dark mode */
+.dark .bg-white {
+  background-color: #111827 !important;
+}
+
+.dark .bg-white\/95,
+.dark .bg-white\/90,
+.dark .bg-white\/80,
+.dark .bg-white\/70,
+.dark .bg-white\/65 {
+  background-color: rgba(17, 24, 39, 0.92) !important;
+}
+
+.dark .bg-slate-50 {
+  background-color: #0F172A !important;
+}
+
+.dark .bg-slate-50\/70,
+.dark .bg-slate-50\/80 {
+  background-color: rgba(15, 23, 42, 0.8) !important;
+}
+
+.dark .bg-slate-100 {
+  background-color: #1E293B !important;
+}
+
+.dark .bg-slate-100\/70,
+.dark .bg-slate-100\/80 {
+  background-color: rgba(30, 41, 59, 0.8) !important;
+}
+
+.dark .bg-slate-200 {
+  background-color: #334155 !important;
+}
+
+/* Border overrides in dark mode */
+.dark .border-slate-100,
+.dark .border-slate-200,
+.dark .border-slate-200\/70,
+.dark .border-slate-200\/80,
+.dark .border-slate-200\/90 {
+  border-color: #1E293B !important;
+}
+
+.dark .border-slate-300,
+.dark .border-slate-300\/80 {
+  border-color: #334155 !important;
+}
+
+.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #1E293B !important;
+}
+
+/* Typography contrast in dark mode */
+.dark .text-slate-900 {
+  color: #F8FAFC !important;
+}
+
+.dark .text-slate-800 {
+  color: #F1F5F9 !important;
+}
+
+.dark .text-slate-700 {
+  color: #E2E8F0 !important;
+}
+
+.dark .text-slate-600 {
+  color: #CBD5E1 !important;
+}
+
+.dark .text-slate-500 {
+  color: #94A3B8 !important;
+}
+
+.dark .text-slate-400 {
+  color: #64748B !important;
+}
+
+/* Hover state overrides */
+.dark .hover\:bg-slate-50:hover,
+.dark .hover\:bg-slate-50\/70:hover,
+.dark .hover\:bg-slate-100:hover,
+.dark .hover\:bg-slate-100\/70:hover,
+.dark .hover\:bg-white\/80:hover {
+  background-color: #1E293B !important;
+}
+
+.dark .hover\:border-slate-300:hover,
+.dark .hover\:border-slate-300\/80:hover {
+  border-color: #475569 !important;
+}
+
+/* Form Controls & Inputs */
+.dark input[type="text"],
+.dark input[type="search"],
+.dark input[type="password"],
+.dark input[type="number"],
+.dark input[type="date"],
+.dark select,
+.dark textarea {
+  background-color: #1E293B !important;
+  color: #F8FAFC !important;
+  border-color: #334155 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #64748B !important;
+}
+
+/* Modal and Drawer backdrop */
+.dark .bg-slate-900\/40,
+.dark .bg-slate-900\/50,
+.dark .bg-slate-900\/60 {
+  background-color: rgba(3, 7, 18, 0.75) !important;
+}
+
+/* Badge and Tag tinting in dark mode */
+.dark .bg-cyan-50 { background-color: rgba(8, 145, 178, 0.16) !important; color: #38BDF8 !important; }
+.dark .border-cyan-200 { border-color: rgba(8, 145, 178, 0.35) !important; }
+.dark .text-cyan-800, .dark .text-cyan-700 { color: #38BDF8 !important; }
+
+.dark .bg-emerald-50 { background-color: rgba(16, 185, 129, 0.16) !important; color: #34D399 !important; }
+.dark .border-emerald-200 { border-color: rgba(16, 185, 129, 0.35) !important; }
+.dark .text-emerald-800, .dark .text-emerald-700 { color: #34D399 !important; }
+
+.dark .bg-amber-50 { background-color: rgba(245, 158, 11, 0.16) !important; color: #FBBF24 !important; }
+.dark .border-amber-200 { border-color: rgba(245, 158, 11, 0.35) !important; }
+.dark .text-amber-800, .dark .text-amber-700 { color: #FBBF24 !important; }
+
+.dark .bg-rose-50 { background-color: rgba(244, 63, 94, 0.16) !important; color: #FB7185 !important; }
+.dark .border-rose-200 { border-color: rgba(244, 63, 94, 0.35) !important; }
+.dark .text-rose-800, .dark .text-rose-700 { color: #FB7185 !important; }
+
+.dark .bg-indigo-50 { background-color: rgba(99, 102, 241, 0.16) !important; color: #818CF8 !important; }
+.dark .border-indigo-200 { border-color: rgba(99, 102, 241, 0.35) !important; }
+.dark .text-indigo-800, .dark .text-indigo-700 { color: #818CF8 !important; }
+
+.dark .bg-purple-50 { background-color: rgba(168, 85, 247, 0.16) !important; color: #C084FC !important; }
+.dark .border-purple-200 { border-color: rgba(168, 85, 247, 0.35) !important; }
+.dark .text-purple-800, .dark .text-purple-700 { color: #C084FC !important; }
