@@ -142,9 +142,6 @@ export const Explainability: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-cyan-100 text-cyan-800 border border-cyan-200">
-              Phase 3I
-            </span>
             <span className="text-xs font-mono text-slate-500 uppercase tracking-widest">
               Grounded Derivations
             </span>

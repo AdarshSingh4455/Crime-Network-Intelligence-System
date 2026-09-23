@@ -286,9 +286,6 @@ export const TemporalIntelligence: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-2xs">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-indigo-100 text-indigo-800 border border-indigo-200">
-              Phase 3J
-            </span>
             <span className="text-xs font-mono text-slate-500 uppercase tracking-widest">
               Observed Network Evolution
             </span>

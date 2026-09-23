@@ -171,7 +171,7 @@ export const Investigation: React.FC = () => {
   };
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] pb-16">
+    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 pb-16">
       {/* ─── TOP CONTROL BAR ─── */}
       <div className="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-2xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
@@ -186,9 +186,6 @@ export const Investigation: React.FC = () => {
                   <h1 className="text-lg font-bold text-slate-900 tracking-tight">
                     Investigation Command Workspace
                   </h1>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-cyan-50 text-cyan-800 border border-cyan-200">
-                    Phase 3E Intelligence
-                  </span>
                 </div>
                 <p className="text-xs text-slate-500">
                   Targeted multi-vector analysis • Shortest path corroboration • Observed cross-case overlap

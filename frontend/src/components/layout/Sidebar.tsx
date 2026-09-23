@@ -52,26 +52,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
       items: [
         { name: 'Overview', path: '/', icon: LayoutDashboard },
         { name: 'Cases', path: '/cases', icon: Briefcase, badge: '10 Cases' },
-        { name: 'Investigation', path: '/investigation', icon: Compass, badge: 'Workspace' },
-        { name: 'FIR', path: '/fir', icon: FileSpreadsheet, badge: 'Phase 4' },
+        { name: 'Investigation', path: '/investigation', icon: Compass },
+        { name: 'FIR', path: '/fir', icon: FileSpreadsheet },
       ],
     },
     {
       title: 'Intelligence',
       items: [
-        { name: 'Network', path: '/network', icon: Share2, badge: 'Interactive' },
+        { name: 'Network', path: '/network', icon: Share2 },
         { name: 'Entities', path: '/entities', icon: Users, badge: entitiesCount ? String(entitiesCount) : undefined },
         { name: 'Anomalies', path: '/anomalies', icon: AlertTriangle, badge: anomalyCount ? String(anomalyCount) : undefined, alert: true },
         { name: 'Timeline', path: '/timeline', icon: Clock },
         { name: 'Locations', path: '/locations', icon: MapPin },
-        { name: 'AGI', path: '/graph-intelligence', icon: GitFork, badge: 'Phase 3K' },
-        { name: 'Temporal Intelligence', path: '/temporal', icon: History, badge: 'Phase 3J' },
+        { name: 'AGI', path: '/graph-intelligence', icon: GitFork },
+        { name: 'Temporal Intelligence', path: '/temporal', icon: History },
       ],
     },
     {
       title: 'Analysis & Explanation',
       items: [
-        { name: 'Explainability', path: '/explainability', icon: Lightbulb, badge: 'Phase 3I' },
+        { name: 'Explainability', path: '/explainability', icon: Lightbulb },
         { name: 'Intelligence Reports', path: '/reports', icon: FileText },
       ],
     },
@@ -79,8 +79,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       title: 'Data / System',
       items: [
         { name: 'Data Sources', path: '/sources', icon: Database, badge: '4 Active' },
-        { name: 'Data Quality', path: '/data-quality', icon: FlaskConical, badge: 'Phase 3F' },
-        { name: 'Settings', path: '/settings', icon: Settings, badge: 'Config' },
+        { name: 'Data Quality', path: '/data-quality', icon: FlaskConical },
+        { name: 'Settings', path: '/settings', icon: Settings },
       ],
     },
   ];

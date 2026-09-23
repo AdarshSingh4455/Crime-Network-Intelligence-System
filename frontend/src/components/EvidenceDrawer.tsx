@@ -345,7 +345,7 @@ export const EvidenceDrawer: React.FC<EvidenceDrawerProps> = ({ evidenceId, onCl
         {/* Drawer Footer */}
         <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between flex-shrink-0">
           <p className="text-[11px] text-slate-400">
-            CNIS Phase 3H Evidence Engine · Deterministic &amp; Auditable
+            CNIS Evidence Engine · Deterministic &amp; Auditable
           </p>
           <button
             onClick={onClose}

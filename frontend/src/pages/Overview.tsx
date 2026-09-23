@@ -99,7 +99,7 @@ export const Overview: React.FC = () => {
             <span className="font-mono text-[11px] font-semibold text-cyan-800 bg-cyan-50 px-2.5 py-0.5 rounded border border-cyan-200 uppercase tracking-wider">
               CNIS SECTION :: OVERVIEW
             </span>
-            <span className="text-xs text-slate-500 font-mono">PHASE 2B REAL DATA ACTIVE</span>
+            <span className="text-xs text-slate-500 font-mono">LIVE INTELLIGENCE ACTIVE</span>
           </div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight mt-1">Intelligence Overview</h1>
           <p className="text-xs text-slate-600 mt-1 max-w-2xl">

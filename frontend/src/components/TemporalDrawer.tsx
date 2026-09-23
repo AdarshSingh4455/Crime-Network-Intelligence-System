@@ -197,7 +197,7 @@ export const TemporalDrawer: React.FC<TemporalDrawerProps> = ({
                   >
                     <span className="flex items-center gap-1.5">
                       <Shield className="w-3.5 h-3.5 text-cyan-600" />
-                      Inspect Phase 3H Evidence ({pattern.supporting_evidence_ids[0]})
+                      Inspect Evidence Trace ({pattern.supporting_evidence_ids[0]})
                     </span>
                     <ExternalLink className="w-3 h-3 text-slate-400" />
                   </button>
@@ -210,7 +210,7 @@ export const TemporalDrawer: React.FC<TemporalDrawerProps> = ({
                   >
                     <span className="flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-purple-600" />
-                      Open Phase 3I Explanation ({pattern.explanation_id})
+                      Open Analytical Explanation ({pattern.explanation_id})
                     </span>
                     <ExternalLink className="w-3 h-3 text-purple-400" />
                   </button>
@@ -308,7 +308,7 @@ export const TemporalDrawer: React.FC<TemporalDrawerProps> = ({
                 >
                   <span className="flex items-center gap-1.5">
                     <Shield className="w-3.5 h-3.5 text-cyan-600" />
-                    Inspect Phase 3H Evidence Item ({observation.evidence_id})
+                    Inspect Evidence Item ({observation.evidence_id})
                   </span>
                   <ExternalLink className="w-3 h-3 text-slate-400" />
                 </button>

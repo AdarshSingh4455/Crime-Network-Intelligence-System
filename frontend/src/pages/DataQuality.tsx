@@ -346,7 +346,7 @@ export const DataQuality: React.FC = () => {
     : null;
 
   return (
-    <div className="h-full flex flex-col bg-[#F8FAFC]">
+    <div className="h-full flex flex-col bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100">
       {/* ── Page Header ─────────────────────────────────────────────────────── */}
       <div className="bg-white border-b border-slate-200 px-6 py-4 shrink-0">
         <div className="flex items-start justify-between gap-4">
@@ -359,7 +359,7 @@ export const DataQuality: React.FC = () => {
                 Data Quality &amp; Robustness Testing
               </h1>
               <p className="text-xs text-slate-500 mt-0.5">
-                Phase 3F — Synthetic fixture evaluation of entity resolution, ingestion
+                Automated fixture evaluation of entity resolution, ingestion
                 stability, and adversarial data handling. Not an investigator intelligence view.
               </p>
             </div>
@@ -440,7 +440,7 @@ export const DataQuality: React.FC = () => {
       )}
 
       {/* ── Tab Bar ─────────────────────────────────────────────────────────── */}
-      <div className="px-6 pt-2 shrink-0 border-b border-slate-200 bg-[#F8FAFC]">
+      <div className="px-6 pt-2 shrink-0 border-b border-slate-200 dark:border-slate-800 bg-[#F8FAFC] dark:bg-[#0B0F19]">
         <div className="flex gap-0">
           {(
             [
@@ -657,7 +657,7 @@ export const DataQuality: React.FC = () => {
                     </div>
                     <p className="text-xs text-violet-800 leading-relaxed">
                       <span className="font-mono">data/sample_records.json</span> is the single
-                      source of truth for production intelligence. Phase 3F synthetic fixtures are
+                      source of truth for production intelligence. Synthetic test fixtures are
                       never merged with this baseline. Any modification to the baseline is an
                       implementation error.
                     </p>

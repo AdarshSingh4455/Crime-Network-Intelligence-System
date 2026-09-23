@@ -149,7 +149,7 @@ export const Settings: React.FC = () => {
               System Configuration & Intelligence Settings
             </h1>
             <span className="px-2 py-0.5 text-xs font-semibold bg-cyan-50 text-cyan-800 border border-cyan-200 rounded-full">
-              v2.0-prototype
+              v2.0
             </span>
           </div>
           <p className="text-sm text-slate-500 mt-1">
@@ -271,7 +271,7 @@ export const Settings: React.FC = () => {
                 Platform & Environment Overview
               </h2>
               <p className="text-xs text-slate-500 mt-1">
-                Active runtime specifications and software stack powering the Crime Network Intelligence System prototype.
+                Active runtime specifications and software stack powering the Crime Network Intelligence System.
               </p>
             </div>
 
@@ -831,7 +831,7 @@ export const Settings: React.FC = () => {
                 Production Readiness & Architecture Gap Analysis
               </h2>
               <p className="text-xs text-slate-500 mt-1">
-                Objective comparison between current hackathon prototype capabilities and enterprise law-enforcement requirements.
+                Objective comparison between current capabilities and enterprise law-enforcement requirements.
               </p>
             </div>
 
@@ -840,7 +840,7 @@ export const Settings: React.FC = () => {
                 <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold uppercase">
                   <tr>
                     <th className="p-3">Category</th>
-                    <th className="p-3">Current Prototype State</th>
+                    <th className="p-3">Current System State</th>
                     <th className="p-3">Production Requirement</th>
                     <th className="p-3 text-center">Gap Severity</th>
                   </tr>
@@ -873,7 +873,7 @@ export const Settings: React.FC = () => {
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-600 leading-relaxed space-y-2">
               <h3 className="font-bold text-slate-800">Security & Governance Disclosure:</h3>
               <p>
-                In accordance with responsible engineering principles, this prototype does not fabricate pseudo-enterprise authentication or claims of regulatory compliance (e.g. GDPR, DPDP, ISO 27001). Production deployment of link analysis and anomaly detection software requires formal legal authorization, persistent audit trails, access controls, and strict chain-of-custody protocols.
+                In accordance with responsible engineering principles, the system does not fabricate pseudo-enterprise authentication or claims of regulatory compliance (e.g. GDPR, DPDP, ISO 27001). Production deployment of link analysis and anomaly detection software requires formal legal authorization, persistent audit trails, access controls, and strict chain-of-custody protocols.
               </p>
             </div>
           </div>

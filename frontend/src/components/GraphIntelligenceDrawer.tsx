@@ -80,7 +80,7 @@ export const GraphIntelligenceDrawer: React.FC<GraphIntelligenceDrawerProps> = (
               </div>
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500 font-semibold">
-                  Phase 3K Graph Intelligence Inspector
+                  Graph Intelligence Inspector
                 </span>
                 <h2 className="text-base font-bold text-slate-900 leading-tight">
                   {neighborhood && `Neighborhood: ${neighborhood.center_node || neighborhood.entity_id}`}

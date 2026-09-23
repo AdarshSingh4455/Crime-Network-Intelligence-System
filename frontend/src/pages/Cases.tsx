@@ -455,7 +455,7 @@ export const Cases: React.FC = () => {
   }, [selectedCaseDetail, fuCategoryFilter, fuStatusFilter]);
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] pb-16">
+    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 pb-16">
       {/* ─── Page Header ─────────────────────────────────────────────────── */}
       <div className="border-b border-slate-200 bg-white px-8 py-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -467,7 +467,7 @@ export const Cases: React.FC = () => {
               </span>
               <span className="text-xs text-slate-400 font-mono">•</span>
               <span className="text-xs font-mono text-slate-500">
-                Phase 3C Investigation Orchestration & Case Linking
+                Investigation Orchestration & Case Linking
               </span>
             </div>
             <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900">

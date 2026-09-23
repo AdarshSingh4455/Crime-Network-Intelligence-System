@@ -327,7 +327,7 @@ export const ExplanationDrawer: React.FC<ExplanationDrawerProps> = ({
                   </div>
 
                   <p className="text-xs text-slate-500">
-                    Each derived intelligence finding is anchored directly to Phase 3H evidence items with cryptographic provenance and raw records.
+                    Each derived intelligence finding is anchored directly to evidence items with cryptographic provenance and raw records.
                   </p>
 
                   <div className="flex flex-wrap gap-2 pt-1">
@@ -342,7 +342,7 @@ export const ExplanationDrawer: React.FC<ExplanationDrawerProps> = ({
                           }
                         }}
                         className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono font-medium bg-cyan-50 hover:bg-cyan-100 text-cyan-900 border border-cyan-200 transition-colors shadow-2xs group cursor-pointer"
-                        title="Inspect Phase 3H Evidence Item"
+                        title="Inspect Evidence Item"
                       >
                         <Shield className="w-3 h-3 text-cyan-600 group-hover:text-cyan-800" />
                         <span>{evId}</span>
@@ -396,7 +396,7 @@ export const ExplanationDrawer: React.FC<ExplanationDrawerProps> = ({
           {/* Drawer Footer */}
           <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs text-slate-500 shrink-0">
             <span className="font-mono text-[10px]">
-              CNIS Phase 3I Explainability Engine · 100% Deterministic & Auditable
+              CNIS Explainability Engine · 100% Deterministic & Auditable
             </span>
             <button
               onClick={onClose}

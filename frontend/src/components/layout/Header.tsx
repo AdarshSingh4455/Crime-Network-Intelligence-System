@@ -66,15 +66,14 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </button>
 
-        {/* Notifications Icon */}
+        {/* Notifications Icon (Neutral state when zero notifications) */}
         <button
           type="button"
           aria-label="System Notifications"
           className="relative p-2 rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-          title="System Notifications"
+          title="System Notifications (0 Unread)"
         >
           <Bell className="w-4.5 h-4.5" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900" />
         </button>
 
         {/* Investigator Profile Badge */}

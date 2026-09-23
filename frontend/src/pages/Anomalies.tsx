@@ -208,7 +208,7 @@ export const Anomalies: React.FC = () => {
   // Render loading state
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center h-full bg-[#F8FAFC]">
+      <div className="flex-1 flex items-center justify-center h-full bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100">
         <div className="text-center space-y-4">
           <div className="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-slate-700 font-semibold">Loading anomaly intelligence...</p>
@@ -221,7 +221,7 @@ export const Anomalies: React.FC = () => {
   // Render error state
   if (error) {
     return (
-      <div className="flex-1 flex items-center justify-center h-full bg-[#F8FAFC]">
+      <div className="flex-1 flex items-center justify-center h-full bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100">
         <div className="text-center space-y-3 max-w-md p-6 bg-white rounded-xl border border-slate-200 shadow-sm">
           <AlertTriangle className="w-10 h-10 text-rose-500 mx-auto" />
           <h2 className="text-lg font-bold text-slate-900">Unable to load anomaly intelligence</h2>
@@ -240,7 +240,7 @@ export const Anomalies: React.FC = () => {
   const distinctPatterns = Object.keys(PATTERN_CFG).filter(p => (patternCounts[p] || 0) > 0);
 
   return (
-    <div className="flex h-full overflow-hidden bg-[#F8FAFC]">
+    <div className="flex h-full overflow-hidden bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100">
       {/* ── Main Left Container ── */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         {/* Page Header */}

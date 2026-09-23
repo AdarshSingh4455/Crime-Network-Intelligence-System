@@ -281,21 +281,21 @@ export const Network: React.FC = () => {
   }, [selectedNode, networkData]);
 
   if (loading) return (
-    <div className="flex-1 flex items-center justify-center h-full bg-[#F8FAFC]">
+    <div className="flex-1 flex items-center justify-center h-full bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100">
       <div className="text-center space-y-4">
         <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="text-slate-600 font-medium">Loading Network Intelligence…</p>
-        <p className="text-slate-400 text-sm">Fetching graph from Python engine</p>
+        <p className="text-slate-600 dark:text-slate-300 font-medium">Loading Network Intelligence…</p>
+        <p className="text-slate-400 dark:text-slate-500 text-sm">Fetching graph from Python engine</p>
       </div>
     </div>
   );
 
   if (error) return (
-    <div className="flex-1 flex items-center justify-center h-full bg-[#F8FAFC]">
+    <div className="flex-1 flex items-center justify-center h-full bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100">
       <div className="text-center space-y-4 max-w-md">
         <AlertTriangle className="w-12 h-12 text-rose-500 mx-auto" />
-        <p className="text-slate-800 font-semibold text-lg">Network load failed</p>
-        <p className="text-slate-500 text-sm">{error}</p>
+        <p className="text-slate-800 dark:text-slate-200 font-semibold text-lg">Network load failed</p>
+        <p className="text-slate-500 dark:text-slate-400 text-sm">{error}</p>
         <button onClick={loadData} className="px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm font-medium hover:bg-cyan-700 transition-colors">Retry</button>
       </div>
     </div>

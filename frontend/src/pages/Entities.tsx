@@ -6,7 +6,7 @@ import {
   Search, X, Users, Phone, Car, MapPin, Building2, DollarSign,
   Circle, AlertTriangle, Shield, Star, ChevronUp, ChevronDown,
   ChevronsUpDown, ExternalLink, Share2, FileText, ChevronRight, Info, Briefcase,
-  Lightbulb
+  Lightbulb, RefreshCw
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { EvidenceDrawer, EpistemicBadge } from "../components/EvidenceDrawer";
@@ -610,23 +610,23 @@ export const Entities: React.FC = () => {
     else { setSortKey(key); setSortDir("desc"); }
   };
 
+  const loadData = loadEntities;
+
   if (loading) return (
-    <div className="flex-1 flex items-center justify-center bg-[#F8FAFC]">
-      <div className="text-center space-y-4">
-        <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="text-slate-600 font-medium">Loading Entity Registry…</p>
-        <p className="text-slate-400 text-sm">Fetching from Python intelligence engine</p>
+    <div className="flex-1 flex items-center justify-center bg-[#F8FAFC] dark:bg-[#0B0F19]">
+      <div className="flex flex-col items-center gap-3">
+        <RefreshCw className="w-8 h-8 text-cyan-600 animate-spin" />
+        <p className="text-sm font-medium text-slate-600">Loading entity registry…</p>
       </div>
     </div>
   );
 
   if (error) return (
-    <div className="flex-1 flex items-center justify-center bg-[#F8FAFC]">
-      <div className="text-center space-y-3 max-w-md">
-        <AlertTriangle className="w-10 h-10 text-rose-500 mx-auto" />
-        <p className="font-semibold text-slate-800">Registry load failed</p>
-        <p className="text-sm text-slate-500">{error}</p>
-        <button onClick={loadEntities}
+    <div className="flex-1 flex items-center justify-center bg-[#F8FAFC] dark:bg-[#0B0F19]">
+      <div className="flex flex-col items-center gap-3 max-w-md text-center p-6">
+        <AlertTriangle className="w-10 h-10 text-rose-500" />
+        <p className="text-sm text-slate-700">{error}</p>
+        <button onClick={loadData}
           className="px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm font-medium hover:bg-cyan-700 transition-colors">
           Retry
         </button>
@@ -635,7 +635,7 @@ export const Entities: React.FC = () => {
   );
 
   return (
-    <div className="flex h-full overflow-hidden bg-[#F8FAFC]">
+    <div className="flex h-full overflow-hidden bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100">
       {/* Registry */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-200 bg-white flex-shrink-0">

@@ -218,7 +218,7 @@ export const GraphIntelligence: React.FC = () => {
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
         <RefreshCw className="w-8 h-8 text-indigo-600 animate-spin" />
         <p className="text-sm font-medium text-slate-600 font-mono">
-          Compiling Phase 3K Advanced Graph Intelligence Topology...
+          Compiling Advanced Graph Intelligence Topology...
         </p>
       </div>
     );
@@ -234,7 +234,7 @@ export const GraphIntelligence: React.FC = () => {
           onClick={fetchAllInitialData}
           className="px-4 py-2 bg-rose-600 text-white font-medium text-xs rounded-lg hover:bg-rose-700 transition-colors"
         >
-          Retry Connection
+          Retry
         </button>
       </div>
     );
@@ -242,13 +242,10 @@ export const GraphIntelligence: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-12">
-      {/* ─── Header & Phase Banner ────────────────────────────────────────── */}
+      {/* ─── Header & Section Banner ────────────────────────────────────────── */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2 py-0.5 bg-indigo-50 border border-indigo-200 text-indigo-700 text-[11px] font-mono font-bold rounded">
-              PHASE 3K
-            </span>
             <span className="text-xs font-mono uppercase tracking-wider text-slate-500">
               Deterministic Structural Graph Engine
             </span>
@@ -1104,7 +1101,7 @@ export const GraphIntelligence: React.FC = () => {
                 Formula: Composite Influence = 0.25×Degree + 0.35×Betweenness + 0.25×Eigenvector + 0.15×PageRank
               </span>
               <span className="italic text-slate-400">
-                Preserves Phase 3I standard formula. Indicates structural network prominence only; does not infer culpability, risk, or illicit hierarchy.
+                Preserves standard composite centrality formula. Indicates structural network prominence only; does not infer culpability, risk, or illicit hierarchy.
               </span>
             </div>
           </div>

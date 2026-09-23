@@ -190,7 +190,7 @@ export const Sources: React.FC = () => {
   };
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] pb-16">
+    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 pb-16">
       {/* ─── Page Header ─────────────────────────────────────────────────── */}
       <div className="border-b border-slate-200 bg-white px-8 py-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -202,7 +202,7 @@ export const Sources: React.FC = () => {
               </span>
               <span className="text-xs text-slate-400 font-mono">•</span>
               <span className="text-xs font-mono text-slate-500">
-                Phase 3A Provenance Layer
+                Ingestion & Provenance Layer
               </span>
             </div>
             <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
@@ -1058,14 +1058,14 @@ export const Sources: React.FC = () => {
               {inspectorTab === "connector" && (
                 <div className="space-y-5">
                   <div className="text-xs text-slate-500 leading-relaxed">
-                    Technical architecture mapping prototype ingestion to enterprise deployment standards.
+                    Technical architecture mapping current ingestion connectors to enterprise deployment standards.
                   </div>
 
                   {/* Prototype Ingestion Spec */}
                   <div className="rounded-lg border border-slate-200 bg-slate-50/70 p-4 space-y-3">
                     <h4 className="text-xs font-bold uppercase font-mono text-slate-900 flex items-center gap-2">
                       <Server className="w-3.5 h-3.5 text-cyan-700" />
-                      Current Prototype Ingestion Specification
+                      Current Ingestion Specification
                     </h4>
 
                     <div className="grid grid-cols-2 gap-3 text-xs">

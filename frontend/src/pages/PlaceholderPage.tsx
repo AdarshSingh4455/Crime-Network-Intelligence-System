@@ -44,7 +44,7 @@ export const PlaceholderPage: React.FC<PlaceholderPageProps> = ({
             <span className="font-mono text-[11px] font-semibold text-cyan-800 bg-cyan-50 px-2.5 py-0.5 rounded border border-cyan-200 uppercase tracking-wider">
               CNIS SECTION :: {sectionCode}
             </span>
-            <span className="text-xs text-slate-500 font-mono">PHASE 2 ENGINE ACTIVE</span>
+            <span className="text-xs text-slate-500 font-mono">LIVE ENGINE ACTIVE</span>
           </div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight mt-1">{title}</h1>
           <p className="text-xs text-slate-600 mt-1 max-w-2xl">{subtitle}</p>
@@ -126,7 +126,7 @@ export const PlaceholderPage: React.FC<PlaceholderPageProps> = ({
             {title} Workspace Configured
           </h3>
           <p className="text-xs text-slate-600 max-w-lg mx-auto">
-            The Phase 2 Light Theme Shell, Navigation, and FastAPI Intelligence API service layer are active. Data for this module is available and ready for visual rendering.
+            The Navigation, Theme Shell, and FastAPI Intelligence API service layer are active. Data for this module is available and ready for visual rendering.
           </p>
         </div>
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-[11px] font-mono text-slate-600">

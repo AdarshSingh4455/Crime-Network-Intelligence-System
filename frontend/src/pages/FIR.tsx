@@ -307,7 +307,7 @@ export const FIR: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-[#F8FAFC]">
+    <div className="flex flex-col h-full overflow-hidden bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100">
       {/* ─── Page Header ────────────────────────────────────────────────────── */}
       <div className="px-6 py-4 border-b border-slate-200 bg-white/80 backdrop-blur-md shrink-0">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -317,9 +317,6 @@ export const FIR: React.FC = () => {
                 <FileSpreadsheet className="w-4 h-4" />
               </div>
               <h1 className="text-xl font-bold text-slate-900 tracking-tight">FIR Workspace</h1>
-              <span className="text-[10px] font-mono bg-cyan-50 text-cyan-800 border border-cyan-200 px-2 py-0.5 rounded font-semibold">
-                Phase 4 Foundation
-              </span>
             </div>
             <p className="text-xs text-slate-500 mt-1">
               Statutory First Information Reports · BNS 2023 Provisions · Case Intake & Evidence Cross-Reference

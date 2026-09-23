@@ -74,7 +74,7 @@ export const Reports: React.FC = () => {
   // Loading State
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center h-full bg-[#F8FAFC]">
+      <div className="flex-1 flex items-center justify-center h-full bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100">
         <div className="text-center space-y-4">
           <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-slate-700 font-semibold">Synthesizing intelligence report...</p>
@@ -87,7 +87,7 @@ export const Reports: React.FC = () => {
   // Error State
   if (error || !report) {
     return (
-      <div className="flex-1 flex items-center justify-center h-full bg-[#F8FAFC]">
+      <div className="flex-1 flex items-center justify-center h-full bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100">
         <div className="text-center space-y-3 max-w-md p-6 bg-white rounded-xl border border-slate-200 shadow-sm">
           <AlertTriangle className="w-10 h-10 text-rose-500 mx-auto" />
           <h2 className="text-lg font-bold text-slate-900">Unable to load intelligence report.</h2>
@@ -106,7 +106,7 @@ export const Reports: React.FC = () => {
   const m = report.investigation_metrics;
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto bg-[#F8FAFC]">
+    <div className="flex flex-col h-full overflow-y-auto bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100">
       {/* ── Page Header ── */}
       <div className="px-6 py-4 border-b border-slate-200 bg-white flex-shrink-0">
         <div className="flex items-center justify-between flex-wrap gap-4">
