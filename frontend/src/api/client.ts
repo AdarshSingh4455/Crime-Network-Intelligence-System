@@ -443,6 +443,11 @@ export const api = {
     const res = await apiClient.get<FIRLegalCatalogResponse>('/fir/reference/legal-provisions');
     return res.data;
   },
+
+  login: async (credentials: { username: string; password: string }): Promise<{ status: string; token: string; user: any }> => {
+    const res = await apiClient.post('/auth/login', credentials);
+    return res.data;
+  },
 };
 
 

@@ -316,3 +316,37 @@
 
 .dark .bg-purple-50, .dark .bg-purple-100 { background-color: rgba(168, 85, 247, 0.16) !important; color: #C084FC !important; }
 .dark .border-purple-200, .dark .border-purple-100 { border-color: rgba(168, 85, 247, 0.35) !important; }
+
+/* ─── CNIS Authentication & Boot Animations ────────────────────────────── */
+
+@keyframes cnisLogoRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-logo-rotate {
+  animation: cnisLogoRotate 24s linear infinite;
+  transform-origin: center center;
+}
+
+.animate-logo-rotate:hover {
+  animation-duration: 10s;
+}
+
+@keyframes cnisCodeStreamUp {
+  0% { transform: translateY(0%); }
+  100% { transform: translateY(-50%); }
+}
+
+.animate-code-stream {
+  animation: cnisCodeStreamUp 10s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-logo-rotate {
+    animation: none !important;
+  }
+  .animate-code-stream {
+    animation: none !important;
+  }
+}

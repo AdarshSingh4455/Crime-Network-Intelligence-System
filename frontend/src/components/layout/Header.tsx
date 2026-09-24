@@ -1,6 +1,7 @@
 import React from 'react';
-import { Search, Bell, ShieldCheck, Cpu, Sun, Moon } from 'lucide-react';
+import { Search, Bell, Cpu, Sun, Moon, LogOut } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 
 interface HeaderProps {
   onOpenSearch: () => void;
@@ -14,6 +15,14 @@ export const Header: React.FC<HeaderProps> = ({
   isBackendConnected = true,
 }) => {
   const { theme, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
+
+  const getInitials = (name?: string) => {
+    if (!name) return 'IA';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    return name.slice(0, 2).toUpperCase();
+  };
 
   return (
     <header className="h-16 bg-white dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-6 flex items-center justify-between z-10 sticky top-0 shadow-2xs transition-colors">
@@ -76,15 +85,30 @@ export const Header: React.FC<HeaderProps> = ({
           <Bell className="w-4.5 h-4.5" />
         </button>
 
-        {/* Investigator Profile Badge */}
+        {/* Investigator Profile Badge & Logout */}
         <div className="flex items-center gap-2.5 pl-3 border-l border-slate-200 dark:border-slate-800">
           <div className="w-8 h-8 rounded-full bg-cyan-700 dark:bg-cyan-600 text-white flex items-center justify-center text-xs font-mono font-bold shadow-2xs">
-            IA
+            {getInitials(user?.name)}
           </div>
           <div className="hidden xl:block">
-            <div className="text-xs font-semibold text-slate-900 dark:text-slate-100 leading-tight">Intel Analyst</div>
-            <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400">Unit-7 Crime Desk</div>
+            <div className="text-xs font-semibold text-slate-900 dark:text-slate-100 leading-tight">
+              {user?.name || 'Intel Analyst'}
+            </div>
+            <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
+              {user?.unit || 'Unit-7 Crime Desk'}
+            </div>
           </div>
+          {logout && (
+            <button
+              type="button"
+              onClick={logout}
+              aria-label="Sign out"
+              title="Sign out of CNIS"
+              className="p-1.5 ml-1 rounded-md text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
     </header>
