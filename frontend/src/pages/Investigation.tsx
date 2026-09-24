@@ -182,58 +182,82 @@ export const Investigation: React.FC = () => {
   return (
     <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 pb-16">
       {/* ─── TOP CONTROL BAR ─── */}
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-2xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            {/* Title & Badge */}
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-20 shadow-2xs transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 space-y-3">
+          {/* ROW 1: Title & Main Actions */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-cyan-700 text-white flex items-center justify-center shadow-xs">
+              <div className="w-9 h-9 rounded-xl bg-cyan-700 text-white flex items-center justify-center shadow-xs shrink-0">
                 <Compass className="w-5 h-5" />
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-lg font-bold text-slate-900 tracking-tight">
-                    Investigation Command Workspace
-                  </h1>
-                </div>
-                <p className="text-xs text-slate-500">
+                <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight">
+                  Investigation Command Workspace
+                </h1>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   Targeted multi-vector analysis • Shortest path corroboration • Observed cross-case overlap
                 </p>
               </div>
             </div>
 
-            {/* Target Selectors & Temporal Filter */}
-            <div className="flex flex-wrap items-center gap-3">
-              {/* Target Type Selector */}
-              <div className="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200">
-                {(['case', 'entity', 'location', 'anomaly'] as const).map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => {
-                      let defaultId = 'CR-1001';
-                      if (t === 'entity') defaultId = 'Ravi Malhotra';
-                      if (t === 'location') defaultId = 'Andheri Warehouse';
-                      if (t === 'anomaly') defaultId = 'ANOM-001';
-                      updateInvestigationTarget(t, defaultId);
-                    }}
-                    className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all ${
-                      targetType === t
-                        ? 'bg-white text-cyan-900 shadow-2xs'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
-                  >
-                    {t.charAt(0).toUpperCase() + t.slice(1)}
-                  </button>
-                ))}
-              </div>
+            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+              {/* Live View Button */}
+              <button
+                type="button"
+                onClick={() => setIsLiveViewOpen(true)}
+                className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-cyan-700 hover:bg-cyan-800 text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
+              >
+                <Radio className="w-3.5 h-3.5 animate-pulse text-cyan-200" />
+                <span>Live View</span>
+              </button>
 
+              {/* View Case Dossier Quick Link */}
+              {dossier && dossier.target.type === 'case' && (
+                <button
+                  type="button"
+                  onClick={() => navigate(`/cases?id=${encodeURIComponent(dossier.target.id)}`)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-medium border border-slate-200 dark:border-slate-700 transition-colors"
+                >
+                  <Briefcase className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                  <span className="hidden sm:inline">Case Dossier</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* ROW 2: Context Tabs, Target Selector & Temporal Filter */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-slate-800/60">
+            {/* Target Type Selector Tabs */}
+            <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700">
+              {(['case', 'entity', 'location', 'anomaly'] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => {
+                    let defaultId = 'CR-1001';
+                    if (t === 'entity') defaultId = 'Ravi Malhotra';
+                    if (t === 'location') defaultId = 'Andheri Warehouse';
+                    if (t === 'anomaly') defaultId = 'ANOM-001';
+                    updateInvestigationTarget(t, defaultId);
+                  }}
+                  className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
+                    targetType === t
+                      ? 'bg-white dark:bg-slate-900 text-cyan-800 dark:text-cyan-300 shadow-2xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                  }`}
+                >
+                  {t.charAt(0).toUpperCase() + t.slice(1)}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2.5">
               {/* Target ID Dropdown */}
               <div className="relative">
                 {targetType === 'case' && (
                   <select
                     value={targetId}
                     onChange={(e) => updateInvestigationTarget('case', e.target.value)}
-                    className="text-xs font-mono font-semibold text-slate-800 bg-white border border-slate-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 shadow-2xs"
+                    className="text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 shadow-2xs"
                   >
                     {availableCases.map((c) => (
                       <option key={c.case_id} value={c.case_id}>
@@ -246,7 +270,7 @@ export const Investigation: React.FC = () => {
                   <select
                     value={targetId}
                     onChange={(e) => updateInvestigationTarget('entity', e.target.value)}
-                    className="text-xs font-semibold text-slate-800 bg-white border border-slate-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 shadow-2xs"
+                    className="text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 shadow-2xs"
                   >
                     {availableEntities.map((ent) => (
                       <option key={ent.id} value={ent.id}>
@@ -259,7 +283,7 @@ export const Investigation: React.FC = () => {
                   <select
                     value={targetId}
                     onChange={(e) => updateInvestigationTarget('location', e.target.value)}
-                    className="text-xs font-semibold text-slate-800 bg-white border border-slate-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 shadow-2xs"
+                    className="text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 shadow-2xs"
                   >
                     {availableLocations.map((l) => (
                       <option key={l.id} value={l.id}>
@@ -272,7 +296,7 @@ export const Investigation: React.FC = () => {
                   <select
                     value={targetId}
                     onChange={(e) => updateInvestigationTarget('anomaly', e.target.value)}
-                    className="text-xs font-mono font-semibold text-slate-800 bg-white border border-slate-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 shadow-2xs"
+                    className="text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 shadow-2xs"
                   >
                     {availableAnomalies.map((a) => (
                       <option key={a.id} value={a.id}>
@@ -284,17 +308,17 @@ export const Investigation: React.FC = () => {
               </div>
 
               {/* Temporal Window Filter */}
-              <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 p-0.5 rounded-lg">
-                <span className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono flex items-center gap-1">
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-0.5 rounded-lg">
+                <span className="px-2 text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider font-mono flex items-center gap-1">
                   <Clock className="w-3 h-3 text-slate-400" />
                   Window:
                 </span>
                 {(
                   [
                     { id: 'all', label: 'All Dates' },
-                    { id: '24h', label: '24 Hours' },
-                    { id: '48h', label: '48 Hours' },
-                    { id: '7d', label: '7 Days' },
+                    { id: '24h', label: '24h' },
+                    { id: '48h', label: '48h' },
+                    { id: '7d', label: '7d' },
                   ] as const
                 ).map((w) => (
                   <button
@@ -303,23 +327,13 @@ export const Investigation: React.FC = () => {
                     className={`px-2 py-1 text-[11px] font-medium rounded transition-all ${
                       temporalWindow === w.id
                         ? 'bg-cyan-700 text-white font-semibold shadow-2xs'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-slate-700'
                     }`}
                   >
                     {w.label}
                   </button>
                 ))}
               </div>
-
-              {/* Live View Button */}
-              <button
-                type="button"
-                onClick={() => setIsLiveViewOpen(true)}
-                className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-cyan-700 hover:bg-cyan-800 text-white text-xs font-semibold font-mono shadow-xs transition-all cursor-pointer"
-              >
-                <Radio className="w-3.5 h-3.5 animate-pulse text-cyan-200" />
-                <span>Live View</span>
-              </button>
             </div>
           </div>
         </div>
