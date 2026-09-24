@@ -11,12 +11,10 @@ import {
   Maximize2,
   Minimize2,
   RotateCcw,
-  Layers,
   Globe,
   Mountain,
   Map as MapIcon,
-  Shield,
-  FileText,
+  Search,
 } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -72,7 +70,7 @@ const calculateHaversineDistance = (
   return `${d.toFixed(1)} km`;
 };
 
-// Incident category color scheme (Observed data context, not criminal attribution)
+// Incident category color scheme
 const getCategoryColor = (category?: string) => {
   const cat = (category || '').toLowerCase();
   if (cat.includes('murder') || cat.includes('homicide') || cat.includes('violent')) {
@@ -104,6 +102,8 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
   const [manualInput, setManualInput] = useState('');
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [selectedMarker, setSelectedMarker] = useState<any | null>(null);
+  const [isChangingPosition, setIsChangingPosition] = useState<boolean>(false);
+  const [tileErrorNotice, setTileErrorNotice] = useState<boolean>(false);
 
   // Map state
   const [mapLayer, setMapLayer] = useState<'street' | 'satellite' | 'terrain'>('street');
@@ -114,50 +114,88 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
   const tileLayerRef = useRef<L.TileLayer | null>(null);
   const markersGroupRef = useRef<L.LayerGroup | null>(null);
 
+  // Reset modal state on open/close
   useEffect(() => {
     if (isOpen) {
-      setStep('permission');
+      if (!investigatorCoords) {
+        setStep('permission');
+      } else {
+        setStep('map');
+      }
       setPermissionError(null);
       setSelectedMarker(null);
       setIsFullscreen(false);
+      setIsChangingPosition(false);
+      setTileErrorNotice(false);
+    } else {
+      // Cleanup Leaflet instance when modal closes completely
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+        tileLayerRef.current = null;
+        markersGroupRef.current = null;
+      }
     }
   }, [isOpen]);
 
-  // Leaflet Map Initialization & Updates
+  // Leaflet Map Initialization & Recenter Lifecycle
   useEffect(() => {
     if (step !== 'map' || !mapContainerRef.current || !investigatorCoords) return;
 
-    if (!mapInstanceRef.current) {
-      const map = L.map(mapContainerRef.current, {
-        center: [investigatorCoords.lat, investigatorCoords.lng],
-        zoom: 12,
-        zoomControl: false, // Custom controls
-        attributionControl: false,
-      });
+    const tileUrls = {
+      street: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      satellite: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      terrain: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+    };
 
-      mapInstanceRef.current = map;
-      markersGroupRef.current = L.layerGroup().addTo(map);
-
-      // Tile URLs
-      const tileUrls = {
-        street: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        satellite: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-        terrain: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-      };
-
-      const tileLayer = L.tileLayer(tileUrls[mapLayer], {
-        maxZoom: 18,
-      }).addTo(map);
-
-      tileLayerRef.current = tileLayer;
+    // If map instance ALREADY exists, simply update center & view smoothly!
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.setView([investigatorCoords.lat, investigatorCoords.lng], 12);
+      setTimeout(() => {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.invalidateSize();
+        }
+      }, 100);
+      return;
     }
 
-    // Force tile recalculation
+    // Initialize new Leaflet map instance for container
+    const map = L.map(mapContainerRef.current, {
+      center: [investigatorCoords.lat, investigatorCoords.lng],
+      zoom: 12,
+      zoomControl: false,
+      attributionControl: false,
+    });
+
+    mapInstanceRef.current = map;
+    markersGroupRef.current = L.layerGroup().addTo(map);
+
+    const tileLayer = L.tileLayer(tileUrls[mapLayer], {
+      maxZoom: 18,
+    });
+
+    tileLayer.on('tileerror', () => {
+      setTileErrorNotice(true);
+    });
+
+    tileLayer.addTo(map);
+    tileLayerRef.current = tileLayer;
+
     setTimeout(() => {
       if (mapInstanceRef.current) {
         mapInstanceRef.current.invalidateSize();
       }
     }, 150);
+
+    // Cleanup when step changes or container unmounts
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+        tileLayerRef.current = null;
+        markersGroupRef.current = null;
+      }
+    };
   }, [step, investigatorCoords]);
 
   // Update Map Layer Tile URL
@@ -182,7 +220,7 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
     const investigatorIcon = L.divIcon({
       className: 'custom-investigator-pin',
       html: `
-        <div style="position: relative; display: flex; items-align: center; justify-content: center; width: 32px; height: 32px;">
+        <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;">
           <span style="position: absolute; width: 100%; height: 100%; border-radius: 50%; background-color: #06b6d4; opacity: 0.6; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></span>
           <span style="position: relative; width: 16px; height: 16px; border-radius: 50%; background-color: #0891b2; border: 2px solid white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);"></span>
         </div>
@@ -261,11 +299,23 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
   // Handle Fullscreen Invalidate Size
   useEffect(() => {
     if (mapInstanceRef.current) {
-      setTimeout(() => mapInstanceRef.current?.invalidateSize(), 200);
+      setTimeout(() => {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.invalidateSize();
+        }
+      }, 150);
     }
   }, [isFullscreen]);
 
   if (!isOpen) return null;
+
+  // Select new position helper
+  const selectPosition = (lat: number, lng: number, label: string) => {
+    setInvestigatorCoords({ lat, lng, label });
+    setStep('map');
+    setIsChangingPosition(false);
+    setSelectedMarker(null);
+  };
 
   // Browser GPS Geolocation Handler
   const handleCurrentLocation = () => {
@@ -276,12 +326,7 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setInvestigatorCoords({
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          label: 'Active GPS Geolocation Sector',
-        });
-        setStep('map');
+        selectPosition(pos.coords.latitude, pos.coords.longitude, 'Active GPS Geolocation Sector');
       },
       (err) => {
         let msg = 'Location access denied or unavailable.';
@@ -306,30 +351,20 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
 
     for (const [key, item] of Object.entries(KNOWN_GEO_REGISTRY)) {
       if (query.includes(key) || key.includes(query)) {
-        setInvestigatorCoords({
-          lat: item.lat,
-          lng: item.lng,
-          label: `${item.localityName} (${item.district} District)`,
-        });
-        setStep('map');
+        selectPosition(item.lat, item.lng, `${item.localityName} (${item.district} District)`);
         return;
       }
     }
 
     if (query.includes('uttar pradesh') || query.includes('up')) {
-      setInvestigatorCoords({
-        lat: 26.8467,
-        lng: 80.9462,
-        label: 'Uttar Pradesh State Command Sector (Lucknow)',
-      });
-      setStep('map');
+      selectPosition(26.8467, 80.9462, 'Uttar Pradesh State Command Sector (Lucknow)');
       return;
     }
 
     setPermissionError(`Location '${manualInput}' could not be resolved. Please select a valid district (e.g. Lucknow, Bareilly, Sitapur).`);
   };
 
-  // Map Navigation Handlers
+  // Map Navigation Controls
   const handleZoomIn = () => mapInstanceRef.current?.zoomIn();
   const handleZoomOut = () => mapInstanceRef.current?.zoomOut();
   const handleRecenter = () => {
@@ -350,14 +385,14 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
         } flex flex-col overflow-hidden relative transition-all duration-300`}
       >
         {/* Modal Header Bar */}
-        <div className="px-4 py-3 bg-slate-100/90 dark:bg-slate-900/90 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
+        <div className="px-4 py-3 bg-slate-100/90 dark:bg-slate-900/95 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-cyan-700 text-white flex items-center justify-center shadow-xs shrink-0">
               <Radio className="w-4 h-4 animate-pulse text-cyan-200" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 font-mono tracking-tight">
+                <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-50 font-mono tracking-tight">
                   INVESTIGATION LIVE VIEW
                 </h2>
                 <span className="hidden sm:inline-block text-[10px] font-mono font-bold bg-amber-100 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 px-2 py-0.5 rounded border border-amber-300 dark:border-amber-800">
@@ -374,14 +409,25 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
 
           <div className="flex items-center gap-2">
             {step === 'map' && (
-              <button
-                type="button"
-                onClick={() => setIsFullscreen(!isFullscreen)}
-                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-200/60 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-colors"
-                title={isFullscreen ? 'Exit Full Screen' : 'Full Screen Map'}
-              >
-                {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => setIsChangingPosition(!isChangingPosition)}
+                  className="px-2.5 py-1 text-xs font-mono font-semibold bg-cyan-50 dark:bg-cyan-950/60 text-cyan-800 dark:text-cyan-300 hover:bg-cyan-100 dark:hover:bg-cyan-900 border border-cyan-200 dark:border-cyan-800 rounded-lg transition-colors flex items-center gap-1.5"
+                >
+                  <MapPin className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+                  <span>Change Position</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsFullscreen(!isFullscreen)}
+                  className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100 hover:bg-slate-200/60 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-colors"
+                  title={isFullscreen ? 'Exit Full Screen' : 'Full Screen Map'}
+                >
+                  {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                </button>
+              </>
             )}
 
             <button
@@ -394,14 +440,88 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
         </div>
 
         {/* Epistemic Statutory Disclaimer Banner */}
-        <div className="bg-amber-50 dark:bg-amber-950/50 border-b border-amber-200 dark:border-amber-900/60 px-4 py-1.5 flex items-center gap-2 text-xs text-amber-900 dark:text-amber-300 shrink-0">
-          <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
-          <span className="text-[11px]">
-            <strong>Investigative Visualization Notice:</strong> Markers display authorized intake location contexts. Proximity does not establish criminal activity, culpability, or guilt.
-          </span>
+        <div className="bg-amber-50 dark:bg-amber-950/50 border-b border-amber-200 dark:border-amber-900/60 px-4 py-1.5 flex items-center justify-between text-xs text-amber-900 dark:text-amber-300 shrink-0">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+            <span className="text-[11px] font-medium">
+              <strong>Investigative Visualization Notice:</strong> Markers display authorized intake location contexts. Proximity does not establish criminal activity, culpability, or guilt.
+            </span>
+          </div>
+
+          {tileErrorNotice && (
+            <span className="hidden md:inline-block px-2 py-0.5 bg-amber-100 dark:bg-amber-900/80 text-amber-900 dark:text-amber-200 rounded text-[10px] font-mono border border-amber-300 dark:border-amber-700">
+              Map tiles temporarily unavailable. Recorded markers active.
+            </span>
+          )}
         </div>
 
-        {/* STEP 1: PERMISSION & SECTOR SELECTION */}
+        {/* FLOATING CHANGE POSITION POPOVER OVERLAY */}
+        {isChangingPosition && (
+          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-40 max-w-md w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl shadow-2xl p-4 space-y-3 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+              <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                <MapPin className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                Select New Investigator Position
+              </h4>
+              <button
+                type="button"
+                onClick={() => setIsChangingPosition(false)}
+                className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleCurrentLocation}
+              className="w-full py-2 px-3 rounded-xl font-semibold text-xs bg-cyan-700 hover:bg-cyan-800 text-white dark:bg-cyan-600 dark:hover:bg-cyan-500 transition-all shadow-xs flex items-center justify-center gap-2 font-mono"
+            >
+              <Navigation className="w-3.5 h-3.5 text-cyan-200" />
+              <span>Use Current GPS Location</span>
+            </button>
+
+            <div className="grid grid-cols-3 gap-1.5">
+              {[
+                { name: 'Lucknow', label: 'Lucknow Sector' },
+                { name: 'Bareilly', label: 'Bareilly Sector' },
+                { name: 'Sitapur', label: 'Sitapur Sector' },
+              ].map((zone) => (
+                <button
+                  key={zone.name}
+                  type="button"
+                  onClick={() => {
+                    const item = KNOWN_GEO_REGISTRY[zone.name.toLowerCase()];
+                    selectPosition(item.lat, item.lng, `${item.localityName} (${item.district} District)`);
+                  }}
+                  className="py-1.5 px-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-800 dark:text-slate-200 transition-all shadow-2xs text-center"
+                >
+                  {zone.name}
+                </button>
+              ))}
+            </div>
+
+            <form onSubmit={handleManualSubmit} className="space-y-1.5 pt-1">
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="text"
+                  placeholder="Locality (e.g. Hazratganj, Gomti Nagar)..."
+                  value={manualInput}
+                  onChange={(e) => setManualInput(e.target.value)}
+                  className="flex-1 px-3 py-1.5 rounded-lg text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                />
+                <button
+                  type="submit"
+                  className="px-3 py-1.5 rounded-lg bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 text-white text-xs font-semibold transition-all"
+                >
+                  Apply
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* STEP 1: INITIAL PERMISSION & SECTOR SELECTION */}
         {step === 'permission' ? (
           <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-6 bg-slate-50 dark:bg-[#0B0F19] overflow-y-auto">
             <div className="w-14 h-14 rounded-2xl bg-cyan-100 dark:bg-cyan-950/60 border border-cyan-300 dark:border-cyan-800 text-cyan-700 dark:text-cyan-400 flex items-center justify-center shadow-md">
@@ -409,10 +529,10 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
             </div>
 
             <div className="max-w-md space-y-1.5">
-              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-50">
                 Investigator Location Authorization
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 Establish your operational command position to map distance vectors and sector context.
               </p>
             </div>
@@ -435,7 +555,7 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
                 <span>Use Current Location (Browser GPS)</span>
               </button>
 
-              <div className="flex items-center gap-3 text-xs text-slate-400 font-mono">
+              <div className="flex items-center gap-3 text-xs text-slate-400 dark:text-slate-400 font-mono">
                 <span className="h-px bg-slate-200 dark:bg-slate-800 flex-1" />
                 <span>OR SELECT OPERATIONAL ZONE</span>
                 <span className="h-px bg-slate-200 dark:bg-slate-800 flex-1" />
@@ -453,12 +573,7 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
                     type="button"
                     onClick={() => {
                       const item = KNOWN_GEO_REGISTRY[zone.name.toLowerCase()];
-                      setInvestigatorCoords({
-                        lat: item.lat,
-                        lng: item.lng,
-                        label: `${item.localityName} (${item.district} District)`,
-                      });
-                      setStep('map');
+                      selectPosition(item.lat, item.lng, `${item.localityName} (${item.district} District)`);
                     }}
                     className="py-2 px-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-800 dark:text-slate-200 transition-all shadow-2xs"
                   >
@@ -475,7 +590,7 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
                     placeholder="Type locality name (e.g. Hazratganj, Gomti Nagar, Khairabad)..."
                     value={manualInput}
                     onChange={(e) => setManualInput(e.target.value)}
-                    className="flex-1 px-3 py-2 rounded-xl text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    className="flex-1 px-3 py-2 rounded-xl text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   />
                   <button
                     type="submit"
@@ -526,7 +641,7 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
                   })}
                 </div>
 
-                {/* Navigation Zoom / Recenter / Fullscreen Controls */}
+                {/* Navigation Zoom / Recenter / Position Controls */}
                 <div className="bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl p-1 shadow-lg flex flex-col gap-1 self-end">
                   <button
                     type="button"
@@ -551,14 +666,6 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
                     title="Recenter Map on Investigator Location"
                   >
                     <RotateCcw className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setStep('permission')}
-                    className="p-2 rounded-lg text-cyan-400 hover:text-cyan-300 hover:bg-slate-800 transition-colors border-t border-slate-800 text-[10px] font-mono"
-                    title="Change Operational Position"
-                  >
-                    <MapPin className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -596,7 +703,7 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
                       className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: selectedMarker.colorScheme.bg }}
                     />
-                    <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 font-mono">
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-slate-50 font-mono">
                       {selectedMarker.fir_number}
                     </h3>
                   </div>
@@ -610,7 +717,7 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
 
                 <div className="space-y-3 text-xs">
                   <div>
-                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
+                    <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                       Incident Category
                     </span>
                     <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
@@ -619,7 +726,7 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
                   </div>
 
                   <div>
-                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
+                    <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                       Distance From Investigator Location
                     </span>
                     <span className="text-sm font-bold font-mono text-cyan-700 dark:text-cyan-400">
@@ -628,7 +735,7 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
                   </div>
 
                   <div>
-                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
+                    <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                       Locality & Station Context
                     </span>
                     <span className="text-xs text-slate-700 dark:text-slate-300 font-medium">
@@ -637,7 +744,7 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
                   </div>
 
                   <div>
-                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
+                    <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                       Associated Case ID
                     </span>
                     <span className="text-xs font-mono font-semibold text-slate-800 dark:text-slate-200">
@@ -646,7 +753,7 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
                   </div>
 
                   <div>
-                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
+                    <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                       Statutory BNS Provisions
                     </span>
                     <span className="text-xs font-mono text-cyan-800 dark:text-cyan-300 font-semibold">
@@ -655,7 +762,7 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
                   </div>
 
                   <div>
-                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
+                    <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                       Recorded Suspect / POI Intake
                     </span>
                     <span className="text-xs text-slate-700 dark:text-slate-300">
@@ -664,7 +771,7 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
                   </div>
 
                   <div>
-                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
+                    <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                       Investigating Officer
                     </span>
                     <span className="text-xs text-slate-700 dark:text-slate-300">
@@ -674,7 +781,7 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
                 </div>
 
                 <div className="pt-3 border-t border-slate-200 dark:border-slate-800">
-                  <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-lg text-[11px] text-slate-600 dark:text-slate-400 space-y-1">
+                  <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-lg text-[11px] text-slate-600 dark:text-slate-300 space-y-1">
                     <span className="font-semibold block text-slate-800 dark:text-slate-200">
                       Statutory Safeguard Notice
                     </span>
@@ -686,7 +793,7 @@ export const LiveViewModal: React.FC<LiveViewModalProps> = ({
               </div>
             ) : (
               <div className="hidden lg:flex w-72 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 p-6 flex-col items-center justify-center text-center space-y-3 shrink-0 z-20">
-                <MapPin className="w-8 h-8 text-slate-400" />
+                <MapPin className="w-8 h-8 text-slate-400 dark:text-slate-500" />
                 <div className="text-xs text-slate-500 dark:text-slate-400">
                   Click any mapped record marker on the geographic map to inspect intake details and distance vector.
                 </div>
