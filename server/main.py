@@ -705,6 +705,15 @@ def get_fir_legal_provisions():
     return IntelligenceService.get_fir_legal_provisions()
 
 
+@app.get("/api/fir/suggest-bns")
+def suggest_bns_provisions(category: Optional[str] = None, narrative: Optional[str] = None):
+    """
+    Returns dynamic BNS 2023 legal-provision suggestions based on incident category and narrative.
+    Registered BEFORE /api/fir/{fir_id} to prevent route shadowing.
+    """
+    return IntelligenceService.suggest_bns_provisions(category=category or "", narrative=narrative or "")
+
+
 @app.get("/api/fir/kpis")
 def get_fir_kpis():
     """

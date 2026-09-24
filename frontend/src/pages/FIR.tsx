@@ -119,6 +119,17 @@ export const FIR: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [formMessage, setFormMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
+  // BNS Suggestion Engine state
+  const [bnsSuggestions, setBnsSuggestions] = useState<Array<{
+    bns_section: string;
+    ipc_legacy_section: string;
+    offense_name: string;
+    confidence: number;
+    reason: string;
+  }>>([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [dismissedSuggestions, setDismissedSuggestions] = useState<Set<string>>(new Set());
+
   // ─── Data Loading ─────────────────────────────────────────────────────────
 
   const loadData = useCallback(async () => {
@@ -143,6 +154,55 @@ export const FIR: React.FC = () => {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Dynamic real-time BNS suggestion trigger
+  useEffect(() => {
+    if (activeTab !== "create") return;
+    if (!formIncident.incident_category && !formNarrative.trim() && !formIncident.summary.trim()) {
+      setBnsSuggestions([]);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      setLoadingSuggestions(true);
+      try {
+        const fullText = `${formIncident.summary} ${formNarrative}`.trim();
+        const res = await api.suggestBnsProvisions(formIncident.incident_category, fullText);
+        if (res && res.suggestions) {
+          setBnsSuggestions(res.suggestions);
+        }
+      } catch (err) {
+        console.error("Failed to fetch BNS suggestions:", err);
+      } finally {
+        setLoadingSuggestions(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [formIncident.incident_category, formIncident.summary, formNarrative, activeTab]);
+
+  const handleAcceptSuggestion = (sug: { bns_section: string; ipc_legacy_section: string; offense_name: string; reason: string }) => {
+    const exists = formProvisions.some((p) => p.bns_section === sug.bns_section);
+    if (!exists) {
+      setFormProvisions((prev) => [
+        ...prev,
+        {
+          bns_section: sug.bns_section,
+          ipc_legacy_section: sug.ipc_legacy_section,
+          offense_name: sug.offense_name,
+          officer_notes: sug.reason,
+        },
+      ]);
+    }
+    setDismissedSuggestions((prev) => new Set(prev).add(sug.bns_section));
+  };
+
+  const handleEditSuggestion = (sug: { bns_section: string; ipc_legacy_section: string; offense_name: string; reason: string }) => {
+    handleAcceptSuggestion(sug);
+  };
+
+  const handleDismissSuggestion = (bnsSection: string) => {
+    setDismissedSuggestions((prev) => new Set(prev).add(bnsSection));
+  };
 
   // ─── Search & Filter Execution ────────────────────────────────────────────
 
@@ -973,6 +1033,106 @@ export const FIR: React.FC = () => {
                     <Plus className="w-3 h-3" /> Add Legal Section
                   </button>
                 </div>
+
+                {/* Real-time BNS Suggestions Card */}
+                {bnsSuggestions.filter((s) => !dismissedSuggestions.has(s.bns_section)).length > 0 && (
+                  <div className="p-3.5 bg-gradient-to-r from-purple-50 via-indigo-50 to-cyan-50 border border-purple-200/80 rounded-xl space-y-3 shadow-2xs">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center">
+                          <Sparkles className="w-3.5 h-3.5" />
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-bold text-purple-950 flex items-center gap-2">
+                            AI Legal Assistance — Dynamic BNS Suggestions
+                            {loadingSuggestions && (
+                              <div className="w-3 h-3 border-2 border-purple-600 border-t-transparent rounded-full animate-spin inline-block ml-1" />
+                            )}
+                          </h4>
+                          <p className="text-[10px] text-purple-700">
+                            Evaluates category & narrative keywords against BNS 2023 Statutory Catalog
+                          </p>
+                        </div>
+                      </div>
+
+                      <span className="px-2 py-0.5 bg-purple-100 text-purple-800 border border-purple-300 rounded font-mono text-[10px] font-bold">
+                        Suggested — Officer Review Required
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-2">
+                      {bnsSuggestions
+                        .filter((s) => !dismissedSuggestions.has(s.bns_section))
+                        .map((sug, idx) => {
+                          const isAlreadyAdded = formProvisions.some((p) => p.bns_section === sug.bns_section);
+                          return (
+                            <div
+                              key={idx}
+                              className="p-2.5 bg-white border border-purple-200/60 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-2xs"
+                            >
+                              <div className="space-y-0.5">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-mono font-bold text-purple-900 text-xs">
+                                    {sug.bns_section}
+                                  </span>
+                                  <span className="text-[10px] font-mono text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                                    Legacy: {sug.ipc_legacy_section}
+                                  </span>
+                                  <span className="text-[10px] font-mono font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                                    {Math.round(sug.confidence * 100)}% Match
+                                  </span>
+                                </div>
+                                <p className="text-xs font-semibold text-slate-800">{sug.offense_name}</p>
+                                <p className="text-[10px] text-slate-500 italic">Basis: {sug.reason}</p>
+                              </div>
+
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                {isAlreadyAdded ? (
+                                  <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded">
+                                    ✓ Added to FIR
+                                  </span>
+                                ) : (
+                                  <>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleAcceptSuggestion(sug)}
+                                      className="px-2.5 py-1 bg-purple-700 hover:bg-purple-800 text-white rounded text-[11px] font-semibold flex items-center gap-1 shadow-2xs transition-colors"
+                                    >
+                                      <CheckCircle2 className="w-3 h-3" />
+                                      Accept
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleEditSuggestion(sug)}
+                                      className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded text-[11px] font-medium flex items-center gap-1 transition-colors"
+                                    >
+                                      <Edit className="w-3 h-3" />
+                                      Edit & Add
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDismissSuggestion(sug.bns_section)}
+                                      className="p-1 text-slate-400 hover:text-rose-600 rounded"
+                                      title="Dismiss suggestion"
+                                    >
+                                      <X className="w-3.5 h-3.5" />
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+
+                    <div className="text-[10px] text-purple-800/80 flex items-center gap-1">
+                      <Scale className="w-3 h-3 shrink-0" />
+                      <span>
+                        Non-binding statutory assistance. Section assignment requires manual confirmation by investigating officer.
+                      </span>
+                    </div>
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   {formProvisions.map((prov, idx) => (

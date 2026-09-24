@@ -850,6 +850,67 @@ class FIREngine:
             "pending_review_provisions": pending_review_provisions,
         }
 
+    @classmethod
+    def suggest_bns_provisions(cls, category: str = "", narrative: str = "") -> Dict[str, Any]:
+        """
+        Dynamic BNS (2023) Legal Provision Suggestion Engine.
+        Analyzes selected FIR category and narrative context against the canonical BNS catalog.
+        Returns suggested provisions marked as 'Suggested — Officer Review Required'.
+        Does NOT establish guilt or auto-commit provisions.
+        """
+        category_clean = (category or "").strip().lower()
+        narrative_clean = (narrative or "").strip().lower()
+
+        suggestions = []
+
+        for item in BNS_IPC_CATALOG:
+            cat_match = item["category"].lower() in category_clean or category_clean in item["category"].lower()
+            offense_lower = item["offense_name"].lower()
+            desc_lower = item["description"].lower()
+
+            keyword_score = 0
+            keywords = ["cheat", "fraud", "conspirac", "forg", "trust", "extort", "theft", "stolen", "property", "organis", "syndicate", "public servant", "banker", "breach"]
+            for kw in keywords:
+                if kw in narrative_clean and (kw in offense_lower or kw in desc_lower or kw in item["category"].lower()):
+                    keyword_score += 1
+
+            if cat_match or keyword_score > 0:
+                reason = "Matched category" if cat_match else "Matched narrative context"
+                if cat_match and keyword_score > 0:
+                    reason = "Matched category and incident narrative context"
+
+                suggestions.append({
+                    "bns_section": item["bns_section"],
+                    "ipc_legacy_section": item["ipc_legacy_section"],
+                    "offense_name": item["offense_name"],
+                    "category": item["category"],
+                    "description": item["description"],
+                    "match_reason": reason,
+                    "review_status": "Suggested — Officer Review Required",
+                    "officer_review_notice": "Suggested provision based on intake narrative; officer review required.",
+                })
+
+        if not suggestions and (category_clean or narrative_clean):
+            first = BNS_IPC_CATALOG[0]
+            suggestions.append({
+                "bns_section": first["bns_section"],
+                "ipc_legacy_section": first["ipc_legacy_section"],
+                "offense_name": first["offense_name"],
+                "category": first["category"],
+                "description": first["description"],
+                "match_reason": "General reference provision for officer review",
+                "review_status": "Suggested — Officer Review Required",
+                "officer_review_notice": "Suggested provision based on intake narrative; officer review required.",
+            })
+
+        return {
+            "status": "success",
+            "category": category,
+            "total_suggestions": len(suggestions),
+            "suggestions": suggestions,
+            "epistemic_notice": "Suggestions are advisory for officer review. Officer selection is required.",
+        }
+
 
 _global_fir_engine: Optional[FIREngine] = None
 

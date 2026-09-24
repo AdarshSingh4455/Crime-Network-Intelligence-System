@@ -3777,3 +3777,51 @@ class IntelligenceService:
             }
 
         return None
+
+    # ─── FIR Module Intelligence Delegates ──────────────────────────────────────
+
+    @classmethod
+    def list_firs(cls, **kwargs):
+        from src.fir_engine import get_fir_engine
+        return get_fir_engine().list_firs(**kwargs)
+
+    @classmethod
+    def create_fir(cls, payload):
+        from src.fir_engine import get_fir_engine
+        return get_fir_engine().create_fir(payload)
+
+    @classmethod
+    def update_fir(cls, fir_id, payload):
+        from src.fir_engine import get_fir_engine
+        return get_fir_engine().update_fir(fir_id, payload)
+
+    @classmethod
+    def delete_fir(cls, fir_id):
+        from src.fir_engine import get_fir_engine
+        return get_fir_engine().delete_fir(fir_id)
+
+    @classmethod
+    def get_fir(cls, fir_id):
+        from src.fir_engine import get_fir_engine
+        return get_fir_engine().get_fir(fir_id)
+
+    @classmethod
+    def search_firs(cls, **kwargs):
+        from src.fir_engine import get_fir_engine
+        return get_fir_engine().search_firs(**kwargs)
+
+    @classmethod
+    def get_fir_legal_provisions(cls):
+        from src.fir_engine import get_fir_engine
+        return get_fir_engine().get_legal_provisions_catalog()
+
+    @classmethod
+    def get_fir_kpis(cls):
+        from src.fir_engine import get_fir_engine
+        return get_fir_engine().get_summary_kpis()
+
+    @classmethod
+    def suggest_bns_provisions(cls, category="", narrative=""):
+        from src.fir_engine import FIREngine
+        return FIREngine.suggest_bns_provisions(category=category, narrative=narrative)
+

@@ -448,6 +448,13 @@ export const api = {
     const res = await apiClient.post('/auth/login', credentials);
     return res.data;
   },
+
+  suggestBnsProvisions: async (category?: string, narrative?: string): Promise<any> => {
+    const res = await apiClient.get('/fir/suggest-bns', {
+      params: { category, narrative },
+    });
+    return res.data;
+  },
 };
 
 

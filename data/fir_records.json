@@ -1,7 +1,805 @@
 {
   "version": "1.0",
   "storage_type": "file_backed_json",
-  "updated_at": "2026-09-18T06:16:39.747289+00:00",
+  "updated_at": "2026-09-24T10:30:00.000000+00:00",
   "epistemic_limitation": "File-backed persistence layer for operational FIR intake records. Not equivalent to an ACID distributed enterprise database; does not support multi-process concurrent write locking.",
-  "records": []
+  "records": [
+    {
+      "fir_id": "FIR-2024-UP-LKO-001",
+      "fir_number": "UP-LKO-2024-001",
+      "status": "Under Investigation",
+      "created_at": "2024-08-12T09:30:00+00:00",
+      "updated_at": "2024-08-12T09:30:00+00:00",
+      "administrative": {
+        "fir_number": "UP-LKO-2024-001",
+        "police_station": "Hazratganj PS",
+        "district": "Lucknow",
+        "state": "Uttar Pradesh",
+        "registration_date": "2024-08-12",
+        "investigating_officer": "Inspector R. K. Verma",
+        "officer_rank": "Inspector of Police",
+        "officer_id": "UP-LKO-1042"
+      },
+      "complainant": {
+        "name": "Alok Kumar Rastogi",
+        "contact_number": "+91-9415011001",
+        "address": "Hazratganj, Lucknow, UP",
+        "complainant_role": "Aggrieved Investor"
+      },
+      "accused": [
+        {
+          "accused_id": "ACC-01",
+          "name": "Rakesh Vikram Singh",
+          "alias": "Vicky Lucknow",
+          "status": "Named in FIR",
+          "alleged_role": "Primary promoter & fund diverter"
+        }
+      ],
+      "incident": {
+        "incident_location": "Hazratganj Main Market, Lucknow",
+        "jurisdiction": "Hazratganj Division",
+        "incident_date": "2024-08-10",
+        "incident_category": "Financial Fraud",
+        "summary": "Cheating and fraudulent diversion of investment funds via shell bank accounts."
+      },
+      "narrative": "Complainant alleges that the accused dishonestly induced multiple retail investors to deposit Rs. 45 Lakhs promising real estate allocation, subsequently siphoning funds into unregistered shell accounts.",
+      "legal_provisions": [
+        {
+          "provision_id": "LP-01",
+          "bns_section": "BNS Section 318(4)",
+          "ipc_legacy_section": "IPC Section 420",
+          "offense_name": "Cheating and Dishonestly Inducing Delivery of Property",
+          "review_status": "Pending Officer Review",
+          "officer_notes": "Suggested based on intake category Financial Fraud and narrative allegations."
+        }
+      ],
+      "intelligence_links": {
+        "case_id": "CR-UP-101",
+        "linked_entity_ids": ["ENT-LKO-01"],
+        "linked_evidence_ids": ["EVD-LKO-01"]
+      }
+    },
+    {
+      "fir_id": "FIR-2024-UP-LKO-002",
+      "fir_number": "UP-LKO-2024-002",
+      "status": "Registered",
+      "created_at": "2024-08-15T11:15:00+00:00",
+      "updated_at": "2024-08-15T11:15:00+00:00",
+      "administrative": {
+        "fir_number": "UP-LKO-2024-002",
+        "police_station": "Gomti Nagar PS",
+        "district": "Lucknow",
+        "state": "Uttar Pradesh",
+        "registration_date": "2024-08-15",
+        "investigating_officer": "Inspector S. P. Singh",
+        "officer_rank": "Inspector of Police",
+        "officer_id": "UP-LKO-1088"
+      },
+      "complainant": {
+        "name": "Sunil Kumar Srivastava",
+        "contact_number": "+91-9415022002",
+        "address": "Vibhuti Khand, Gomti Nagar, Lucknow, UP",
+        "complainant_role": "Resident"
+      },
+      "accused": [
+        {
+          "accused_id": "ACC-01",
+          "name": "Anurag Tripathi",
+          "alias": "Panditji",
+          "status": "Suspect",
+          "alleged_role": "Document orchestrator"
+        }
+      ],
+      "incident": {
+        "incident_location": "Vibhuti Khand, Gomti Nagar, Lucknow",
+        "jurisdiction": "Gomti Nagar Circle",
+        "incident_date": "2024-08-13",
+        "incident_category": "Criminal Conspiracy",
+        "summary": "Conspiracy to issue forged land allotment letters and misappropriate public deposits."
+      },
+      "narrative": "Information received regarding an organized group conspiring to produce fake development authority clearance notices and collect booking advances.",
+      "legal_provisions": [
+        {
+          "provision_id": "LP-01",
+          "bns_section": "BNS Section 61(2)",
+          "ipc_legacy_section": "IPC Section 120B",
+          "offense_name": "Criminal Conspiracy",
+          "review_status": "Pending Officer Review",
+          "officer_notes": "Conspiracy provisions flagged for detailed syndicate investigation."
+        }
+      ],
+      "intelligence_links": {
+        "case_id": "CR-UP-102"
+      }
+    },
+    {
+      "fir_id": "FIR-2024-UP-LKO-003",
+      "fir_number": "UP-LKO-2024-003",
+      "status": "Under Investigation",
+      "created_at": "2024-08-20T14:20:00+00:00",
+      "updated_at": "2024-08-20T14:20:00+00:00",
+      "administrative": {
+        "fir_number": "UP-LKO-2024-003",
+        "police_station": "Alambagh PS",
+        "district": "Lucknow",
+        "state": "Uttar Pradesh",
+        "registration_date": "2024-08-20",
+        "investigating_officer": "Inspector M. K. Tripathi",
+        "officer_rank": "Inspector of Police",
+        "officer_id": "UP-LKO-1104"
+      },
+      "complainant": {
+        "name": "Branch Manager, State Financial Corp",
+        "contact_number": "+91-9415033003",
+        "address": "Charbagh Branch, Lucknow, UP",
+        "complainant_role": "Institutional Complainant"
+      },
+      "accused": [
+        {
+          "accused_id": "ACC-01",
+          "name": "Manish Dev Sharma",
+          "alias": "Manoj",
+          "status": "Named in FIR",
+          "alleged_role": "Forged document presenter"
+        }
+      ],
+      "incident": {
+        "incident_location": "Charbagh Station Area, Lucknow",
+        "jurisdiction": "Alambagh Division",
+        "incident_date": "2024-08-18",
+        "incident_category": "Document Fraud",
+        "summary": "Use of forged identity documents and counterfeit stamps to execute unauthorized bank transfers."
+      },
+      "narrative": "Accused submitted forged PAN, Aadhaar, and corporate resolution certificates to open collateral credit line.",
+      "legal_provisions": [
+        {
+          "provision_id": "LP-01",
+          "bns_section": "BNS Section 338",
+          "ipc_legacy_section": "IPC Section 468",
+          "offense_name": "Forgery for Purpose of Cheating",
+          "review_status": "Pending Officer Review",
+          "officer_notes": "Document forgery verified by bank security auditor."
+        }
+      ],
+      "intelligence_links": {
+        "case_id": "CR-UP-103"
+      }
+    },
+    {
+      "fir_id": "FIR-2024-UP-LKO-004",
+      "fir_number": "UP-LKO-2024-004",
+      "status": "Registered",
+      "created_at": "2024-08-25T16:00:00+00:00",
+      "updated_at": "2024-08-25T16:00:00+00:00",
+      "administrative": {
+        "fir_number": "UP-LKO-2024-004",
+        "police_station": "Mahanagar PS",
+        "district": "Lucknow",
+        "state": "Uttar Pradesh",
+        "registration_date": "2024-08-25",
+        "investigating_officer": "Inspector A. K. Shukla",
+        "officer_rank": "Inspector of Police",
+        "officer_id": "UP-LKO-1150"
+      },
+      "complainant": {
+        "name": "Deepak Traders Corp",
+        "contact_number": "+91-9415044004",
+        "address": "Nishatganj, Lucknow, UP",
+        "complainant_role": "Property Owner"
+      },
+      "accused": [
+        {
+          "accused_id": "ACC-01",
+          "name": "Vikas Nigam",
+          "alias": "Vicky",
+          "status": "Suspect",
+          "alleged_role": "Warehouse custodian"
+        }
+      ],
+      "incident": {
+        "incident_location": "Nishatganj, Lucknow",
+        "jurisdiction": "Mahanagar Circle",
+        "incident_date": "2024-08-24",
+        "incident_category": "Property Crime",
+        "summary": "Dishonest misappropriation of commercial inventory entrusted to warehouse logistics agent."
+      },
+      "narrative": "Commercial goods worth Rs. 12 Lakhs entrusted for regional transit were misappropriated and diverted to unauthorized retail outlets.",
+      "legal_provisions": [
+        {
+          "provision_id": "LP-01",
+          "bns_section": "BNS Section 316(2)",
+          "ipc_legacy_section": "IPC Section 406",
+          "offense_name": "Criminal Breach of Trust",
+          "review_status": "Pending Officer Review",
+          "officer_notes": "Entrusted property misappropriation recorded."
+        }
+      ],
+      "intelligence_links": {
+        "case_id": "CR-UP-104"
+      }
+    },
+    {
+      "fir_id": "FIR-2024-UP-LKO-005",
+      "fir_number": "UP-LKO-2024-005",
+      "status": "Under Investigation",
+      "created_at": "2024-09-01T10:45:00+00:00",
+      "updated_at": "2024-09-01T10:45:00+00:00",
+      "administrative": {
+        "fir_number": "UP-LKO-2024-005",
+        "police_station": "Chowk PS",
+        "district": "Lucknow",
+        "state": "Uttar Pradesh",
+        "registration_date": "2024-09-01",
+        "investigating_officer": "Inspector V. N. Pandey",
+        "officer_rank": "Inspector of Police",
+        "officer_id": "UP-LKO-1201"
+      },
+      "complainant": {
+        "name": "Bullion Merchants Association",
+        "contact_number": "+91-9415055005",
+        "address": "Chowk, Lucknow, UP",
+        "complainant_role": "Association Representative"
+      },
+      "accused": [
+        {
+          "accused_id": "ACC-01",
+          "name": "Tariq Ahmad",
+          "alias": "Bhaiyya",
+          "status": "Named in FIR",
+          "alleged_role": "Extortion caller"
+        }
+      ],
+      "incident": {
+        "incident_location": "Chowk Bullion Market, Lucknow",
+        "jurisdiction": "Chowk Division",
+        "incident_date": "2024-08-30",
+        "incident_category": "Organised Crime",
+        "summary": "Extortion syndicate demanding protection money from bullion merchants via untraceable VOIP calls."
+      },
+      "narrative": "Multiple jewellers reported systemic extortion threats demanding monthly protection payments under coercion.",
+      "legal_provisions": [
+        {
+          "provision_id": "LP-01",
+          "bns_section": "BNS Section 111",
+          "ipc_legacy_section": "Special Legislation / IPC 120B",
+          "offense_name": "Organised Crime",
+          "review_status": "Pending Officer Review",
+          "officer_notes": "Syndicated activity under BNS Section 111."
+        }
+      ],
+      "intelligence_links": {
+        "case_id": "CR-UP-105"
+      }
+    },
+    {
+      "fir_id": "FIR-2024-UP-BLY-001",
+      "fir_number": "UP-BLY-2024-001",
+      "status": "Registered",
+      "created_at": "2024-08-10T08:20:00+00:00",
+      "updated_at": "2024-08-10T08:20:00+00:00",
+      "administrative": {
+        "fir_number": "UP-BLY-2024-001",
+        "police_station": "Kotwali Bareilly PS",
+        "district": "Bareilly",
+        "state": "Uttar Pradesh",
+        "registration_date": "2024-08-10",
+        "investigating_officer": "Inspector D. C. Gangwar",
+        "officer_rank": "Inspector of Police",
+        "officer_id": "UP-BLY-2010"
+      },
+      "complainant": {
+        "name": "Rajesh Kumar Gangwar",
+        "contact_number": "+91-9412011001",
+        "address": "Civil Lines, Bareilly, UP",
+        "complainant_role": "Transport Manager"
+      },
+      "accused": [
+        {
+          "accused_id": "ACC-01",
+          "name": "Unknown Suspect",
+          "alias": "Driver Helper",
+          "status": "Unknown",
+          "alleged_role": "Cargo thief"
+        }
+      ],
+      "incident": {
+        "incident_location": "Civil Lines, Bareilly",
+        "jurisdiction": "Kotwali Circle",
+        "incident_date": "2024-08-09",
+        "incident_category": "Theft",
+        "summary": "Theft of commercial transit cargo from goods carrier parked at Bareilly Transport Hub."
+      },
+      "narrative": "Sealed consignment of electrical appliances valued at Rs. 6.5 Lakhs stolen from parked container vehicle overnight.",
+      "legal_provisions": [
+        {
+          "provision_id": "LP-01",
+          "bns_section": "BNS Section 303(2)",
+          "ipc_legacy_section": "IPC Section 379",
+          "offense_name": "Theft",
+          "review_status": "Pending Officer Review",
+          "officer_notes": "Cargo theft case registered."
+        }
+      ],
+      "intelligence_links": {
+        "case_id": "CR-UP-201"
+      }
+    },
+    {
+      "fir_id": "FIR-2024-UP-BLY-002",
+      "fir_number": "UP-BLY-2024-002",
+      "status": "Under Investigation",
+      "created_at": "2024-08-14T13:40:00+00:00",
+      "updated_at": "2024-08-14T13:40:00+00:00",
+      "administrative": {
+        "fir_number": "UP-BLY-2024-002",
+        "police_station": "Baradari PS",
+        "district": "Bareilly",
+        "state": "Uttar Pradesh",
+        "registration_date": "2024-08-14",
+        "investigating_officer": "Inspector P. K. Sharma",
+        "officer_rank": "Inspector of Police",
+        "officer_id": "UP-BLY-2045"
+      },
+      "complainant": {
+        "name": "Meena Saxena",
+        "contact_number": "+91-9412022002",
+        "address": "Pilibhit By-Pass Road, Bareilly, UP",
+        "complainant_role": "Aggrieved Citizen"
+      },
+      "accused": [
+        {
+          "accused_id": "ACC-01",
+          "name": "Amit Pathak",
+          "alias": "App Admin",
+          "status": "Named in FIR",
+          "alleged_role": "Fraudulent application operator"
+        }
+      ],
+      "incident": {
+        "incident_location": "Pilibhit By-Pass Road, Bareilly",
+        "jurisdiction": "Baradari Division",
+        "incident_date": "2024-08-12",
+        "incident_category": "Financial Fraud",
+        "summary": "Unauthorized collection of micro-finance deposits through fraudulent mobile banking app."
+      },
+      "narrative": "Victims induced to deposit small savings into fake digital wallet claiming interest returns, followed by closure of digital operation.",
+      "legal_provisions": [
+        {
+          "provision_id": "LP-01",
+          "bns_section": "BNS Section 318(4)",
+          "ipc_legacy_section": "IPC Section 420",
+          "offense_name": "Cheating and Dishonestly Inducing Delivery of Property",
+          "review_status": "Pending Officer Review",
+          "officer_notes": "Digital cheating intake registered."
+        }
+      ],
+      "intelligence_links": {
+        "case_id": "CR-UP-202"
+      }
+    },
+    {
+      "fir_id": "FIR-2024-UP-BLY-003",
+      "fir_number": "UP-BLY-2024-003",
+      "status": "Registered",
+      "created_at": "2024-08-18T15:10:00+00:00",
+      "updated_at": "2024-08-18T15:10:00+00:00",
+      "administrative": {
+        "fir_number": "UP-BLY-2024-003",
+        "police_station": "Subhash Nagar PS",
+        "district": "Bareilly",
+        "state": "Uttar Pradesh",
+        "registration_date": "2024-08-18",
+        "investigating_officer": "Inspector R. S. Yadav",
+        "officer_rank": "Inspector of Police",
+        "officer_id": "UP-BLY-2080"
+      },
+      "complainant": {
+        "name": "Kishan Lal Timber Works",
+        "contact_number": "+91-9412033003",
+        "address": "Badaun Road Industrial Area, Bareilly, UP",
+        "complainant_role": "Industrialist"
+      },
+      "accused": [
+        {
+          "accused_id": "ACC-01",
+          "name": "Dharmendra Yadav",
+          "alias": "Dharma",
+          "status": "Named in FIR",
+          "alleged_role": "Extortion caller"
+        }
+      ],
+      "incident": {
+        "incident_location": "Badaun Road Industrial Area, Bareilly",
+        "jurisdiction": "Subhash Nagar Division",
+        "incident_date": "2024-08-17",
+        "incident_category": "Extortion",
+        "summary": "Extortion threats and coercion targeted against timber factory proprietor."
+      },
+      "narrative": "Accused threatened industrial unit owner with physical harm and operational disruption if protection tribute was not paid.",
+      "legal_provisions": [
+        {
+          "provision_id": "LP-01",
+          "bns_section": "BNS Section 308(2)",
+          "ipc_legacy_section": "IPC Section 384",
+          "offense_name": "Extortion",
+          "review_status": "Pending Officer Review",
+          "officer_notes": "Extortion threat recorded."
+        }
+      ],
+      "intelligence_links": {
+        "case_id": "CR-UP-203"
+      }
+    },
+    {
+      "fir_id": "FIR-2024-UP-BLY-004",
+      "fir_number": "UP-BLY-2024-004",
+      "status": "Under Investigation",
+      "created_at": "2024-08-22T12:00:00+00:00",
+      "updated_at": "2024-08-22T12:00:00+00:00",
+      "administrative": {
+        "fir_number": "UP-BLY-2024-004",
+        "police_station": "Izzatnagar PS",
+        "district": "Bareilly",
+        "state": "Uttar Pradesh",
+        "registration_date": "2024-08-22",
+        "investigating_officer": "Inspector H. N. Joshi",
+        "officer_rank": "Inspector of Police",
+        "officer_id": "UP-BLY-2115"
+      },
+      "complainant": {
+        "name": "Regional Co-operative Credit Society",
+        "contact_number": "+91-9412044004",
+        "address": "Izzatnagar Railway Colony, Bareilly, UP",
+        "complainant_role": "Society Auditor"
+      },
+      "accused": [
+        {
+          "accused_id": "ACC-01",
+          "name": "Subhash Chandra Kureel",
+          "alias": "Accountant",
+          "status": "Named in FIR",
+          "alleged_role": "Treasury custodian"
+        }
+      ],
+      "incident": {
+        "incident_location": "Izzatnagar Railway Colony Area, Bareilly",
+        "jurisdiction": "Izzatnagar Division",
+        "incident_date": "2024-08-20",
+        "incident_category": "Breach of Trust",
+        "summary": "Criminal breach of trust involving unauthorized sale of pledged bank security assets."
+      },
+      "narrative": "Society treasury custodian entrusted with pledged gold securities illegally hypothecated the assets to private moneylenders.",
+      "legal_provisions": [
+        {
+          "provision_id": "LP-01",
+          "bns_section": "BNS Section 316(5)",
+          "ipc_legacy_section": "IPC Section 409",
+          "offense_name": "Criminal Breach of Trust by Public Servant, Banker, or Agent",
+          "review_status": "Pending Officer Review",
+          "officer_notes": "Breach of trust by agent recorded."
+        }
+      ],
+      "intelligence_links": {
+        "case_id": "CR-UP-204"
+      }
+    },
+    {
+      "fir_id": "FIR-2024-UP-BLY-005",
+      "fir_number": "UP-BLY-2024-005",
+      "status": "Registered",
+      "created_at": "2024-08-28T09:50:00+00:00",
+      "updated_at": "2024-08-28T09:50:00+00:00",
+      "administrative": {
+        "fir_number": "UP-BLY-2024-005",
+        "police_station": "Cantonment Bareilly PS",
+        "district": "Bareilly",
+        "state": "Uttar Pradesh",
+        "registration_date": "2024-08-28",
+        "investigating_officer": "Inspector B. L. Maurya",
+        "officer_rank": "Inspector of Police",
+        "officer_id": "UP-BLY-2150"
+      },
+      "complainant": {
+        "name": "State Electricity Distribution Corp",
+        "contact_number": "+91-9412055005",
+        "address": "Sadat Ganj, Bareilly Cantonment, UP",
+        "complainant_role": "Utility Officer"
+      },
+      "accused": [
+        {
+          "accused_id": "ACC-01",
+          "name": "Naresh Pal",
+          "alias": "Kala",
+          "status": "Suspect",
+          "alleged_role": "Scrap dealer receiving stolen property"
+        }
+      ],
+      "incident": {
+        "incident_location": "Sadat Ganj, Bareilly Cantonment",
+        "jurisdiction": "Cantonment Division",
+        "incident_date": "2024-08-26",
+        "incident_category": "Stolen Property",
+        "summary": "Receiving and retaining stolen electronic goods and copper wiring in commercial godown."
+      },
+      "narrative": "Raid conducted on scrap godown recovered 450kg stolen electrical transformer copper coils known to be stolen utility property.",
+      "legal_provisions": [
+        {
+          "provision_id": "LP-01",
+          "bns_section": "BNS Section 317",
+          "ipc_legacy_section": "IPC Section 411",
+          "offense_name": "Dishonestly Receiving Stolen Property",
+          "review_status": "Pending Officer Review",
+          "officer_notes": "Stolen property possession recorded."
+        }
+      ],
+      "intelligence_links": {
+        "case_id": "CR-UP-205"
+      }
+    },
+    {
+      "fir_id": "FIR-2024-UP-STP-001",
+      "fir_number": "UP-STP-2024-001",
+      "status": "Registered",
+      "created_at": "2024-08-11T10:00:00+00:00",
+      "updated_at": "2024-08-11T10:00:00+00:00",
+      "administrative": {
+        "fir_number": "UP-STP-2024-001",
+        "police_station": "Sitapur City PS",
+        "district": "Sitapur",
+        "state": "Uttar Pradesh",
+        "registration_date": "2024-08-11",
+        "investigating_officer": "Inspector G. S. Rathore",
+        "officer_rank": "Inspector of Police",
+        "officer_id": "UP-STP-3012"
+      },
+      "complainant": {
+        "name": "Ramesh Chandra Verma",
+        "contact_number": "+91-9415066001",
+        "address": "Lalbagh Square, Sitapur, UP",
+        "complainant_role": "Cooperative Secretary"
+      },
+      "accused": [
+        {
+          "accused_id": "ACC-01",
+          "name": "Shiv Balak Ram",
+          "alias": "Balak",
+          "status": "Named in FIR",
+          "alleged_role": "Store manager"
+        }
+      ],
+      "incident": {
+        "incident_location": "Lalbagh Square, Sitapur",
+        "jurisdiction": "Sitapur City Division",
+        "incident_date": "2024-08-09",
+        "incident_category": "Property Crime",
+        "summary": "Dishonest misappropriation of agricultural equipment entrusted for cooperative distribution."
+      },
+      "narrative": "Cooperative agricultural pumpsets worth Rs. 4.8 Lakhs misappropriated and sold privately by store custodian.",
+      "legal_provisions": [
+        {
+          "provision_id": "LP-01",
+          "bns_section": "BNS Section 314",
+          "ipc_legacy_section": "IPC Section 403",
+          "offense_name": "Dishonest Misappropriation of Property",
+          "review_status": "Pending Officer Review",
+          "officer_notes": "Misappropriation recorded at intake."
+        }
+      ],
+      "intelligence_links": {
+        "case_id": "CR-UP-301"
+      }
+    },
+    {
+      "fir_id": "FIR-2024-UP-STP-002",
+      "fir_number": "UP-STP-2024-002",
+      "status": "Under Investigation",
+      "created_at": "2024-08-16T11:30:00+00:00",
+      "updated_at": "2024-08-16T11:30:00+00:00",
+      "administrative": {
+        "fir_number": "UP-STP-2024-002",
+        "police_station": "Khairabad PS",
+        "district": "Sitapur",
+        "state": "Uttar Pradesh",
+        "registration_date": "2024-08-16",
+        "investigating_officer": "Inspector A. P. Mishra",
+        "officer_rank": "Inspector of Police",
+        "officer_id": "UP-STP-3048"
+      },
+      "complainant": {
+        "name": "Khairabad Sugarcane Farmers Union",
+        "contact_number": "+91-9415077002",
+        "address": "Town Market, Khairabad, Sitapur, UP",
+        "complainant_role": "Union President"
+      },
+      "accused": [
+        {
+          "accused_id": "ACC-01",
+          "name": "Kamlesh Kumar Gautam",
+          "alias": "Kamloo",
+          "status": "Named in FIR",
+          "alleged_role": "Draft issuer"
+        }
+      ],
+      "incident": {
+        "incident_location": "Town Market, Khairabad, Sitapur",
+        "jurisdiction": "Khairabad Circle",
+        "incident_date": "2024-08-14",
+        "incident_category": "Financial Fraud",
+        "summary": "Fraudulent inducement of local sugar mill suppliers with counterfeit payment drafts."
+      },
+      "narrative": "Sugarcane growers provided bogus payment bank slips for crop supply, resulting in financial loss of Rs. 18 Lakhs.",
+      "legal_provisions": [
+        {
+          "provision_id": "LP-01",
+          "bns_section": "BNS Section 318(4)",
+          "ipc_legacy_section": "IPC Section 420",
+          "offense_name": "Cheating and Dishonestly Inducing Delivery of Property",
+          "review_status": "Pending Officer Review",
+          "officer_notes": "Cheating case registered."
+        }
+      ],
+      "intelligence_links": {
+        "case_id": "CR-UP-302"
+      }
+    },
+    {
+      "fir_id": "FIR-2024-UP-STP-003",
+      "fir_number": "UP-STP-2024-003",
+      "status": "Registered",
+      "created_at": "2024-08-21T14:00:00+00:00",
+      "updated_at": "2024-08-21T14:00:00+00:00",
+      "administrative": {
+        "fir_number": "UP-STP-2024-003",
+        "police_station": "Maholi PS",
+        "district": "Sitapur",
+        "state": "Uttar Pradesh",
+        "registration_date": "2024-08-21",
+        "investigating_officer": "Inspector N. K. Singh",
+        "officer_rank": "Inspector of Police",
+        "officer_id": "UP-STP-3085"
+      },
+      "complainant": {
+        "name": "District Agricultural Supply Officer",
+        "contact_number": "+91-9415088003",
+        "address": "Maholi Corridor, Sitapur, UP",
+        "complainant_role": "Government Officer"
+      },
+      "accused": [
+        {
+          "accused_id": "ACC-01",
+          "name": "Dinesh Chandra Awasthi",
+          "alias": "Master",
+          "status": "Suspect",
+          "alleged_role": "Conspiracy mastermind"
+        }
+      ],
+      "incident": {
+        "incident_location": "Maholi Sugar Mill Corridor, Sitapur",
+        "jurisdiction": "Maholi Division",
+        "incident_date": "2024-08-19",
+        "incident_category": "Criminal Conspiracy",
+        "summary": "Criminal conspiracy to siphoning government subsidy tokens using dummy beneficiary records."
+      },
+      "narrative": "Conspiracy unraveled involving submission of fake land holding records to collect fertilizer subsidies.",
+      "legal_provisions": [
+        {
+          "provision_id": "LP-01",
+          "bns_section": "BNS Section 61(2)",
+          "ipc_legacy_section": "IPC Section 120B",
+          "offense_name": "Criminal Conspiracy",
+          "review_status": "Pending Officer Review",
+          "officer_notes": "Conspiracy investigation initiated."
+        }
+      ],
+      "intelligence_links": {
+        "case_id": "CR-UP-303"
+      }
+    },
+    {
+      "fir_id": "FIR-2024-UP-STP-004",
+      "fir_number": "UP-STP-2024-004",
+      "status": "Under Investigation",
+      "created_at": "2024-08-26T16:30:00+00:00",
+      "updated_at": "2024-08-26T16:30:00+00:00",
+      "administrative": {
+        "fir_number": "UP-STP-2024-004",
+        "police_station": "Sidhauli PS",
+        "district": "Sitapur",
+        "state": "Uttar Pradesh",
+        "registration_date": "2024-08-26",
+        "investigating_officer": "Inspector S. K. Verma",
+        "officer_rank": "Inspector of Police",
+        "officer_id": "UP-STP-3120"
+      },
+      "complainant": {
+        "name": "National Highway Construction Agency",
+        "contact_number": "+91-9415099004",
+        "address": "Sidhauli, Sitapur, UP",
+        "complainant_role": "Site Engineer"
+      },
+      "accused": [
+        {
+          "accused_id": "ACC-01",
+          "name": "Unknown Offender",
+          "alias": "Highway Gang",
+          "status": "Unknown",
+          "alleged_role": "Equipment thief"
+        }
+      ],
+      "incident": {
+        "incident_location": "NH-24 Toll Area, Sidhauli, Sitapur",
+        "jurisdiction": "Sidhauli Circle",
+        "incident_date": "2024-08-25",
+        "incident_category": "Theft",
+        "summary": "Theft of highway construction machinery components from overnight staging yard."
+      },
+      "narrative": "Heavy hydraulic breaker units and diesel generators stolen from highway construction site.",
+      "legal_provisions": [
+        {
+          "provision_id": "LP-01",
+          "bns_section": "BNS Section 303(2)",
+          "ipc_legacy_section": "IPC Section 379",
+          "offense_name": "Theft",
+          "review_status": "Pending Officer Review",
+          "officer_notes": "Machinery theft case logged."
+        }
+      ],
+      "intelligence_links": {
+        "case_id": "CR-UP-304"
+      }
+    },
+    {
+      "fir_id": "FIR-2024-UP-STP-005",
+      "fir_number": "UP-STP-2024-005",
+      "status": "Registered",
+      "created_at": "2024-09-02T11:00:00+00:00",
+      "updated_at": "2024-09-02T11:00:00+00:00",
+      "administrative": {
+        "fir_number": "UP-STP-2024-005",
+        "police_station": "Biswan PS",
+        "district": "Sitapur",
+        "state": "Uttar Pradesh",
+        "registration_date": "2024-09-02",
+        "investigating_officer": "Inspector K. B. Dwivedi",
+        "officer_rank": "Inspector of Police",
+        "officer_id": "UP-STP-3160"
+      },
+      "complainant": {
+        "name": "Harish Chandra Shukl",
+        "contact_number": "+91-9415100005",
+        "address": "Main Ganj, Biswan, Sitapur, UP",
+        "complainant_role": "Landholder"
+      },
+      "accused": [
+        {
+          "accused_id": "ACC-01",
+          "name": "Ram Asre Maurya",
+          "alias": "Patwari Assistant",
+          "status": "Named in FIR",
+          "alleged_role": "Deed forger"
+        }
+      ],
+      "incident": {
+        "incident_location": "Main Ganj, Biswan, Sitapur",
+        "jurisdiction": "Biswan Division",
+        "incident_date": "2024-08-31",
+        "incident_category": "Document Fraud",
+        "summary": "Executing forged revenue deeds and fake property transfer papers to claim agricultural holdings."
+      },
+      "narrative": "Accused created forged revenue stamps and fake mutation orders to unlawfully transfer 12 bigha agricultural land.",
+      "legal_provisions": [
+        {
+          "provision_id": "LP-01",
+          "bns_section": "BNS Section 336(3)",
+          "ipc_legacy_section": "IPC Section 465",
+          "offense_name": "Forgery",
+          "review_status": "Pending Officer Review",
+          "officer_notes": "Deed forgery recorded."
+        }
+      ],
+      "intelligence_links": {
+        "case_id": "CR-UP-305"
+      }
+    }
+  ]
 }
