@@ -343,139 +343,140 @@ export const Sources: React.FC = () => {
         </div>
 
         {/* ─── Conceptual Ingestion Pipeline Flow ───────────────────────────── */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        {/* ─── Conceptual Ingestion Pipeline Flow ───────────────────────────── */}
+        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs">
+          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
             <div>
-              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider font-mono flex items-center gap-2">
-                <GitMerge className="w-4 h-4 text-cyan-700" />
+              <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider font-mono flex items-center gap-2">
+                <GitMerge className="w-4 h-4 text-cyan-700 dark:text-cyan-400" />
                 CNIS Ingestion Architecture & Data Pipeline
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-700 dark:text-slate-300 mt-0.5 font-medium">
                 Heterogeneous ingestion abstraction: raw sources are normalized before NLP extraction and graph construction.
               </p>
             </div>
-            <span className="rounded bg-slate-100 px-2.5 py-1 text-[11px] font-mono text-slate-600 border border-slate-200">
+            <span className="rounded bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-[11px] font-mono text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-semibold">
               src/ingestion.py • BaseConnector Interface
             </span>
           </div>
 
           <div className="mt-5 grid grid-cols-1 md:grid-cols-5 gap-3">
             {/* Step 1 */}
-            <div className="rounded-lg border border-slate-200 bg-slate-50/60 p-3.5 flex flex-col justify-between">
+            <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 p-3.5 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-bold font-mono text-slate-400 uppercase tracking-wider">
+                  <span className="text-[10px] font-bold font-mono text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                     Stage 1
                   </span>
-                  <span className="text-[10px] font-mono bg-cyan-100 text-cyan-800 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] font-mono bg-cyan-100 dark:bg-cyan-950/80 text-cyan-900 dark:text-cyan-300 px-1.5 py-0.5 rounded font-bold border border-cyan-200 dark:border-cyan-800">
                     Connectors
                   </span>
                 </div>
-                <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                  <Database className="w-3.5 h-3.5 text-cyan-700" />
+                <div className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                  <Database className="w-3.5 h-3.5 text-cyan-700 dark:text-cyan-400" />
                   Heterogeneous Intake
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                <p className="text-[11px] text-slate-700 dark:text-slate-300 mt-1 leading-relaxed font-medium">
                   JSONFileConnector reads 4 source categories (RMS, CDR, FIU, HUMINT) from raw data export.
                 </p>
               </div>
-              <div className="mt-3 pt-2 border-t border-slate-200/60 text-[10px] font-mono text-slate-600">
+              <div className="mt-3 pt-2 border-t border-slate-200 dark:border-slate-700 text-[10px] font-mono font-semibold text-slate-800 dark:text-slate-200">
                 JSON / SQL / CSV
               </div>
             </div>
 
             {/* Step 2 */}
-            <div className="rounded-lg border border-slate-200 bg-slate-50/60 p-3.5 flex flex-col justify-between">
+            <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 p-3.5 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-bold font-mono text-slate-400 uppercase tracking-wider">
+                  <span className="text-[10px] font-bold font-mono text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                     Stage 2
                   </span>
-                  <span className="text-[10px] font-mono bg-sky-100 text-sky-800 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] font-mono bg-sky-100 dark:bg-sky-950/80 text-sky-900 dark:text-sky-300 px-1.5 py-0.5 rounded font-bold border border-sky-200 dark:border-sky-800">
                     Standardize
                   </span>
                 </div>
-                <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5 text-sky-700" />
+                <div className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5 text-sky-700 dark:text-sky-400" />
                   Record Normalization
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                <p className="text-[11px] text-slate-700 dark:text-slate-300 mt-1 leading-relaxed font-medium">
                   Normalized into uniform dataclass with record_id, source, date, text, and structured fields.
                 </p>
               </div>
-              <div className="mt-3 pt-2 border-t border-slate-200/60 text-[10px] font-mono text-slate-600">
+              <div className="mt-3 pt-2 border-t border-slate-200 dark:border-slate-700 text-[10px] font-mono font-semibold text-slate-800 dark:text-slate-200">
                 10 Ingested Records
               </div>
             </div>
 
             {/* Step 3 */}
-            <div className="rounded-lg border border-slate-200 bg-slate-50/60 p-3.5 flex flex-col justify-between">
+            <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 p-3.5 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-bold font-mono text-slate-400 uppercase tracking-wider">
+                  <span className="text-[10px] font-bold font-mono text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                     Stage 3
                   </span>
-                  <span className="text-[10px] font-mono bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] font-mono bg-indigo-100 dark:bg-indigo-950/80 text-indigo-900 dark:text-indigo-300 px-1.5 py-0.5 rounded font-bold border border-indigo-200 dark:border-indigo-800">
                     NLP Extraction
                   </span>
                 </div>
-                <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                  <Cpu className="w-3.5 h-3.5 text-indigo-700" />
+                <div className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                  <Cpu className="w-3.5 h-3.5 text-indigo-700 dark:text-indigo-400" />
                   Entity Extraction
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                <p className="text-[11px] text-slate-700 dark:text-slate-300 mt-1 leading-relaxed font-medium">
                   RuleBasedNER extracts persons, phone numbers, vehicles, locations, organizations, and currencies.
                 </p>
               </div>
-              <div className="mt-3 pt-2 border-t border-slate-200/60 text-[10px] font-mono text-slate-600">
+              <div className="mt-3 pt-2 border-t border-slate-200 dark:border-slate-700 text-[10px] font-mono font-semibold text-slate-800 dark:text-slate-200">
                 15 Unique Entities
               </div>
             </div>
 
             {/* Step 4 */}
-            <div className="rounded-lg border border-slate-200 bg-slate-50/60 p-3.5 flex flex-col justify-between">
+            <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 p-3.5 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+                  <span className="text-[10px] font-bold font-mono text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                     Stage 4
                   </span>
-                  <span className="text-[10px] font-mono bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] font-mono bg-purple-100 dark:bg-purple-950/80 text-purple-900 dark:text-purple-300 px-1.5 py-0.5 rounded font-bold border border-purple-200 dark:border-purple-800">
                     Network Graph
                   </span>
                 </div>
-                <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                  <GitMerge className="w-3.5 h-3.5 text-purple-700" />
+                <div className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                  <GitMerge className="w-3.5 h-3.5 text-purple-700 dark:text-purple-400" />
                   Graph Construction
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                <p className="text-[11px] text-slate-700 dark:text-slate-300 mt-1 leading-relaxed font-medium">
                   Co-occurrence edges construct NetworkX graph, calculating Degree, Betweenness, and Louvain communities.
                 </p>
               </div>
-              <div className="mt-3 pt-2 border-t border-slate-200/60 text-[10px] font-mono text-slate-600">
+              <div className="mt-3 pt-2 border-t border-slate-200 dark:border-slate-700 text-[10px] font-mono font-semibold text-slate-800 dark:text-slate-200">
                 52 Co-occurrence Edges
               </div>
             </div>
 
             {/* Step 5 */}
-            <div className="rounded-lg border border-slate-200 bg-slate-50/60 p-3.5 flex flex-col justify-between">
+            <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 p-3.5 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+                  <span className="text-[10px] font-bold font-mono text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                     Stage 5
                   </span>
-                  <span className="text-[10px] font-mono bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] font-mono bg-rose-100 dark:bg-rose-950/80 text-rose-900 dark:text-rose-300 px-1.5 py-0.5 rounded font-bold border border-rose-200 dark:border-rose-800">
                     Intelligence
                   </span>
                 </div>
-                <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                  <AlertTriangle className="w-3.5 h-3.5 text-rose-700" />
+                <div className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 text-rose-700 dark:text-rose-400" />
                   Anomaly Detection
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                <p className="text-[11px] text-slate-700 dark:text-slate-300 mt-1 leading-relaxed font-medium">
                   IsolationForest outlier detector and burst activity, structuring, and entity spike rules execute.
                 </p>
               </div>
-              <div className="mt-3 pt-2 border-t border-slate-200/60 text-[10px] font-mono text-slate-600">
+              <div className="mt-3 pt-2 border-t border-slate-200 dark:border-slate-700 text-[10px] font-mono font-semibold text-slate-800 dark:text-slate-200">
                 25 Actionable Signals
               </div>
             </div>

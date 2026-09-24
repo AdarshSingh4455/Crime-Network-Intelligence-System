@@ -244,7 +244,7 @@ export const Overview: React.FC = () => {
         {/* Left Column: Entity Distribution + Key Players */}
         <div className="lg:col-span-6 space-y-8">
           {/* Entity Type Distribution Card */}
-          <div className="ui-panel p-6 rounded-xl bg-white border border-slate-200 shadow-panel">
+          <div className="ui-panel p-6 rounded-xl bg-white border border-slate-200 shadow-panel transition-all duration-700 animate-fadeIn">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <div>
                 <h3 className="text-sm font-bold text-slate-900">Entity Type Distribution</h3>
@@ -256,10 +256,10 @@ export const Overview: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center pt-6">
-              {/* Donut Visual Representation */}
+              {/* Donut Visual Representation with Entrance Scale Animation */}
               <div className="sm:col-span-5 flex justify-center">
-                <div className="relative w-36 h-36 flex items-center justify-center">
-                  <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                <div className="relative w-36 h-36 flex items-center justify-center transform transition-transform duration-1000 ease-out hover:scale-105">
+                  <svg className="w-full h-full -rotate-90 transition-all duration-1000 ease-out" viewBox="0 0 36 36">
                     <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#E2E8F0" strokeWidth="3.5" />
                     {donutSlices.map((slice, i) => {
                       const dashArray = `${slice.percent} ${100 - slice.percent}`;
@@ -279,6 +279,7 @@ export const Overview: React.FC = () => {
                           strokeWidth="3.5"
                           strokeDasharray={dashArray}
                           strokeDashoffset={dashOffset}
+                          className="transition-all duration-1000 ease-out"
                         />
                       );
                     })}
@@ -290,19 +291,30 @@ export const Overview: React.FC = () => {
                 </div>
               </div>
 
-              {/* Legend & Percentages List */}
-              <div className="sm:col-span-7 space-y-2.5">
+              {/* Legend & Percentages List with Animated Progress Indicator Bars */}
+              <div className="sm:col-span-7 space-y-3">
                 {entityTypesList.map((item) => {
                   const pct = totalEnt > 0 ? Math.round((item.count / totalEnt) * 100) : 0;
                   return (
-                    <div key={item.key} className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
-                        <span className="text-slate-700 font-medium">{item.label}</span>
+                    <div key={item.key} className="space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
+                          <span className="text-slate-700 font-medium">{item.label}</span>
+                        </div>
+                        <div className="flex items-center gap-3 font-mono">
+                          <span className="text-slate-500 text-[11px]">{pct}%</span>
+                          <span className="font-semibold text-slate-900 w-4 text-right">{item.count}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-3 font-mono">
-                        <span className="text-slate-500 text-[11px]">{pct}%</span>
-                        <span className="font-semibold text-slate-900 w-4 text-right">{item.count}</span>
+                      <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-1000 ease-out"
+                          style={{
+                            backgroundColor: item.color,
+                            width: `${pct}%`,
+                          }}
+                        />
                       </div>
                     </div>
                   );

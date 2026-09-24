@@ -24,6 +24,7 @@ import {
   X,
   ChevronRight,
   Sparkles,
+  Radio,
 } from 'lucide-react';
 import { api } from '../api/client';
 import {
@@ -34,7 +35,9 @@ import {
   LocationItem,
   SuspiciousPattern,
   NetworkNode,
+  FIRRecord,
 } from '../types';
+import { LiveViewModal } from '../components/investigation/LiveViewModal';
 
 export const Investigation: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -74,20 +77,26 @@ export const Investigation: React.FC = () => {
   const [pathLoading, setPathLoading] = useState<boolean>(false);
   const [pathError, setPathError] = useState<string | null>(null);
 
+  // Live View Spatial Mapping state
+  const [isLiveViewOpen, setIsLiveViewOpen] = useState<boolean>(false);
+  const [firsList, setFirsList] = useState<FIRRecord[]>([]);
+
   // Initial reference lists load
   useEffect(() => {
     const loadReferences = async () => {
       try {
-        const [casesRes, entitiesRes, locsRes, anomsRes] = await Promise.all([
+        const [casesRes, entitiesRes, locsRes, anomsRes, firsRes] = await Promise.all([
           api.getCases(),
           api.getEntities(),
           api.getLocations(),
           api.getAnomalies(),
+          api.listFirs({ limit: 100 }),
         ]);
         setAvailableCases(casesRes.cases || []);
         setAvailableEntities(entitiesRes || []);
         setAvailableLocations(locsRes || []);
         setAvailableAnomalies(anomsRes || []);
+        setFirsList(firsRes.firs || []);
       } catch (e) {
         console.error('Failed to load investigation reference options:', e);
       }
@@ -301,6 +310,16 @@ export const Investigation: React.FC = () => {
                   </button>
                 ))}
               </div>
+
+              {/* Live View Button */}
+              <button
+                type="button"
+                onClick={() => setIsLiveViewOpen(true)}
+                className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-cyan-700 hover:bg-cyan-800 text-white text-xs font-semibold font-mono shadow-xs transition-all cursor-pointer"
+              >
+                <Radio className="w-3.5 h-3.5 animate-pulse text-cyan-200" />
+                <span>Live View</span>
+              </button>
             </div>
           </div>
         </div>
@@ -945,6 +964,14 @@ export const Investigation: React.FC = () => {
           </>
         )}
       </div>
+
+      {/* Live View Spatial Mapping Modal */}
+      <LiveViewModal
+        isOpen={isLiveViewOpen}
+        onClose={() => setIsLiveViewOpen(false)}
+        firs={firsList}
+        locations={availableLocations}
+      />
     </div>
   );
 };

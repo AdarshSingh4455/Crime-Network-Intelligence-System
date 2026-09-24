@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Bell, Cpu, Sun, Moon, LogOut } from 'lucide-react';
+import { Search, Cpu, Sun, Moon, LogOut } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 
@@ -25,20 +25,20 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="h-16 bg-white dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-6 flex items-center justify-between z-10 sticky top-0 shadow-2xs transition-colors">
+    <header className="h-16 bg-slate-100/80 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/90 dark:border-slate-800 px-6 flex items-center justify-between z-10 sticky top-0 shadow-xs transition-colors">
       {/* Global Search Input Shell */}
       <div className="flex items-center gap-4 flex-1 max-w-xl">
         <button
           type="button"
           onClick={onOpenSearch}
           aria-label="Open Global Intelligence Search (Ctrl+K)"
-          className="w-full flex items-center justify-between px-3.5 py-2 rounded-md bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100/70 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition-all text-xs group"
+          className="w-full flex items-center justify-between px-3.5 py-2 rounded-md bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition-all text-xs group"
         >
           <div className="flex items-center gap-2.5">
             <Search className="w-4 h-4 text-slate-400 group-hover:text-cyan-700 dark:group-hover:text-cyan-400 transition-colors" />
             <span>Search entities, vehicles, phone numbers, cases...</span>
           </div>
-          <kbd className="hidden sm:inline-block font-mono text-[10px] bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-600 shadow-2xs">
+          <kbd className="hidden sm:inline-block font-mono text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-600 shadow-2xs">
             Ctrl + K
           </kbd>
         </button>
@@ -47,7 +47,7 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Header Right Status Controls */}
       <div className="flex items-center gap-3">
         {/* Status Indicator Badge */}
-        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
+        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
           <span className={`w-2 h-2 rounded-full ${isBackendConnected ? 'bg-emerald-500 animate-soft-pulse' : 'bg-amber-500'}`} />
           <span className="text-[11px] font-mono font-medium text-slate-700 dark:text-slate-300 tracking-wide">
             {systemStatus}
@@ -66,23 +66,13 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={toggleTheme}
           aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          className="p-2 rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          className="p-2 rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-white dark:hover:bg-slate-800 transition-colors"
         >
           {theme === 'dark' ? (
             <Sun className="w-4.5 h-4.5 text-amber-400 hover:rotate-12 transition-transform" />
           ) : (
             <Moon className="w-4.5 h-4.5 text-slate-600 hover:-rotate-12 transition-transform" />
           )}
-        </button>
-
-        {/* Notifications Icon (Neutral state when zero notifications) */}
-        <button
-          type="button"
-          aria-label="System Notifications"
-          className="relative p-2 rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-          title="System Notifications (0 Unread)"
-        >
-          <Bell className="w-4.5 h-4.5" />
         </button>
 
         {/* Investigator Profile Badge & Logout */}
