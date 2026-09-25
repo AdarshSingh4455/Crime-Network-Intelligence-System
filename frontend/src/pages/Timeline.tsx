@@ -321,12 +321,7 @@ export const Timeline: React.FC = () => {
       <div className="px-6 py-4 border-b border-slate-200 bg-white flex-shrink-0">
         <div className="flex items-center justify-between">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-[11px] font-mono uppercase font-bold tracking-wider text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded border border-cyan-200">
-                CNIS SECTION :: TIMELINE
-              </span>
-            </div>
-            <h1 className="text-xl font-bold text-slate-900">Chronological Intelligence Timeline</h1>
+              <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Chronological Intelligence Timeline</h1>
             <p className="text-sm text-slate-500">
               Time-sorted sequence of criminal case records and detected investigative events · Real Pipeline Data · Source: CNIS Intelligence Engine · {metrics.totalRecords} records indexed
             </p>

@@ -60,16 +60,26 @@ const MainLayout: React.FC = () => {
 
   return (
     <ProtectedRoute>
-      <div className="flex h-screen w-screen overflow-hidden bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 font-sans">
+      <div className="relative flex h-screen w-screen overflow-hidden bg-slate-100 dark:bg-[#070B14] text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300">
+        {/* Ambient Glowing Orbs for Glassmorphism Refraction */}
+        <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
+          <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-sky-400/20 dark:bg-cyan-500/15 blur-[128px] animate-ambient-glow" />
+          <div className="absolute top-1/3 -right-32 w-[32rem] h-[32rem] rounded-full bg-indigo-400/15 dark:bg-indigo-500/12 blur-[140px] animate-ambient-glow" style={{ animationDelay: '-3s' }} />
+          <div className="absolute -bottom-32 left-1/3 w-[28rem] h-[28rem] rounded-full bg-purple-400/15 dark:bg-purple-500/12 blur-[130px] animate-ambient-glow" style={{ animationDelay: '-5s' }} />
+          <div className="absolute top-2/3 left-10 w-72 h-72 rounded-full bg-emerald-400/15 dark:bg-emerald-500/10 blur-[100px] animate-ambient-glow" style={{ animationDelay: '-2s' }} />
+        </div>
+
         {/* Sidebar Navigation Shell */}
-        <Sidebar
-          anomalyCount={metrics?.suspicious_patterns_count || 25}
-          entitiesCount={metrics?.total_entities || 15}
-          recordsCount={metrics?.total_records || 10}
-        />
+        <div className="relative z-10 flex h-full">
+          <Sidebar
+            anomalyCount={metrics?.suspicious_patterns_count || 25}
+            entitiesCount={metrics?.total_entities || 15}
+            recordsCount={metrics?.total_records || 10}
+          />
+        </div>
 
         {/* Main Application Container */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <div className="relative z-10 flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Top Header Shell */}
           <Header
             onOpenSearch={() => setIsSearchOpen(true)}
@@ -78,7 +88,7 @@ const MainLayout: React.FC = () => {
           />
 
           {/* Page Viewport */}
-          <main className="flex-1 overflow-y-auto bg-[#F8FAFC] dark:bg-[#0B0F19]">
+          <main className="flex-1 overflow-y-auto bg-transparent">
             <Routes>
               <Route path="/" element={<Overview />} />
               <Route path="/network" element={<Network />} />

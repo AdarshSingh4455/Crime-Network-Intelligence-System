@@ -196,12 +196,7 @@ export const Locations: React.FC = () => {
         <div className="px-6 py-4 border-b border-slate-200 bg-white flex-shrink-0">
           <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[11px] font-mono uppercase font-bold tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                  CNIS SECTION :: LOCATIONS
-                </span>
-              </div>
-              <h1 className="text-xl font-bold text-slate-900">Location Intelligence Analysis</h1>
+              <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Location Intelligence Analysis</h1>
               <p className="text-sm text-slate-500">
                 Spatial entity associations, location-based case records, and high-activity hubs · Real Pipeline Data · Source: CNIS Intelligence Engine
               </p>

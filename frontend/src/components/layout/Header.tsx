@@ -23,20 +23,20 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="h-14 bg-slate-100/90 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 flex items-center justify-between z-10 sticky top-0 shadow-xs transition-colors">
+    <header className="h-14 bg-white/80 dark:bg-slate-950/60 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/10 px-4 sm:px-6 flex items-center justify-between z-10 sticky top-0 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all">
       {/* Global Search Input Shell */}
       <div className="flex items-center gap-3 flex-1 max-w-xl">
         <button
           type="button"
           onClick={onOpenSearch}
           aria-label="Open Global Intelligence Search (Ctrl+K)"
-          className="w-full flex items-center justify-between px-3.5 py-1.5 rounded-lg bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:border-slate-300 dark:hover:border-slate-600 transition-all text-xs group shadow-2xs"
+          className="w-full flex items-center justify-between px-3.5 py-1.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/50 backdrop-blur-md border border-slate-200/90 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-900/70 hover:border-cyan-500/30 dark:hover:border-cyan-400/30 transition-all text-xs group shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]"
         >
           <div className="flex items-center gap-2.5">
-            <Search className="w-4 h-4 text-slate-400 group-hover:text-cyan-700 dark:group-hover:text-cyan-400 transition-colors" />
-            <span className="truncate">Search entities, vehicles, phone numbers, cases...</span>
+            <Search className="w-4 h-4 text-cyan-600 dark:text-cyan-400 group-hover:text-cyan-500 dark:group-hover:text-cyan-300 transition-colors" />
+            <span className="truncate text-slate-600 dark:text-slate-400">Search entities, vehicles, phone numbers, cases...</span>
           </div>
-          <kbd className="hidden sm:inline-block font-mono text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-600 shadow-2xs">
+          <kbd className="hidden sm:inline-block font-mono text-[10px] bg-slate-200/80 dark:bg-slate-800/80 text-cyan-700 dark:text-cyan-300 px-1.5 py-0.5 rounded-md border border-slate-300/80 dark:border-white/10 shadow-xs">
             Ctrl + K
           </kbd>
         </button>

@@ -985,6 +985,7 @@ export const Investigation: React.FC = () => {
         onClose={() => setIsLiveViewOpen(false)}
         firs={firsList}
         locations={availableLocations}
+        entities={availableEntities}
       />
     </div>
   );

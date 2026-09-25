@@ -96,10 +96,9 @@ export const Overview: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
           <div className="flex items-center gap-2.5">
-            <span className="font-mono text-[11px] font-semibold text-cyan-800 bg-cyan-50 px-2.5 py-0.5 rounded border border-cyan-200 uppercase tracking-wider">
-              CNIS SECTION :: OVERVIEW
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-mono font-semibold uppercase tracking-wider">
+              LIVE INTELLIGENCE ACTIVE
             </span>
-            <span className="text-xs text-slate-500 font-mono">LIVE INTELLIGENCE ACTIVE</span>
           </div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight mt-1">Intelligence Overview</h1>
           <p className="text-xs text-slate-600 mt-1 max-w-2xl">

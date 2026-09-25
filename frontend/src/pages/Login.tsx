@@ -155,17 +155,21 @@ export const Login: React.FC = () => {
       </div>
 
       {/* ─────────────────────────────────────────────────────────────────────────────
-         RIGHT SIDE — DYNAMIC LOGIN FORM
+         RIGHT SIDE — DYNAMIC LOGIN FORM WITH GLASSMORPHISM
          ───────────────────────────────────────────────────────────────────────────── */}
-      <div className="w-full md:w-1/2 lg:w-7/12 flex items-center justify-center p-6 md:p-12 lg:p-16 bg-slate-50 dark:bg-[#0B0F19]">
-        <div className="w-full max-w-md space-y-8 bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 md:p-10 shadow-xl dark:shadow-2xl backdrop-blur-xl relative z-10">
+      <div className="w-full md:w-1/2 lg:w-7/12 flex items-center justify-center p-6 md:p-12 lg:p-16 relative overflow-hidden bg-slate-100/80 dark:bg-[#070B14]/80">
+        {/* Ambient Glowing Orbs for Glass Refraction */}
+        <div className="pointer-events-none absolute -top-24 -right-24 w-80 h-80 rounded-full bg-sky-400/20 dark:bg-cyan-500/20 blur-[100px] animate-ambient-glow" />
+        <div className="pointer-events-none absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-purple-400/15 dark:bg-purple-500/20 blur-[100px] animate-ambient-glow" style={{ animationDelay: '-4s' }} />
+
+        <div className="w-full max-w-md space-y-8 bg-white/75 dark:bg-slate-900/50 border border-slate-200/80 dark:border-white/10 rounded-2xl p-8 md:p-10 shadow-[0_8px_32px_0_rgba(31,38,135,0.08)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.5),inset_0_1px_0_0_rgba(255,255,255,0.1)] backdrop-blur-2xl relative z-10">
           {/* Card Heading */}
           <div className="space-y-2">
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
               Welcome back
             </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
-              Sign in to continue to CNIS
+            <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+              Access the secure CNIS intelligence operations center
             </p>
           </div>
 
@@ -173,7 +177,7 @@ export const Login: React.FC = () => {
           {errorMessage && (
             <div
               role="alert"
-              className="bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900/80 text-rose-700 dark:text-rose-300 text-xs p-4 rounded-xl flex items-start gap-3 shadow-xs"
+              className="bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-500/40 text-rose-700 dark:text-rose-300 text-xs p-4 rounded-xl flex items-start gap-3 shadow-xs backdrop-blur-md"
             >
               <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
               <div className="font-medium">{errorMessage}</div>
@@ -261,7 +265,7 @@ export const Login: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm bg-cyan-700 hover:bg-cyan-800 text-white dark:bg-cyan-600 dark:hover:bg-cyan-500 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-mono tracking-wide"
+              className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] border border-cyan-400/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-mono tracking-wide"
             >
               {isSubmitting ? (
                 <>
@@ -269,7 +273,7 @@ export const Login: React.FC = () => {
                   <span>Authenticating...</span>
                 </>
               ) : (
-                <span>Sign In</span>
+                <span>Access Intelligence Platform &rarr;</span>
               )}
             </button>
           </form>
