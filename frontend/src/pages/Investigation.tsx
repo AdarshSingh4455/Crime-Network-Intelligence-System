@@ -59,8 +59,9 @@ export const Investigation: React.FC = () => {
   const [targetId, setTargetId] = useState<string>(targetIdParam);
   const [temporalWindow, setTemporalWindow] = useState<string>(temporalWindowParam);
 
-  // Investigation Dossier state
+  // Investigation Dossier state & client-side cache
   const [dossier, setDossier] = useState<InvestigationResponse | null>(null);
+  const [dossierCache, setDossierCache] = useState<Record<string, InvestigationResponse>>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -117,19 +118,31 @@ export const Investigation: React.FC = () => {
       'CR-1001';
     const newWindow = searchParams.get('temporal_window') || searchParams.get('window') || 'all';
 
-    setTargetType(newType);
-    setTargetId(newId);
-    setTemporalWindow(newWindow);
+    if (newType !== targetType) setTargetType(newType);
+    if (newId !== targetId) setTargetId(newId);
+    if (newWindow !== temporalWindow) setTemporalWindow(newWindow);
   }, [searchParams]);
 
-  // Fetch dossier when target or temporal window changes
+  // Fetch dossier when target or temporal window changes (uses client-side cache)
   useEffect(() => {
+    const cacheKey = `${targetType.toLowerCase()}:${targetId.toLowerCase()}:${temporalWindow.toLowerCase()}`;
+    if (dossierCache[cacheKey]) {
+      setDossier(dossierCache[cacheKey]);
+      setLoading(false);
+      setError(null);
+      if (targetType === 'entity') {
+        setPathStart(targetId);
+      }
+      return;
+    }
+
     const fetchDossier = async () => {
       try {
         setLoading(true);
         setError(null);
         const data = await api.getInvestigation(targetType, targetId, temporalWindow);
         setDossier(data);
+        setDossierCache((prev) => ({ ...prev, [cacheKey]: data }));
 
         // If target is entity and path start empty, pre-fill
         if (targetType === 'entity') {

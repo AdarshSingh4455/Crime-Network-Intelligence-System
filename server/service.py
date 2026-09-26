@@ -405,11 +405,23 @@ class IntelligenceService:
     _cached_explainability_engine: Any | None = None
     _cached_temporal_engine: Any | None = None
     _cached_graph_intelligence_engine: Any | None = None
+    _cached_overview: Dict[str, Any] | None = None
+    _cached_timeline: List[Dict[str, Any]] | None = None
+    _cached_locations: List[Dict[str, Any]] | None = None
+    _cached_reports: Dict[str, Any] | None = None
+    _cached_sources: Dict[str, Any] | None = None
     _last_ingestion_time: str = datetime.now(timezone.utc).isoformat()
 
     @classmethod
     def get_data(cls, force_reload: bool = False) -> Dict[str, Any]:
         """Loads and executes the intelligence engine once per session."""
+        if force_reload:
+            cls._cached_overview = None
+            cls._cached_timeline = None
+            cls._cached_locations = None
+            cls._cached_reports = None
+            cls._cached_sources = None
+
         if cls._cached_data is not None and not force_reload:
             return cls._cached_data
 
@@ -624,6 +636,8 @@ class IntelligenceService:
 
     @classmethod
     def get_overview(cls) -> Dict[str, Any]:
+        if cls._cached_overview is not None:
+            return cls._cached_overview
         data = cls.get_data()
         pattern_counts: Dict[str, int] = {}
         for p in data["suspicious_patterns"]:
@@ -632,7 +646,7 @@ class IntelligenceService:
 
         sources = sorted(list({r["source"] for r in data["records"]}))
 
-        return {
+        cls._cached_overview = {
             "total_records": data["total_records"],
             "total_cases": data["total_records"],
             "total_entities": data["summary"]["num_nodes"],
@@ -650,6 +664,7 @@ class IntelligenceService:
             "recent_activity": data["suspicious_patterns"][:10],
             "status": data["status"],
         }
+        return cls._cached_overview
 
     @classmethod
     def get_network(cls) -> Dict[str, Any]:
@@ -1355,6 +1370,8 @@ class IntelligenceService:
 
     @classmethod
     def get_timeline(cls) -> List[Dict[str, Any]]:
+        if cls._cached_timeline is not None:
+            return cls._cached_timeline
         data = cls.get_data()
         events = []
         for r in data["records"]:
@@ -1412,10 +1429,13 @@ class IntelligenceService:
             })
 
         events.sort(key=lambda x: x["date"])
-        return events
+        cls._cached_timeline = events
+        return cls._cached_timeline
 
     @classmethod
     def get_locations(cls) -> List[Dict[str, Any]]:
+        if cls._cached_locations is not None:
+            return cls._cached_locations
         data = cls.get_data()
         loc_nodes = [n for n in data["nodes"] if n["type"] == "LOCATION"]
         node_type_map = {n["id"]: n["type"] for n in data["nodes"]}
@@ -1464,10 +1484,13 @@ class IntelligenceService:
                     "detected_anomalies": anomalies,
                 })
         result.sort(key=lambda x: x["activity_score"], reverse=True)
-        return result
+        cls._cached_locations = result
+        return cls._cached_locations
 
     @classmethod
     def get_reports(cls) -> Dict[str, Any]:
+        if cls._cached_reports is not None:
+            return cls._cached_reports
         data = cls.get_data()
         locs = cls.get_locations()
         tl = cls.get_timeline()
@@ -1658,7 +1681,7 @@ class IntelligenceService:
         dates = sorted(list(set(r["date"] for r in data["records"])))
         date_range = f"{dates[0]} – {dates[-1]}" if dates else "—"
 
-        return {
+        cls._cached_reports = {
             "report_id": "CNIS-IR-001",
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "status": data.get("status", "ACTIVE_INVESTIGATION"),
@@ -1714,6 +1737,7 @@ class IntelligenceService:
                 "All automated investigative leads require verification by a human investigator prior to enforcement action."
             ]
         }
+        return cls._cached_reports
 
     @classmethod
     def search(cls, query: str = "") -> Dict[str, Any]:
@@ -2051,6 +2075,8 @@ class IntelligenceService:
 
     @classmethod
     def get_sources(cls) -> Dict[str, Any]:
+        if cls._cached_sources is not None:
+            return cls._cached_sources
         data = cls.get_data()
         sources_list = []
         node_lookup = {n["id"]: n for n in data["nodes"]}
@@ -2104,7 +2130,7 @@ class IntelligenceService:
                 "production_connector": config["production_connector"],
             })
 
-        return {
+        cls._cached_sources = {
             "total_sources": len(sources_list),
             "total_records_ingested": data["total_records"],
             "total_entities_extracted": data["summary"]["num_nodes"],
@@ -2122,6 +2148,7 @@ class IntelligenceService:
             "sources": sources_list,
             "planned_connectors": cls.PLANNED_CONNECTORS,
         }
+        return cls._cached_sources
 
     @classmethod
     def get_source_detail(cls, source_id: str) -> Dict[str, Any] | None:

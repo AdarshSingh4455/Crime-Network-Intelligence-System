@@ -114,6 +114,7 @@ export const Sources: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [isReingesting, setIsReingesting] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [reingestResult, setReingestResult] = useState<IngestResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -217,7 +218,7 @@ export const Sources: React.FC = () => {
           {/* Action Bar */}
           <div className="flex items-center gap-3">
             <button
-              onClick={handleReingest}
+              onClick={() => setShowConfirmModal(true)}
               disabled={isReingesting}
               className="inline-flex items-center gap-2 rounded-lg bg-cyan-700 px-4 py-2 text-xs font-medium text-white shadow-sm hover:bg-cyan-800 disabled:opacity-50 transition-colors cursor-pointer"
             >
@@ -226,6 +227,56 @@ export const Sources: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {/* Confirmation Modal */}
+        {showConfirmModal && (
+          <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xl max-w-md w-full p-5 space-y-4 animate-fadeIn">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2 text-slate-900 dark:text-slate-100 font-bold text-sm">
+                  <RefreshCw className="w-4 h-4 text-cyan-600" />
+                  Confirm Pipeline Re-Ingestion
+                </div>
+                <button
+                  onClick={() => setShowConfirmModal(false)}
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="text-xs text-slate-600 dark:text-slate-300 space-y-2">
+                <p>
+                  Triggering pipeline re-ingestion will re-parse source records from disk (<code className="bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded font-mono text-cyan-700">data/sample_records.json</code>), rebuild co-occurrence graph edges, and recompute graph centrality metrics.
+                </p>
+                <p className="text-slate-500 text-[11px]">
+                  This operation is safe and non-destructive to persistent records.
+                </p>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmModal(false)}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowConfirmModal(false);
+                    handleReingest();
+                  }}
+                  disabled={isReingesting}
+                  className="px-4 py-1.5 rounded-lg bg-cyan-700 hover:bg-cyan-800 text-white text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+                >
+                  Confirm Re-Ingestion
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Re-ingest Confirmation Banner */}
         {reingestResult && (

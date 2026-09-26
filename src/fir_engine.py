@@ -839,17 +839,23 @@ class FIREngine:
         # Accused
         raw_accused = data.get("accused", [])
         cleaned_accused = []
-        for idx, acc in enumerate(raw_accused):
-            acc_id = acc.get("accused_id") or f"ACC-{idx+1:02d}"
-            name = (acc.get("name") or "Unknown Person").strip()
+        for acc in raw_accused:
+            name = (acc.get("name") or "").strip()
+            role = (acc.get("alleged_role") or acc.get("role") or "").strip()
+            alias = (acc.get("alias") or "").strip()
+            if not name and not role and not alias:
+                continue
+            if not name:
+                name = "Unknown Accused"
+            acc_id = acc.get("accused_id") or f"ACC-{len(cleaned_accused)+1:02d}"
             status = acc.get("status") or "Suspect"
             cleaned_accused.append({
                 "accused_id": acc_id,
                 "name": name,
-                "alias": acc.get("alias", ""),
+                "alias": alias,
                 "status": status,
                 "identifiers": acc.get("identifiers", {}),
-                "alleged_role": acc.get("alleged_role", ""),
+                "alleged_role": role,
                 "epistemic_notice": (
                     "Allegation recorded at intake; non-conclusive and subject to investigation. "
                     "Presumption of innocence applies."

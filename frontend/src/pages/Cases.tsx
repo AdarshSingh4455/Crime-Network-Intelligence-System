@@ -319,8 +319,29 @@ export const Cases: React.FC = () => {
   const handleToggleChecklist = async (itemId: string, currentCompleted: boolean) => {
     if (!selectedCaseDetail) return;
     setTogglingItemId(itemId);
+    const newCompleted = !currentCompleted;
+
+    // Optimistic local state update to eliminate latency and scroll jumps
+    setSelectedCaseDetail((prev) => {
+      if (!prev || !prev.workflow) return prev;
+      const updatedChecklist = prev.workflow.checklist.map((item) =>
+        item.id === itemId
+          ? { ...item, completed: newCompleted, completed_at: newCompleted ? new Date().toISOString() : null }
+          : item
+      );
+      const newReviewedCount = updatedChecklist.filter((i) => i.completed).length;
+      return {
+        ...prev,
+        workflow: {
+          ...prev.workflow,
+          checklist: updatedChecklist,
+          checklist_reviewed_count: newReviewedCount,
+        },
+      };
+    });
+
     try {
-      const updatedWf = await api.toggleChecklistItem(selectedCaseDetail.case_id, itemId, !currentCompleted);
+      const updatedWf = await api.toggleChecklistItem(selectedCaseDetail.case_id, itemId, newCompleted);
       setSelectedCaseDetail((prev) =>
         prev
           ? {
@@ -332,6 +353,22 @@ export const Cases: React.FC = () => {
       );
     } catch (err) {
       console.error("Failed to toggle checklist item:", err);
+      // Revert optimistic update on error
+      setSelectedCaseDetail((prev) => {
+        if (!prev || !prev.workflow) return prev;
+        const revertedChecklist = prev.workflow.checklist.map((item) =>
+          item.id === itemId ? { ...item, completed: currentCompleted } : item
+        );
+        const revertedCount = revertedChecklist.filter((i) => i.completed).length;
+        return {
+          ...prev,
+          workflow: {
+            ...prev.workflow,
+            checklist: revertedChecklist,
+            checklist_reviewed_count: revertedCount,
+          },
+        };
+      });
     } finally {
       setTogglingItemId(null);
     }
@@ -1199,7 +1236,10 @@ export const Cases: React.FC = () => {
                       >
                         <div className="flex items-start gap-3">
                           <button
-                            onClick={() => handleToggleChecklist(item.id, item.completed)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleChecklist(item.id, item.completed);
+                            }}
                             disabled={togglingItemId === item.id}
                             className={`mt-0.5 rounded border p-1 transition-colors cursor-pointer ${
                               item.completed

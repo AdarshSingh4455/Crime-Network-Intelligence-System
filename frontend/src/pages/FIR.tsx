@@ -303,13 +303,13 @@ export const FIR: React.FC = () => {
         incident: formIncident,
         narrative: formNarrative,
         accused: formAccused
-          .filter((a) => a.name.trim().length > 0)
+          .filter((a) => a.name.trim().length > 0 || a.role.trim().length > 0 || a.alias.trim().length > 0)
           .map((a, idx) => ({
             accused_id: `ACC-${String(idx + 1).padStart(2, "0")}`,
-            name: a.name.trim(),
+            name: a.name.trim() || "Unknown Accused",
             alias: a.alias.trim(),
             status: a.status,
-            alleged_role: a.role,
+            alleged_role: a.role.trim(),
           })),
         legal_provisions: formProvisions.map((p, idx) => ({
           provision_id: `LP-${String(idx + 1).padStart(2, "0")}`,
