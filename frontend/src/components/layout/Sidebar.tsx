@@ -22,10 +22,14 @@ import {
 } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 
+import { X } from 'lucide-react';
+
 interface SidebarProps {
   anomalyCount?: number;
   entitiesCount?: number;
   recordsCount?: number;
+  isOpenOnMobile?: boolean;
+  onCloseMobile?: () => void;
 }
 
 interface NavItem {
@@ -45,6 +49,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   anomalyCount = 25,
   entitiesCount = 15,
   recordsCount = 10,
+  isOpenOnMobile = false,
+  onCloseMobile,
 }) => {
   const sections: NavSection[] = [
     {
@@ -85,8 +91,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
   ];
 
-  return (
-    <aside className="w-64 bg-white/80 dark:bg-slate-950/60 backdrop-blur-2xl border-r border-slate-200/80 dark:border-white/10 flex flex-col h-screen select-none z-20 shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.04)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.5)] transition-all">
+  const sidebarContent = (
+    <aside className="w-64 bg-white/95 dark:bg-slate-950/90 backdrop-blur-2xl border-r border-slate-200/80 dark:border-white/10 flex flex-col h-full select-none shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.04)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.5)] transition-all">
       {/* Brand Header */}
       <div className="p-4 border-b border-slate-200/80 dark:border-white/10 bg-slate-100/70 dark:bg-slate-900/40 backdrop-blur-xl flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -98,6 +104,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <p className="text-[10px] text-cyan-600 dark:text-cyan-400/80 tracking-widest font-mono">INTELLIGENCE V2.0</p>
           </div>
         </div>
+        {onCloseMobile && (
+          <button
+            type="button"
+            onClick={onCloseMobile}
+            className="lg:hidden p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+            title="Close navigation"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       {/* Glassmorphic Section-Wise Navigation */}
@@ -119,6 +135,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     key={item.path}
                     to={item.path}
                     end={item.path === '/'}
+                    onClick={() => onCloseMobile?.()}
                     className={({ isActive }) =>
                       `group flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 ${
                         isActive
@@ -167,5 +184,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
     </aside>
+  );
+
+  return (
+    <>
+      {/* Desktop static sidebar */}
+      <div className="hidden lg:flex h-full">
+        {sidebarContent}
+      </div>
+
+      {/* Mobile/Tablet drawer overlay */}
+      {isOpenOnMobile && (
+        <div className="fixed inset-0 z-50 lg:hidden flex">
+          <div
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity"
+            onClick={onCloseMobile}
+          />
+          <div className="relative z-10 flex h-full max-w-xs w-full animate-fadeIn">
+            {sidebarContent}
+          </div>
+        </div>
+      )}
+    </>
   );
 };

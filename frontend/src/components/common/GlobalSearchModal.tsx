@@ -296,19 +296,21 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                 setQuery("");
                 inputRef.current?.focus();
               }}
-              className="p-1 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-200/50"
+              aria-label="Clear search query"
+              className="p-1 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 dark:hover:text-slate-200"
               title="Clear query"
             >
               <X className="w-4 h-4" />
             </button>
           )}
-          <div className="flex items-center gap-1.5 border-l border-slate-200 pl-3">
-            <kbd className="hidden sm:inline-block font-mono text-[10px] bg-white text-slate-500 px-1.5 py-0.5 rounded border border-slate-200 shadow-2xs">
+          <div className="flex items-center gap-1.5 border-l border-slate-200 dark:border-slate-800 pl-3">
+            <kbd className="hidden sm:inline-block font-mono text-[10px] bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 shadow-2xs">
               ESC
             </kbd>
             <button
               onClick={onClose}
-              className="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors"
+              aria-label="Close global search modal"
+              className="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 dark:hover:text-slate-200 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>

@@ -125,7 +125,8 @@ export const EvidenceDrawer: React.FC<EvidenceDrawerProps> = ({ evidenceId, onCl
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition-colors"
+            aria-label="Close provenance trace drawer"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 dark:hover:text-slate-200 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>

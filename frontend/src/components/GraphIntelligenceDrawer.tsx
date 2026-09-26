@@ -93,7 +93,8 @@ export const GraphIntelligenceDrawer: React.FC<GraphIntelligenceDrawerProps> = (
             </div>
             <button
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 rounded-md transition-colors"
+              aria-label="Close graph intelligence inspector drawer"
+              className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 dark:hover:text-slate-200 rounded-md transition-colors"
               title="Close Drawer"
             >
               <X className="w-5 h-5" />

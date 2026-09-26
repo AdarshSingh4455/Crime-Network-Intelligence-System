@@ -28,6 +28,7 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 const MainLayout: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [metrics, setMetrics] = useState<OverviewMetrics | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
@@ -70,11 +71,13 @@ const MainLayout: React.FC = () => {
         </div>
 
         {/* Sidebar Navigation Shell */}
-        <div className="relative z-10 flex h-full">
+        <div className="relative z-10 flex h-full shrink-0">
           <Sidebar
             anomalyCount={metrics?.suspicious_patterns_count || 25}
             entitiesCount={metrics?.total_entities || 15}
             recordsCount={metrics?.total_records || 10}
+            isOpenOnMobile={isMobileSidebarOpen}
+            onCloseMobile={() => setIsMobileSidebarOpen(false)}
           />
         </div>
 
@@ -83,6 +86,7 @@ const MainLayout: React.FC = () => {
           {/* Top Header Shell */}
           <Header
             onOpenSearch={() => setIsSearchOpen(true)}
+            onToggleSidebar={() => setIsMobileSidebarOpen(prev => !prev)}
             systemStatus={isConnected ? 'Active Investigation Mode' : 'Offline'}
             isBackendConnected={isConnected}
           />

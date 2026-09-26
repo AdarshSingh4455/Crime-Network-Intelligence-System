@@ -132,7 +132,8 @@ export const ExplanationDrawer: React.FC<ExplanationDrawerProps> = ({
 
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors"
+              aria-label="Close intelligence explanation drawer"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 dark:hover:text-slate-200 transition-colors"
               title="Close Drawer"
             >
               <X className="w-5 h-5" />

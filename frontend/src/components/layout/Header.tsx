@@ -1,16 +1,18 @@
 import React from 'react';
-import { Search, Sun, Moon, LogOut } from 'lucide-react';
+import { Search, Sun, Moon, LogOut, Menu } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 
 interface HeaderProps {
   onOpenSearch: () => void;
+  onToggleSidebar?: () => void;
   systemStatus?: string;
   isBackendConnected?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onOpenSearch,
+  onToggleSidebar,
 }) => {
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
@@ -23,7 +25,20 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="h-14 bg-white/80 dark:bg-slate-950/60 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/10 px-4 sm:px-6 flex items-center justify-between z-10 sticky top-0 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all">
+    <header className="h-14 bg-white/80 dark:bg-slate-950/60 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/10 px-3 sm:px-6 flex items-center justify-between z-10 sticky top-0 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all gap-2">
+      {/* Mobile/Tablet Menu Button */}
+      {onToggleSidebar && (
+        <button
+          type="button"
+          onClick={onToggleSidebar}
+          aria-label="Toggle Navigation Menu"
+          title="Toggle Navigation Menu"
+          className="lg:hidden p-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all shrink-0 cursor-pointer"
+        >
+          <Menu className="w-5 h-5 text-cyan-700 dark:text-cyan-400" />
+        </button>
+      )}
+
       {/* Global Search Input Shell */}
       <div className="flex items-center gap-3 flex-1 max-w-xl">
         <button

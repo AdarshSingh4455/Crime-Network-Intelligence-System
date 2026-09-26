@@ -120,7 +120,8 @@ export const TemporalDrawer: React.FC<TemporalDrawerProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-md hover:bg-slate-200/60 text-slate-500 hover:text-slate-700 transition-colors"
+            aria-label="Close temporal observation drawer"
+            className="p-1.5 rounded-md hover:bg-slate-200/60 dark:hover:bg-slate-700/60 text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
