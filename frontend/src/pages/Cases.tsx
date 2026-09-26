@@ -494,7 +494,7 @@ export const Cases: React.FC = () => {
   return (
     <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 pb-16">
       {/* ─── Page Header ─────────────────────────────────────────────────── */}
-      <div className="border-b border-slate-200 bg-white px-8 py-6">
+      <div className="border-b border-slate-200 dark:border-white/10 bg-white dark:bg-[#0A1220] px-8 py-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <div className="flex items-center gap-2">
@@ -522,19 +522,19 @@ export const Cases: React.FC = () => {
             {selectedCaseDetail ? (
               <button
                 onClick={handleCloseCase}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-xs font-medium text-slate-700 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/60 px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 shadow-2xs hover:bg-slate-50 dark:hover:bg-slate-700/60 transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
                 Back to Case Registry
               </button>
             ) : (
-              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/60 p-1 rounded-lg border border-slate-200 dark:border-slate-700/50">
                 <button
                   onClick={() => setViewMode("cards")}
                   className={`px-3 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
                     viewMode === "cards"
-                      ? "bg-white text-slate-900 shadow-2xs font-semibold"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-2xs font-semibold"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
                   }`}
                 >
                   Card Grid
@@ -543,8 +543,8 @@ export const Cases: React.FC = () => {
                   onClick={() => setViewMode("table")}
                   className={`px-3 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
                     viewMode === "table"
-                      ? "bg-white text-slate-900 shadow-2xs font-semibold"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-2xs font-semibold"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
                   }`}
                 >
                   Dossier Table
@@ -570,21 +570,21 @@ export const Cases: React.FC = () => {
       {selectedCaseDetail ? (
         <div className="px-8 py-6 space-y-6 animate-fadeIn">
           {/* Case Dossier Header Card */}
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+          <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0A1220] p-6 shadow-xs space-y-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/8 pb-4">
               <div>
                 <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-xs font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                  <span className="text-xs font-mono font-bold text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
                     {selectedCaseDetail.case_id}
                   </span>
                   <button
                     onClick={() => handleCopyCaseId(selectedCaseDetail.case_id)}
-                    className="text-slate-400 hover:text-slate-700 p-1 rounded cursor-pointer"
+                    className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1 rounded cursor-pointer"
                     title="Copy Case ID"
                   >
-                    {copiedId ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedId ? <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
-                  <span className="text-xs text-slate-300">•</span>
+                  <span className="text-xs text-slate-300 dark:text-slate-600">•</span>
                   <span
                     className="text-[11px] font-mono px-2 py-0.5 rounded border font-semibold"
                     style={{
@@ -595,26 +595,26 @@ export const Cases: React.FC = () => {
                   >
                     {selectedCaseDetail.priority} PRIORITY
                   </span>
-                  <span className="text-xs text-slate-300">•</span>
+                  <span className="text-xs text-slate-300 dark:text-slate-600">•</span>
                   <span className={`text-[11px] font-mono px-2 py-0.5 rounded border font-semibold ${WORKFLOW_BADGES[selectedCaseDetail.workflow_status]?.bg ?? "bg-slate-100"} ${WORKFLOW_BADGES[selectedCaseDetail.workflow_status]?.border ?? "border-slate-200"} ${WORKFLOW_BADGES[selectedCaseDetail.workflow_status]?.text ?? "text-slate-700"}`}>
                     {selectedCaseDetail.workflow_status}
                   </span>
                 </div>
 
-                <h2 className="text-lg font-bold text-slate-900">
+                <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
                   {selectedCaseDetail.title}
                 </h2>
-                <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
+                <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-1">
                   <span className="flex items-center gap-1 font-mono">
-                    <Calendar className="w-3 h-3 text-slate-400" />
+                    <Calendar className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                     {selectedCaseDetail.date} {selectedCaseDetail.time ? `(${selectedCaseDetail.time})` : ""}
                   </span>
                   <span>•</span>
-                  <span className="font-medium text-slate-700">
+                  <span className="font-medium text-slate-700 dark:text-slate-300">
                     Source: {selectedCaseDetail.source_label}
                   </span>
                   <span>•</span>
-                  <span className="text-slate-500 font-mono">
+                  <span className="text-slate-500 dark:text-slate-400 font-mono">
                     State: {selectedCaseDetail.source_status}
                   </span>
                 </div>
@@ -624,39 +624,39 @@ export const Cases: React.FC = () => {
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   onClick={() => navigate(`/timeline?record_id=${encodeURIComponent(selectedCaseDetail.case_id)}`)}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100 hover:border-slate-300 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 hover:border-slate-300 dark:hover:border-slate-600 transition-colors cursor-pointer"
                   title="Open in Chronological Timeline"
                 >
-                  <Clock className="w-3.5 h-3.5 text-cyan-700" />
+                  <Clock className="w-3.5 h-3.5 text-cyan-700 dark:text-cyan-400" />
                   Timeline View
                 </button>
 
                 {selectedCaseDetail.entities.length > 0 && (
                   <button
                     onClick={() => navigate(`/network?focus=${encodeURIComponent(selectedCaseDetail.entities[0].id)}`)}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100 hover:border-slate-300 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 hover:border-slate-300 dark:hover:border-slate-600 transition-colors cursor-pointer"
                     title="Focus network on primary case entity"
                   >
-                    <Share2 className="w-3.5 h-3.5 text-indigo-700" />
+                    <Share2 className="w-3.5 h-3.5 text-indigo-700 dark:text-indigo-400" />
                     Network Focus
                   </button>
                 )}
 
                 <button
                   onClick={() => navigate(`/sources?id=${encodeURIComponent(selectedCaseDetail.source)}`)}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100 hover:border-slate-300 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 hover:border-slate-300 dark:hover:border-slate-600 transition-colors cursor-pointer"
                   title="Inspect Source Provenance"
                 >
-                  <Server className="w-3.5 h-3.5 text-slate-600" />
+                  <Server className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
                   Source Ingestion
                 </button>
 
                 <button
                   onClick={() => navigate("/reports")}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100 hover:border-slate-300 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 hover:border-slate-300 dark:hover:border-slate-600 transition-colors cursor-pointer"
                   title="View Intelligence Synthesis"
                 >
-                  <FileText className="w-3.5 h-3.5 text-purple-700" />
+                  <FileText className="w-3.5 h-3.5 text-purple-700 dark:text-purple-400" />
                   Reports
                 </button>
               </div>
@@ -664,55 +664,55 @@ export const Cases: React.FC = () => {
 
             {/* Case Metrics Strip */}
             <div className="grid grid-cols-2 sm:grid-cols-7 gap-3 text-center">
-              <div className="rounded-lg bg-slate-50 p-2.5 border border-slate-100">
-                <span className="text-[10px] text-slate-400 uppercase font-mono block">RECORDS</span>
-                <span className="text-base font-bold font-mono text-slate-900">{selectedCaseDetail.metrics.records}</span>
+              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-2.5 border border-slate-100 dark:border-slate-700/50">
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-mono block">RECORDS</span>
+                <span className="text-base font-bold font-mono text-slate-900 dark:text-slate-100">{selectedCaseDetail.metrics.records}</span>
               </div>
-              <div className="rounded-lg bg-slate-50 p-2.5 border border-slate-100">
-                <span className="text-[10px] text-slate-400 uppercase font-mono block">ENTITIES</span>
-                <span className="text-base font-bold font-mono text-slate-900">{selectedCaseDetail.metrics.entities}</span>
+              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-2.5 border border-slate-100 dark:border-slate-700/50">
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-mono block">ENTITIES</span>
+                <span className="text-base font-bold font-mono text-slate-900 dark:text-slate-100">{selectedCaseDetail.metrics.entities}</span>
               </div>
-              <div className="rounded-lg bg-slate-50 p-2.5 border border-slate-100">
-                <span className="text-[10px] text-slate-400 uppercase font-mono block">ANOMALIES</span>
-                <span className="text-base font-bold font-mono text-rose-700">{selectedCaseDetail.metrics.anomalies}</span>
+              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-2.5 border border-slate-100 dark:border-slate-700/50">
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-mono block">ANOMALIES</span>
+                <span className="text-base font-bold font-mono text-rose-700 dark:text-rose-400">{selectedCaseDetail.metrics.anomalies}</span>
               </div>
-              <div className="rounded-lg bg-slate-50 p-2.5 border border-slate-100">
-                <span className="text-[10px] text-slate-400 uppercase font-mono block">LOCATIONS</span>
-                <span className="text-base font-bold font-mono text-slate-900">{selectedCaseDetail.metrics.locations}</span>
+              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-2.5 border border-slate-100 dark:border-slate-700/50">
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-mono block">LOCATIONS</span>
+                <span className="text-base font-bold font-mono text-slate-900 dark:text-slate-100">{selectedCaseDetail.metrics.locations}</span>
               </div>
-              <div className="rounded-lg bg-slate-50 p-2.5 border border-slate-100">
-                <span className="text-[10px] text-slate-400 uppercase font-mono block">KEY PLAYERS</span>
-                <span className="text-base font-bold font-mono text-indigo-700">{selectedCaseDetail.metrics.key_players}</span>
+              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-2.5 border border-slate-100 dark:border-slate-700/50">
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-mono block">KEY PLAYERS</span>
+                <span className="text-base font-bold font-mono text-indigo-700 dark:text-indigo-400">{selectedCaseDetail.metrics.key_players}</span>
               </div>
-              <div className="rounded-lg bg-slate-50 p-2.5 border border-slate-100">
-                <span className="text-[10px] text-slate-400 uppercase font-mono block">CONNECTIONS</span>
-                <span className="text-base font-bold font-mono text-slate-900">{selectedCaseDetail.metrics.internal_connections}</span>
+              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-2.5 border border-slate-100 dark:border-slate-700/50">
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-mono block">CONNECTIONS</span>
+                <span className="text-base font-bold font-mono text-slate-900 dark:text-slate-100">{selectedCaseDetail.metrics.internal_connections}</span>
               </div>
-              <div className="rounded-lg bg-slate-50 p-2.5 border border-slate-100">
-                <span className="text-[10px] text-slate-400 uppercase font-mono block">RELATED CASES</span>
-                <span className="text-base font-bold font-mono text-cyan-700">{selectedCaseDetail.related_cases?.length ?? 0}</span>
+              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-2.5 border border-slate-100 dark:border-slate-700/50">
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-mono block">RELATED CASES</span>
+                <span className="text-base font-bold font-mono text-cyan-700 dark:text-cyan-400">{selectedCaseDetail.related_cases?.length ?? 0}</span>
               </div>
             </div>
           </div>
 
           {/* ─── INVESTIGATION WORKFLOW PANEL ─────────────────────────────── */}
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0A1220] p-5 shadow-xs">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-white/8">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono uppercase bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-bold border border-slate-200 flex items-center gap-1">
-                    <ListTodo className="w-3 h-3 text-sky-600" />
+                  <span className="text-[10px] font-mono uppercase bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded font-bold border border-slate-200 dark:border-slate-700 flex items-center gap-1">
+                    <ListTodo className="w-3 h-3 text-sky-600 dark:text-sky-400" />
                     Investigation Workflow Panel
                   </span>
-                  <span className="text-xs text-slate-300">•</span>
-                  <span className="text-[11px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-medium">
+                  <span className="text-xs text-slate-300 dark:text-slate-600">•</span>
+                  <span className="text-[11px] font-mono text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800/60 font-medium">
                     Session Review Workspace Active
                   </span>
                 </div>
-                <h3 className="text-sm font-bold text-slate-900 mt-1">
-                  Investigative Review Tracking & Case Coordination
+                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 mt-1">
+                  Investigative Review Tracking &amp; Case Coordination
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   Workflow state reflects investigator review progress for the active session. Not persisted to enterprise database.
                 </p>
               </div>
@@ -720,15 +720,15 @@ export const Cases: React.FC = () => {
               {/* Workflow Status Selector */}
               <div className="flex items-center gap-3">
                 <div className="text-right hidden sm:block">
-                  <span className="text-[10px] uppercase font-mono text-slate-400 block">Current Review State</span>
-                  <span className="text-xs font-bold text-slate-800">{selectedCaseDetail.workflow_status}</span>
+                  <span className="text-[10px] uppercase font-mono text-slate-400 dark:text-slate-500 block">Current Review State</span>
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">{selectedCaseDetail.workflow_status}</span>
                 </div>
                 <div className="relative">
                   <select
                     value={selectedCaseDetail.workflow_status}
                     onChange={(e) => handleUpdateWorkflowStatus(e.target.value as CaseWorkflowStatus)}
                     disabled={isUpdatingStatus}
-                    className="appearance-none bg-slate-50 border border-slate-300 text-slate-800 text-xs font-semibold rounded-lg pl-3 pr-8 py-2 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 cursor-pointer shadow-2xs"
+                    className="appearance-none bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs font-semibold rounded-lg pl-3 pr-8 py-2 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 cursor-pointer shadow-2xs"
                   >
                     <option value="Review Required">Review Required</option>
                     <option value="In Review">In Review</option>
@@ -743,9 +743,9 @@ export const Cases: React.FC = () => {
             {/* Workflow Metrics & Progress Strip */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-4">
               {/* Metric 1: Analytical Priority (Decoupled from workflow) */}
-              <div className="rounded-lg bg-slate-50 p-3 border border-slate-200/80">
+              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-3 border border-slate-200/80 dark:border-slate-700/50">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono uppercase text-slate-400">Signal Priority</span>
+                  <span className="text-[10px] font-mono uppercase text-slate-400 dark:text-slate-500">Signal Priority</span>
                   <span
                     className="text-[10px] font-mono px-2 py-0.5 rounded font-bold border"
                     style={{
@@ -757,20 +757,20 @@ export const Cases: React.FC = () => {
                     {selectedCaseDetail.priority}
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1.5">
-                  Derived from anomaly density & bridge nodes. Decoupled from review state.
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5">
+                  Derived from anomaly density &amp; bridge nodes. Decoupled from review state.
                 </p>
               </div>
 
               {/* Metric 2: Review Checklist Progress */}
-              <div className="rounded-lg bg-slate-50 p-3 border border-slate-200/80">
+              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-3 border border-slate-200/80 dark:border-slate-700/50">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono uppercase text-slate-400">Review Checklist</span>
-                  <span className="text-xs font-mono font-bold text-slate-800">
+                  <span className="text-[10px] font-mono uppercase text-slate-400 dark:text-slate-500">Review Checklist</span>
+                  <span className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">
                     {selectedCaseDetail.workflow?.checklist_reviewed_count ?? 0} / {selectedCaseDetail.workflow?.checklist_total_count ?? 8}
                   </span>
                 </div>
-                <div className="w-full bg-slate-200 rounded-full h-1.5 mt-2 overflow-hidden">
+                <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 mt-2 overflow-hidden">
                   <div
                     className="bg-sky-600 h-1.5 rounded-full transition-all duration-300"
                     style={{
@@ -780,45 +780,45 @@ export const Cases: React.FC = () => {
                 </div>
                 <button
                   onClick={() => setDetailTab("checklist")}
-                  className="text-[11px] font-medium text-sky-700 hover:text-sky-900 mt-1.5 flex items-center gap-1 cursor-pointer"
+                  className="text-[11px] font-medium text-sky-700 dark:text-sky-400 hover:text-sky-900 dark:hover:text-sky-300 mt-1.5 flex items-center gap-1 cursor-pointer"
                 >
                   Complete review checklist <ArrowRight className="w-2.5 h-2.5" />
                 </button>
               </div>
 
               {/* Metric 3: Follow-up Tasks */}
-              <div className="rounded-lg bg-slate-50 p-3 border border-slate-200/80">
+              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-3 border border-slate-200/80 dark:border-slate-700/50">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono uppercase text-slate-400">Follow-up Tasks</span>
-                  <span className="text-xs font-mono font-bold text-violet-700 bg-violet-50 px-2 py-0.5 rounded border border-violet-200">
+                  <span className="text-[10px] font-mono uppercase text-slate-400 dark:text-slate-500">Follow-up Tasks</span>
+                  <span className="text-xs font-mono font-bold text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-950/40 px-2 py-0.5 rounded border border-violet-200 dark:border-violet-800/60">
                     {selectedCaseDetail.workflow?.pending_followups_count ?? 0} Pending
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1.5">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5">
                   {selectedCaseDetail.workflow?.followups?.length ?? 0} total tasks registered for this case file.
                 </p>
                 <button
                   onClick={() => setDetailTab("followups")}
-                  className="text-[11px] font-medium text-violet-700 hover:text-violet-900 mt-1 flex items-center gap-1 cursor-pointer"
+                  className="text-[11px] font-medium text-violet-700 dark:text-violet-400 hover:text-violet-900 dark:hover:text-violet-300 mt-1 flex items-center gap-1 cursor-pointer"
                 >
                   Manage follow-up tasks <ArrowRight className="w-2.5 h-2.5" />
                 </button>
               </div>
 
               {/* Metric 4: Derived Related Cases */}
-              <div className="rounded-lg bg-slate-50 p-3 border border-slate-200/80">
+              <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-3 border border-slate-200/80 dark:border-slate-700/50">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono uppercase text-slate-400">Related Cases</span>
-                  <span className="text-xs font-mono font-bold text-slate-800">
+                  <span className="text-[10px] font-mono uppercase text-slate-400 dark:text-slate-500">Related Cases</span>
+                  <span className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">
                     {selectedCaseDetail.related_cases?.length ?? 0} Linked
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1.5">
-                  Traceable links via shared entities, locations & analytical signals.
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5">
+                  Traceable links via shared entities, locations &amp; analytical signals.
                 </p>
                 <button
                   onClick={() => setDetailTab("related_cases")}
-                  className="text-[11px] font-medium text-cyan-700 hover:text-cyan-900 mt-1 flex items-center gap-1 cursor-pointer"
+                  className="text-[11px] font-medium text-cyan-700 dark:text-cyan-400 hover:text-cyan-900 dark:hover:text-cyan-300 mt-1 flex items-center gap-1 cursor-pointer"
                 >
                   Inspect related cases <ArrowRight className="w-2.5 h-2.5" />
                 </button>
@@ -827,14 +827,14 @@ export const Cases: React.FC = () => {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="border-b border-slate-200 bg-white rounded-xl shadow-xs overflow-hidden">
-            <div className="flex flex-wrap items-center gap-1 px-4 pt-2 border-b border-slate-100 bg-slate-50/50">
+          <div className="border-b border-slate-200 dark:border-white/10 bg-white dark:bg-[#0A1220] rounded-xl shadow-xs overflow-hidden">
+            <div className="flex flex-wrap items-center gap-1 px-4 pt-2 border-b border-slate-100 dark:border-white/8 bg-slate-50/50 dark:bg-[#080E1A]">
               <button
                 onClick={() => setDetailTab("records")}
                 className={`px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-colors cursor-pointer ${
                   detailTab === "records"
-                    ? "border-cyan-600 text-cyan-900 bg-white rounded-t-md"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
+                    ? "border-cyan-600 text-cyan-900 dark:text-cyan-300 bg-white dark:bg-slate-800/60 rounded-t-md"
+                    : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                 }`}
               >
                 Case Records ({selectedCaseDetail.metrics.records})
@@ -843,8 +843,8 @@ export const Cases: React.FC = () => {
                 onClick={() => setDetailTab("related_cases")}
                 className={`px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
                   detailTab === "related_cases"
-                    ? "border-cyan-600 text-cyan-900 bg-white rounded-t-md"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
+                    ? "border-cyan-600 text-cyan-900 dark:text-cyan-300 bg-white dark:bg-slate-800/60 rounded-t-md"
+                    : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                 }`}
               >
                 <Link2 className="w-3 h-3 text-cyan-600" />
@@ -854,8 +854,8 @@ export const Cases: React.FC = () => {
                 onClick={() => setDetailTab("checklist")}
                 className={`px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
                   detailTab === "checklist"
-                    ? "border-cyan-600 text-cyan-900 bg-white rounded-t-md"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
+                    ? "border-cyan-600 text-cyan-900 dark:text-cyan-300 bg-white dark:bg-slate-800/60 rounded-t-md"
+                    : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                 }`}
               >
                 <CheckSquare className="w-3 h-3 text-sky-600" />
@@ -865,8 +865,8 @@ export const Cases: React.FC = () => {
                 onClick={() => setDetailTab("followups")}
                 className={`px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
                   detailTab === "followups"
-                    ? "border-cyan-600 text-cyan-900 bg-white rounded-t-md"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
+                    ? "border-cyan-600 text-cyan-900 dark:text-cyan-300 bg-white dark:bg-slate-800/60 rounded-t-md"
+                    : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                 }`}
               >
                 <ListTodo className="w-3 h-3 text-violet-600" />
@@ -876,8 +876,8 @@ export const Cases: React.FC = () => {
                 onClick={() => setDetailTab("activity")}
                 className={`px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
                   detailTab === "activity"
-                    ? "border-cyan-600 text-cyan-900 bg-white rounded-t-md"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
+                    ? "border-cyan-600 text-cyan-900 dark:text-cyan-300 bg-white dark:bg-slate-800/60 rounded-t-md"
+                    : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                 }`}
               >
                 <History className="w-3 h-3 text-slate-500" />
@@ -887,8 +887,8 @@ export const Cases: React.FC = () => {
                 onClick={() => setDetailTab("entities")}
                 className={`px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-colors cursor-pointer ${
                   detailTab === "entities"
-                    ? "border-cyan-600 text-cyan-900 bg-white rounded-t-md"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
+                    ? "border-cyan-600 text-cyan-900 dark:text-cyan-300 bg-white dark:bg-slate-800/60 rounded-t-md"
+                    : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                 }`}
               >
                 Extracted Entities ({selectedCaseDetail.entities.length})
@@ -897,8 +897,8 @@ export const Cases: React.FC = () => {
                 onClick={() => setDetailTab("anomalies")}
                 className={`px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-colors cursor-pointer ${
                   detailTab === "anomalies"
-                    ? "border-cyan-600 text-cyan-900 bg-white rounded-t-md"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
+                    ? "border-cyan-600 text-cyan-900 dark:text-cyan-300 bg-white dark:bg-slate-800/60 rounded-t-md"
+                    : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                 }`}
               >
                 Correlated Signals ({selectedCaseDetail.anomalies.length})
@@ -907,8 +907,8 @@ export const Cases: React.FC = () => {
                 onClick={() => setDetailTab("timeline")}
                 className={`px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-colors cursor-pointer ${
                   detailTab === "timeline"
-                    ? "border-cyan-600 text-cyan-900 bg-white rounded-t-md"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
+                    ? "border-cyan-600 text-cyan-900 dark:text-cyan-300 bg-white dark:bg-slate-800/60 rounded-t-md"
+                    : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                 }`}
               >
                 Chronology ({selectedCaseDetail.timeline_events.length})
@@ -917,8 +917,8 @@ export const Cases: React.FC = () => {
                 onClick={() => setDetailTab("locations")}
                 className={`px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-colors cursor-pointer ${
                   detailTab === "locations"
-                    ? "border-cyan-600 text-cyan-900 bg-white rounded-t-md"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
+                    ? "border-cyan-600 text-cyan-900 dark:text-cyan-300 bg-white dark:bg-slate-800/60 rounded-t-md"
+                    : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                 }`}
               >
                 Locations ({selectedCaseDetail.locations.length})
@@ -927,8 +927,8 @@ export const Cases: React.FC = () => {
                 onClick={() => setDetailTab("network")}
                 className={`px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-colors cursor-pointer ${
                   detailTab === "network"
-                    ? "border-cyan-600 text-cyan-900 bg-white rounded-t-md"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
+                    ? "border-cyan-600 text-cyan-900 dark:text-cyan-300 bg-white dark:bg-slate-800/60 rounded-t-md"
+                    : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                 }`}
               >
                 Network Subgraph ({selectedCaseDetail.network_context.links.length} Links)
@@ -937,8 +937,8 @@ export const Cases: React.FC = () => {
                 onClick={() => setDetailTab("references")}
                 className={`px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-colors cursor-pointer ${
                   detailTab === "references"
-                    ? "border-cyan-600 text-cyan-900 bg-white rounded-t-md"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
+                    ? "border-cyan-600 text-cyan-900 dark:text-cyan-300 bg-white dark:bg-slate-800/60 rounded-t-md"
+                    : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                 }`}
               >
                 Intelligence References ({selectedCaseDetail.intelligence_references.length})
@@ -947,8 +947,8 @@ export const Cases: React.FC = () => {
                 onClick={() => setDetailTab("notes")}
                 className={`px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-colors cursor-pointer ${
                   detailTab === "notes"
-                    ? "border-cyan-600 text-cyan-900 bg-white rounded-t-md"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
+                    ? "border-cyan-600 text-cyan-900 dark:text-cyan-300 bg-white dark:bg-slate-800/60 rounded-t-md"
+                    : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                 }`}
               >
                 Investigator Notes
@@ -957,8 +957,8 @@ export const Cases: React.FC = () => {
                 onClick={() => setDetailTab("evidence")}
                 className={`px-3.5 py-2.5 text-xs font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
                   detailTab === "evidence"
-                    ? "border-cyan-600 text-cyan-900 bg-white rounded-t-md"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
+                    ? "border-cyan-600 text-cyan-900 dark:text-cyan-300 bg-white dark:bg-slate-800/60 rounded-t-md"
+                    : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                 }`}
               >
                 <Shield className="w-3 h-3 text-emerald-600" />
@@ -972,35 +972,35 @@ export const Cases: React.FC = () => {
               {detailTab === "records" && (
                 <div className="space-y-6">
                   {/* Primary Record */}
-                  <div className="rounded-xl border border-cyan-200 bg-cyan-50/30 p-5 space-y-3">
+                  <div className="rounded-xl border border-cyan-200 dark:border-cyan-800/60 bg-cyan-50/30 dark:bg-cyan-950/30 p-5 space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono uppercase bg-cyan-100 text-cyan-800 px-2 py-0.5 rounded font-semibold border border-cyan-300">
+                        <span className="text-[10px] font-mono uppercase bg-cyan-100 dark:bg-cyan-900/60 text-cyan-800 dark:text-cyan-300 px-2 py-0.5 rounded font-semibold border border-cyan-300 dark:border-cyan-700/60">
                           Primary Case Record
                         </span>
-                        <span className="font-mono text-xs font-bold text-slate-900">
+                        <span className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100">
                           {selectedCaseDetail.primary_record.record_id}
                         </span>
-                        <span className="text-xs text-slate-400">•</span>
-                        <span className="text-xs text-slate-600 font-mono">
+                        <span className="text-xs text-slate-400 dark:text-slate-500">•</span>
+                        <span className="text-xs text-slate-600 dark:text-slate-400 font-mono">
                           {selectedCaseDetail.primary_record.date}
                         </span>
                       </div>
                       <button
                         onClick={() => navigate(`/timeline?record_id=${encodeURIComponent(selectedCaseDetail.primary_record.record_id)}`)}
-                        className="text-xs font-medium text-cyan-700 hover:text-cyan-900 flex items-center gap-1 cursor-pointer"
+                        className="text-xs font-medium text-cyan-700 dark:text-cyan-400 hover:text-cyan-900 dark:hover:text-cyan-300 flex items-center gap-1 cursor-pointer"
                       >
                         Timeline Context
                         <ExternalLink className="w-3 h-3" />
                       </button>
                     </div>
 
-                    <p className="text-xs text-slate-800 leading-relaxed font-sans bg-white p-3.5 rounded-lg border border-cyan-100 shadow-2xs">
+                    <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed font-sans bg-white dark:bg-slate-800/60 p-3.5 rounded-lg border border-cyan-100 dark:border-cyan-800/40 shadow-2xs">
                       "{selectedCaseDetail.primary_record.text}"
                     </p>
 
                     <div>
-                      <span className="text-[10px] font-mono uppercase text-slate-400 block mb-1.5">
+                      <span className="text-[10px] font-mono uppercase text-slate-400 dark:text-slate-500 block mb-1.5">
                         Extracted Entities in Record ({selectedCaseDetail.primary_record.extracted_entities.length}):
                       </span>
                       <div className="flex flex-wrap gap-1.5">
@@ -1032,11 +1032,11 @@ export const Cases: React.FC = () => {
                   {selectedCaseDetail.related_records.length > 0 && (
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <h4 className="text-xs font-bold font-mono text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                          <Layers className="w-3.5 h-3.5 text-slate-500" />
+                        <h4 className="text-xs font-bold font-mono text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                          <Layers className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                           Co-Occurring Cross-Reference Records ({selectedCaseDetail.related_records.length})
                         </h4>
-                        <span className="text-[11px] text-slate-500">
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">
                           Records sharing multi-entity co-occurrence or key players
                         </span>
                       </div>
@@ -1046,14 +1046,14 @@ export const Cases: React.FC = () => {
                           const sTheme = getSourceTheme(rec.source);
                           const SrcIcon = sTheme.icon;
                           return (
-                            <div key={rec.record_id} className="rounded-lg border border-slate-200 bg-white p-4 hover:border-slate-300 transition-colors shadow-2xs space-y-2">
+                            <div key={rec.record_id} className="rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800/50 p-4 hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-2xs space-y-2">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                  <span className="text-xs font-mono font-bold text-slate-900">
+                                  <span className="text-xs font-mono font-bold text-slate-900 dark:text-slate-100">
                                     {rec.record_id}
                                   </span>
-                                  <span className="text-xs text-slate-400">•</span>
-                                  <span className="text-[11px] font-mono text-slate-500">
+                                  <span className="text-xs text-slate-400 dark:text-slate-500">•</span>
+                                  <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
                                     {rec.date}
                                   </span>
                                 </div>
@@ -1063,17 +1063,17 @@ export const Cases: React.FC = () => {
                                 </span>
                               </div>
 
-                              <p className="text-xs text-slate-700 line-clamp-3">
+                              <p className="text-xs text-slate-700 dark:text-slate-300 line-clamp-3">
                                 "{rec.text}"
                               </p>
 
-                              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                                <span className="text-slate-500 text-[10px] font-mono">
+                              <div className="pt-2 border-t border-slate-100 dark:border-white/8 flex items-center justify-between text-[11px]">
+                                <span className="text-slate-500 dark:text-slate-400 text-[10px] font-mono">
                                   {rec.relationship_note}
                                 </span>
                                 <button
                                   onClick={() => handleOpenCase(rec.record_id)}
-                                  className="text-cyan-700 hover:text-cyan-900 font-medium flex items-center gap-1 cursor-pointer"
+                                  className="text-cyan-700 dark:text-cyan-400 hover:text-cyan-900 dark:hover:text-cyan-300 font-medium flex items-center gap-1 cursor-pointer"
                                 >
                                   Open Case File
                                   <ChevronRight className="w-3 h-3" />
@@ -1104,8 +1104,8 @@ export const Cases: React.FC = () => {
                   </div>
 
                   {/* Responsible Note */}
-                  <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-600 flex items-start gap-2">
-                    <Info className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
+                  <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 p-3 text-xs text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                    <Info className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0 mt-0.5" />
                     <span>
                       Shared entities or locations reflect analytical co-occurrence across reporting channels. Co-occurrence indicates investigative context, not confirmed operational coordination or guilt.
                     </span>
@@ -1118,12 +1118,12 @@ export const Cases: React.FC = () => {
                         return (
                           <div
                             key={rc.case_id}
-                            className="rounded-xl border border-slate-200 bg-white p-4 hover:border-cyan-300 hover:shadow-xs transition-all space-y-3"
+                            className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0A1220] p-4 hover:border-cyan-300 dark:hover:border-cyan-700/60 hover:shadow-xs transition-all space-y-3"
                           >
                             <div className="flex items-start justify-between gap-2">
                               <div>
                                 <div className="flex items-center gap-1.5 mb-1">
-                                  <span className="text-xs font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                                  <span className="text-xs font-mono font-bold text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
                                     {rc.case_id}
                                   </span>
                                   <span
@@ -1140,13 +1140,13 @@ export const Cases: React.FC = () => {
                                     {rc.workflow_status}
                                   </span>
                                 </div>
-                                <h5 className="text-xs font-bold text-slate-800">
+                                <h5 className="text-xs font-bold text-slate-800 dark:text-slate-200">
                                   {rc.title}
                                 </h5>
                               </div>
                               <button
                                 onClick={() => handleOpenCase(rc.case_id)}
-                                className="inline-flex items-center gap-1 rounded-md border border-cyan-200 bg-cyan-50 px-2.5 py-1 text-[11px] font-semibold text-cyan-800 hover:bg-cyan-100 transition-colors cursor-pointer shrink-0"
+                                className="inline-flex items-center gap-1 rounded-md border border-cyan-200 dark:border-cyan-800/60 bg-cyan-50 dark:bg-cyan-950/40 px-2.5 py-1 text-[11px] font-semibold text-cyan-800 dark:text-cyan-300 hover:bg-cyan-100 dark:hover:bg-cyan-900/50 transition-colors cursor-pointer shrink-0"
                               >
                                 Open Case
                                 <ArrowRight className="w-3 h-3" />
@@ -1381,7 +1381,7 @@ export const Cases: React.FC = () => {
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                          <label className="text-[11px] font-medium text-slate-700 block mb-1">
+                          <label className="text-[11px] font-medium text-slate-700 dark:text-slate-300 block mb-1">
                             Follow-up Title *
                           </label>
                           <input
@@ -1390,18 +1390,18 @@ export const Cases: React.FC = () => {
                             placeholder="e.g. Entity Review: Verify toll records for +919876543210"
                             value={newFuTitle}
                             onChange={(e) => setNewFuTitle(e.target.value)}
-                            className="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+                            className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
                           />
                         </div>
 
                         <div>
-                          <label className="text-[11px] font-medium text-slate-700 block mb-1">
+                          <label className="text-[11px] font-medium text-slate-700 dark:text-slate-300 block mb-1">
                             Review Category *
                           </label>
                           <select
                             value={newFuCategory}
                             onChange={(e) => setNewFuCategory(e.target.value as FollowUpCategory)}
-                            className="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-800 focus:ring-2 focus:ring-violet-500 focus:border-violet-500 cursor-pointer"
+                            className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-violet-500 focus:border-violet-500 cursor-pointer"
                           >
                             {ALLOWED_CATEGORIES.map((cat) => (
                               <option key={cat} value={cat}>
@@ -1414,7 +1414,7 @@ export const Cases: React.FC = () => {
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                          <label className="text-[11px] font-medium text-slate-700 block mb-1">
+                          <label className="text-[11px] font-medium text-slate-700 dark:text-slate-300 block mb-1">
                             Related Target (Optional)
                           </label>
                           <input
@@ -1422,12 +1422,12 @@ export const Cases: React.FC = () => {
                             placeholder="e.g. Ravi Malhotra, CR-1004, or Andheri Warehouse"
                             value={newFuTarget}
                             onChange={(e) => setNewFuTarget(e.target.value)}
-                            className="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+                            className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
                           />
                         </div>
 
                         <div>
-                          <label className="text-[11px] font-medium text-slate-700 block mb-1">
+                          <label className="text-[11px] font-medium text-slate-700 dark:text-slate-300 block mb-1">
                             Investigative Notes (Optional)
                           </label>
                           <input
@@ -1435,7 +1435,7 @@ export const Cases: React.FC = () => {
                             placeholder="Brief context or verification rationale"
                             value={newFuNotes}
                             onChange={(e) => setNewFuNotes(e.target.value)}
-                            className="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+                            className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
                           />
                         </div>
                       </div>
@@ -1444,7 +1444,7 @@ export const Cases: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setShowAddFollowup(false)}
-                          className="px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 hover:bg-slate-50 cursor-pointer"
+                          className="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer"
                         >
                           Cancel
                         </button>
@@ -1464,7 +1464,7 @@ export const Cases: React.FC = () => {
                     <select
                       value={fuCategoryFilter}
                       onChange={(e) => setFuCategoryFilter(e.target.value)}
-                      className="bg-white border border-slate-300 rounded-md px-2.5 py-1 text-xs text-slate-700 cursor-pointer"
+                      className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-md px-2.5 py-1 text-xs text-slate-700 dark:text-slate-200 cursor-pointer"
                     >
                       <option value="ALL">All Categories</option>
                       {ALLOWED_CATEGORIES.map((c) => (
@@ -1477,7 +1477,7 @@ export const Cases: React.FC = () => {
                     <select
                       value={fuStatusFilter}
                       onChange={(e) => setFuStatusFilter(e.target.value)}
-                      className="bg-white border border-slate-300 rounded-md px-2.5 py-1 text-xs text-slate-700 cursor-pointer"
+                      className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-md px-2.5 py-1 text-xs text-slate-700 dark:text-slate-200 cursor-pointer"
                     >
                       <option value="ALL">All Statuses</option>
                       <option value="Pending">Pending</option>
@@ -1591,7 +1591,7 @@ export const Cases: React.FC = () => {
                       [...selectedCaseDetail.activity_history].reverse().map((ev) => (
                         <div key={ev.id} className="relative group">
                           <div className="absolute -left-6 top-1 w-2.5 h-2.5 rounded-full bg-cyan-600 border-2 border-white ring-2 ring-cyan-100" />
-                          <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-2xs space-y-1">
+                          <div className="rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800/50 p-3 shadow-2xs space-y-1">
                             <div className="flex items-center justify-between text-[10px] font-mono">
                               <span className="font-bold text-slate-800 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200">
                                 {ev.action}
@@ -1634,7 +1634,7 @@ export const Cases: React.FC = () => {
                       return (
                         <div
                           key={entity.id}
-                          className="rounded-lg border border-slate-200 bg-white p-3.5 hover:border-slate-300 transition-colors shadow-2xs space-y-2"
+                          className="rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800/50 p-3.5 hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-2xs space-y-2"
                         >
                           <div className="flex items-center justify-between">
                             <span
@@ -1780,7 +1780,7 @@ export const Cases: React.FC = () => {
                     {selectedCaseDetail.timeline_events.map((ev, idx) => (
                       <div key={idx} className="relative group">
                         <div className="absolute -left-6 top-1 w-2.5 h-2.5 rounded-full bg-cyan-600 border-2 border-white ring-2 ring-cyan-100" />
-                        <div className="rounded-lg border border-slate-200 bg-white p-3.5 shadow-2xs space-y-1.5">
+                        <div className="rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800/50 p-3.5 shadow-2xs space-y-1.5">
                           <div className="flex items-center justify-between text-xs">
                             <span className="font-mono font-bold text-slate-900">
                               {ev.date} {ev.time ? `(${ev.time})` : ""}
@@ -1815,7 +1815,7 @@ export const Cases: React.FC = () => {
                     {selectedCaseDetail.locations.map((loc) => (
                       <div
                         key={loc.id}
-                        className="rounded-lg border border-slate-200 bg-white p-3.5 hover:border-slate-300 transition-colors shadow-2xs space-y-2"
+                        className="rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800/50 p-3.5 hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-2xs space-y-2"
                       >
                         <div className="flex items-center justify-between">
                           <span className="inline-flex items-center gap-1 text-[10px] font-mono bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200 font-semibold">
@@ -1879,7 +1879,7 @@ export const Cases: React.FC = () => {
                         <button
                           key={eid}
                           onClick={() => navigate(`/network?focus=${encodeURIComponent(eid)}`)}
-                          className="inline-flex items-center gap-1 rounded bg-white border border-slate-200 px-2 py-0.5 text-xs font-mono text-slate-700 hover:border-indigo-300 hover:text-indigo-700 transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 text-xs font-mono text-slate-700 dark:text-slate-200 hover:border-indigo-300 hover:text-indigo-700 transition-colors cursor-pointer"
                         >
                           <Share2 className="w-2.5 h-2.5 text-indigo-500" />
                           {eid}
@@ -1893,7 +1893,7 @@ export const Cases: React.FC = () => {
                       </span>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {selectedCaseDetail.network_context.links.map((link, idx) => (
-                          <div key={idx} className="rounded bg-white p-2.5 border border-slate-200 text-xs font-mono flex items-center justify-between">
+                          <div key={idx} className="rounded bg-white dark:bg-slate-800/60 p-2.5 border border-slate-200 dark:border-slate-700 text-xs font-mono flex items-center justify-between">
                             <span className="text-slate-800 font-medium">
                               {link.source} <span className="text-slate-400">↔</span> {link.target}
                             </span>
@@ -1925,13 +1925,13 @@ export const Cases: React.FC = () => {
                   {/* Provenance Pipeline Flow Banner */}
                   <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-700 flex flex-wrap items-center gap-2 font-mono">
                     <span className="font-bold text-slate-900">Provenance Flow:</span>
-                    <span className="bg-white px-2 py-0.5 rounded border border-slate-200">Source Record</span>
+                    <span className="bg-white dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">Source Record</span>
                     <span>──▶</span>
-                    <span className="bg-white px-2 py-0.5 rounded border border-slate-200">Entity Extraction</span>
+                    <span className="bg-white dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">Entity Extraction</span>
                     <span>──▶</span>
-                    <span className="bg-white px-2 py-0.5 rounded border border-slate-200">Network Analysis</span>
+                    <span className="bg-white dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">Network Analysis</span>
                     <span>──▶</span>
-                    <span className="bg-white px-2 py-0.5 rounded border border-slate-200">Anomaly Detection</span>
+                    <span className="bg-white dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">Anomaly Detection</span>
                     <span>──▶</span>
                     <span className="bg-cyan-50 px-2 py-0.5 rounded border border-cyan-200 font-bold text-cyan-800">Case Dossier</span>
                   </div>
@@ -1940,7 +1940,7 @@ export const Cases: React.FC = () => {
                     {selectedCaseDetail.intelligence_references.map((ref, idx) => (
                       <div
                         key={idx}
-                        className="rounded-lg border border-slate-200 bg-white p-3.5 hover:border-slate-300 transition-colors shadow-2xs space-y-1.5"
+                        className="rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800/50 p-3.5 hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-2xs space-y-1.5"
                       >
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <div className="flex items-center gap-2">
@@ -2014,26 +2014,26 @@ export const Cases: React.FC = () => {
                       value={tempNote}
                       onChange={(e) => setTempNote(e.target.value)}
                       placeholder="Enter working investigative hypothesis, cross-reference questions, or follow-up notes..."
-                      className="w-full bg-white border border-slate-300 rounded-lg p-3 text-xs text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+                      className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg p-3 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
                     />
 
                     <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => setTempNote((prev) => prev + (prev ? " | " : "") + "Flagged for Secondary Source Verification")}
-                          className="px-2 py-1 rounded bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-[11px] cursor-pointer"
+                          className="px-2 py-1 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 text-[11px] cursor-pointer"
                         >
                           + Secondary Verification
                         </button>
                         <button
                           onClick={() => setTempNote((prev) => prev + (prev ? " | " : "") + "Cross-reference CDR Toll Records")}
-                          className="px-2 py-1 rounded bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-[11px] cursor-pointer"
+                          className="px-2 py-1 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 text-[11px] cursor-pointer"
                         >
                           + CDR Cross-Check
                         </button>
                         <button
                           onClick={() => setTempNote((prev) => prev + (prev ? " | " : "") + "Additional Review Required")}
-                          className="px-2 py-1 rounded bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-[11px] cursor-pointer"
+                          className="px-2 py-1 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 text-[11px] cursor-pointer"
                         >
                           + Additional Review Required
                         </button>
@@ -2082,7 +2082,7 @@ export const Cases: React.FC = () => {
                       {caseEvidence.map((item) => (
                         <div
                           key={item.evidence_id}
-                          className="p-4 bg-white rounded-xl border border-slate-200 hover:border-slate-300 transition-colors shadow-2xs space-y-2.5"
+                          className="p-4 bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-2xs space-y-2.5"
                         >
                           <div className="flex items-center justify-between gap-2 flex-wrap">
                             <div className="flex items-center gap-2 flex-wrap">
@@ -2137,49 +2137,49 @@ export const Cases: React.FC = () => {
         <div className="px-8 py-6 space-y-6">
           {/* Top Metrics Strip */}
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
-              <span className="text-[11px] font-mono uppercase text-slate-400 font-semibold block">TOTAL CASES</span>
-              <span className="text-2xl font-bold font-mono text-slate-900 mt-1 block">
+            <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0A1220] p-4 shadow-xs">
+              <span className="text-[11px] font-mono uppercase text-slate-400 dark:text-slate-500 font-semibold block">TOTAL CASES</span>
+              <span className="text-2xl font-bold font-mono text-slate-900 dark:text-slate-100 mt-1 block">
                 {casesData?.total_cases ?? 0}
               </span>
-              <span className="text-[11px] text-slate-500 mt-1 block">Registered Files</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">Registered Files</span>
             </div>
 
-            <div className="rounded-xl border border-amber-200 bg-amber-50/40 p-4 shadow-xs">
-              <span className="text-[11px] font-mono uppercase text-amber-700 font-semibold block">REVIEW REQUIRED</span>
-              <span className="text-2xl font-bold font-mono text-amber-900 mt-1 block">
+            <div className="rounded-xl border border-amber-200 dark:border-amber-800/60 bg-amber-50/40 dark:bg-amber-950/30 p-4 shadow-xs">
+              <span className="text-[11px] font-mono uppercase text-amber-700 dark:text-amber-400 font-semibold block">REVIEW REQUIRED</span>
+              <span className="text-2xl font-bold font-mono text-amber-900 dark:text-amber-200 mt-1 block">
                 {casesData?.review_required_count ?? 0}
               </span>
-              <span className="text-[11px] text-amber-700 mt-1 block">Initial Baseline</span>
+              <span className="text-[11px] text-amber-700 dark:text-amber-400 mt-1 block">Initial Baseline</span>
             </div>
 
-            <div className="rounded-xl border border-sky-200 bg-sky-50/40 p-4 shadow-xs">
-              <span className="text-[11px] font-mono uppercase text-sky-700 font-semibold block">IN REVIEW</span>
-              <span className="text-2xl font-bold font-mono text-sky-900 mt-1 block">
+            <div className="rounded-xl border border-sky-200 dark:border-sky-800/60 bg-sky-50/40 dark:bg-sky-950/30 p-4 shadow-xs">
+              <span className="text-[11px] font-mono uppercase text-sky-700 dark:text-sky-400 font-semibold block">IN REVIEW</span>
+              <span className="text-2xl font-bold font-mono text-sky-900 dark:text-sky-200 mt-1 block">
                 {casesData?.in_review_count ?? 0}
               </span>
-              <span className="text-[11px] text-sky-700 mt-1 block">Active Examination</span>
+              <span className="text-[11px] text-sky-700 dark:text-sky-400 mt-1 block">Active Examination</span>
             </div>
 
-            <div className="rounded-xl border border-violet-200 bg-violet-50/40 p-4 shadow-xs">
-              <span className="text-[11px] font-mono uppercase text-violet-700 font-semibold block">FOLLOW-UP REQUIRED</span>
-              <span className="text-2xl font-bold font-mono text-violet-900 mt-1 block">
+            <div className="rounded-xl border border-violet-200 dark:border-violet-800/60 bg-violet-50/40 dark:bg-violet-950/30 p-4 shadow-xs">
+              <span className="text-[11px] font-mono uppercase text-violet-700 dark:text-violet-400 font-semibold block">FOLLOW-UP REQUIRED</span>
+              <span className="text-2xl font-bold font-mono text-violet-900 dark:text-violet-200 mt-1 block">
                 {casesData?.followup_required_count ?? 0}
               </span>
-              <span className="text-[11px] text-violet-700 mt-1 block">Tasks Pending</span>
+              <span className="text-[11px] text-violet-700 dark:text-violet-400 mt-1 block">Tasks Pending</span>
             </div>
 
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-4 shadow-xs">
-              <span className="text-[11px] font-mono uppercase text-emerald-700 font-semibold block">REVIEW COMPLETED</span>
-              <span className="text-2xl font-bold font-mono text-emerald-900 mt-1 block">
+            <div className="rounded-xl border border-emerald-200 dark:border-emerald-800/60 bg-emerald-50/40 dark:bg-emerald-950/30 p-4 shadow-xs">
+              <span className="text-[11px] font-mono uppercase text-emerald-700 dark:text-emerald-400 font-semibold block">REVIEW COMPLETED</span>
+              <span className="text-2xl font-bold font-mono text-emerald-900 dark:text-emerald-200 mt-1 block">
                 {casesData?.review_completed_count ?? 0}
               </span>
-              <span className="text-[11px] text-emerald-700 mt-1 block">Finalized Reviews</span>
+              <span className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-1 block">Finalized Reviews</span>
             </div>
           </div>
 
           {/* Filter & Search Bar */}
-          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs space-y-3">
+          <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0A1220] p-4 shadow-xs space-y-3">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
               {/* Search */}
               <div className="relative flex-1">
@@ -2189,12 +2189,12 @@ export const Cases: React.FC = () => {
                   placeholder="Search case dossiers, IDs, entities, locations, narratives..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 cursor-pointer"
+                    className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -2207,7 +2207,7 @@ export const Cases: React.FC = () => {
                 <select
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 cursor-pointer font-medium"
+                  className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-200 cursor-pointer font-medium"
                 >
                   <option value="ALL">All Workflow Statuses</option>
                   <option value="Review Required">Review Required</option>
@@ -2220,7 +2220,7 @@ export const Cases: React.FC = () => {
                 <select
                   value={selectedPriority}
                   onChange={(e) => setSelectedPriority(e.target.value)}
-                  className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 cursor-pointer font-medium"
+                  className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-200 cursor-pointer font-medium"
                 >
                   <option value="ALL">All Priorities</option>
                   <option value="HIGH">High Priority</option>
@@ -2232,7 +2232,7 @@ export const Cases: React.FC = () => {
                 <select
                   value={selectedSource}
                   onChange={(e) => setSelectedSource(e.target.value)}
-                  className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 cursor-pointer font-medium"
+                  className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-200 cursor-pointer font-medium"
                 >
                   <option value="ALL">All Sources</option>
                   <option value="police_case_management">Police Case Mgmt</option>
@@ -2245,7 +2245,7 @@ export const Cases: React.FC = () => {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 cursor-pointer font-medium"
+                  className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-200 cursor-pointer font-medium"
                 >
                   <option value="date_desc">Date (Newest First)</option>
                   <option value="date_asc">Date (Oldest First)</option>
@@ -2256,16 +2256,16 @@ export const Cases: React.FC = () => {
             </div>
 
             {/* Sub-bar showing result count & active filters */}
-            <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-white/8">
               <span className="font-mono">
                 Showing {filteredCases.length} of {casesData?.total_cases ?? 0} cases
                 {casesData?.date_coverage && (
-                  <span className="ml-2 text-slate-400">
+                  <span className="ml-2 text-slate-400 dark:text-slate-500">
                     ({casesData.date_coverage.start} → {casesData.date_coverage.end})
                   </span>
                 )}
               </span>
-              <span className="text-[11px] text-slate-400 font-mono">
+              <span className="text-[11px] text-slate-400 dark:text-slate-500 font-mono">
                 Click any case card to open the investigation workspace
               </span>
             </div>
@@ -2283,15 +2283,15 @@ export const Cases: React.FC = () => {
                   <div
                     key={caseItem.case_id}
                     onClick={() => handleOpenCase(caseItem.case_id)}
-                    className="rounded-xl border border-slate-200 bg-white p-5 hover:border-cyan-300 hover:shadow-xs transition-all cursor-pointer space-y-3.5 group"
+                    className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0A1220] p-5 hover:border-cyan-300 dark:hover:border-cyan-700/60 hover:shadow-xs transition-all cursor-pointer space-y-3.5 group"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 group-hover:bg-cyan-50 group-hover:text-cyan-900 group-hover:border-cyan-200 transition-colors">
+                          <span className="text-xs font-mono font-bold text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700 group-hover:bg-cyan-50 dark:group-hover:bg-cyan-950/50 group-hover:text-cyan-900 dark:group-hover:text-cyan-300 group-hover:border-cyan-200 dark:group-hover:border-cyan-700/60 transition-colors">
                             {caseItem.case_id}
                           </span>
-                          <span className="text-xs text-slate-300">•</span>
+                          <span className="text-xs text-slate-300 dark:text-slate-600">•</span>
                           <span
                             className="text-[10px] font-mono px-2 py-0.5 rounded border font-semibold"
                             style={{
@@ -2306,7 +2306,7 @@ export const Cases: React.FC = () => {
                             {caseItem.workflow_status}
                           </span>
                         </div>
-                        <h3 className="text-sm font-bold text-slate-900 group-hover:text-cyan-900 transition-colors line-clamp-1">
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 group-hover:text-cyan-900 dark:group-hover:text-cyan-300 transition-colors line-clamp-1">
                           {caseItem.title}
                         </h3>
                       </div>
@@ -2324,7 +2324,7 @@ export const Cases: React.FC = () => {
                       </span>
                     </div>
 
-                    <p className="text-xs text-slate-600 line-clamp-2">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2">
                       "{caseItem.summary}"
                     </p>
 
@@ -2334,13 +2334,13 @@ export const Cases: React.FC = () => {
                         {caseItem.entities.slice(0, 4).map((ent, idx) => (
                           <span
                             key={idx}
-                            className="text-[10px] font-mono bg-slate-100 text-slate-700 px-1.5 py-0.2 rounded border border-slate-200"
+                            className="text-[10px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-1.5 py-0.2 rounded border border-slate-200 dark:border-slate-700"
                           >
                             {ent}
                           </span>
                         ))}
                         {caseItem.entities.length > 4 && (
-                          <span className="text-[10px] font-mono text-slate-400 px-1 py-0.2">
+                          <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 px-1 py-0.2">
                             +{caseItem.entities.length - 4} more
                           </span>
                         )}
@@ -2348,16 +2348,16 @@ export const Cases: React.FC = () => {
                     )}
 
                     {/* Footer strip */}
-                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                    <div className="pt-2 border-t border-slate-100 dark:border-white/8 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                       <span>
                         {caseItem.date} {caseItem.time ? `(${caseItem.time})` : ""}
                       </span>
                       <div className="flex items-center gap-3">
                         <span>{caseItem.entity_count} ents</span>
                         {caseItem.anomaly_count > 0 && (
-                          <span className="text-rose-700 font-semibold">{caseItem.anomaly_count} signals</span>
+                          <span className="text-rose-700 dark:text-rose-400 font-semibold">{caseItem.anomaly_count} signals</span>
                         )}
-                        <span className="text-cyan-700 font-semibold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                        <span className="text-cyan-700 dark:text-cyan-400 font-semibold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
                           Open File <ChevronRight className="w-3 h-3" />
                         </span>
                       </div>
@@ -2368,14 +2368,14 @@ export const Cases: React.FC = () => {
             </div>
           ) : (
             /* Table View */
-            <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-xs">
+            <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0A1220] overflow-hidden shadow-xs">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 border-b border-slate-200 font-mono uppercase text-slate-500 text-[10px]">
+                <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-white/10 font-mono uppercase text-slate-500 dark:text-slate-400 text-[10px]">
                   <tr>
                     <th className="px-4 py-3">Case ID</th>
                     <th className="px-4 py-3">Date</th>
                     <th className="px-4 py-3">Source</th>
-                    <th className="px-4 py-3">Title & Summary</th>
+                    <th className="px-4 py-3">Title &amp; Summary</th>
                     <th className="px-4 py-3">Priority</th>
                     <th className="px-4 py-3">Workflow Status</th>
                     <th className="px-4 py-3 text-right">Entities</th>
@@ -2383,7 +2383,7 @@ export const Cases: React.FC = () => {
                     <th className="px-4 py-3 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-white/8">
                   {filteredCases.map((caseItem) => {
                     const sTheme = getSourceTheme(caseItem.source);
                     const SrcIcon = sTheme.icon;
@@ -2393,12 +2393,12 @@ export const Cases: React.FC = () => {
                       <tr
                         key={caseItem.case_id}
                         onClick={() => handleOpenCase(caseItem.case_id)}
-                        className="hover:bg-slate-50/70 transition-colors cursor-pointer"
+                        className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors cursor-pointer"
                       >
-                        <td className="px-4 py-3 font-mono font-bold text-slate-900 whitespace-nowrap">
+                        <td className="px-4 py-3 font-mono font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap">
                           {caseItem.case_id}
                         </td>
-                        <td className="px-4 py-3 font-mono text-slate-600 whitespace-nowrap">
+                        <td className="px-4 py-3 font-mono text-slate-600 dark:text-slate-400 whitespace-nowrap">
                           {caseItem.date}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">
@@ -2415,10 +2415,10 @@ export const Cases: React.FC = () => {
                           </span>
                         </td>
                         <td className="px-4 py-3 max-w-xs">
-                          <div className="font-bold text-slate-900 truncate">
+                          <div className="font-bold text-slate-900 dark:text-slate-100 truncate">
                             {caseItem.short_title}
                           </div>
-                          <div className="text-[11px] text-slate-500 truncate mt-0.5">
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
                             {caseItem.summary}
                           </div>
                         </td>
@@ -2439,7 +2439,7 @@ export const Cases: React.FC = () => {
                             {caseItem.workflow_status}
                           </span>
                         </td>
-                        <td className="px-4 py-3 font-mono text-right text-slate-700 whitespace-nowrap">
+                        <td className="px-4 py-3 font-mono text-right text-slate-700 dark:text-slate-300 whitespace-nowrap">
                           {caseItem.entity_count}
                         </td>
                         <td className="px-4 py-3 font-mono text-right whitespace-nowrap">
@@ -2476,3 +2476,5 @@ export const Cases: React.FC = () => {
     </div>
   );
 };
+
+

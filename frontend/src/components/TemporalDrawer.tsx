@@ -102,18 +102,18 @@ export const TemporalDrawer: React.FC<TemporalDrawerProps> = ({
         className="fixed inset-0 bg-slate-900/30 backdrop-blur-xs z-40 transition-opacity"
         onClick={onClose}
       />
-      <div className="fixed inset-y-0 right-0 w-full max-w-xl bg-white shadow-2xl z-50 flex flex-col border-l border-slate-200">
+      <div className="fixed inset-y-0 right-0 w-full max-w-xl bg-white dark:bg-[#0A1220] shadow-2xl z-50 flex flex-col border-l border-slate-200 dark:border-white/10">
         {/* Drawer Header */}
-        <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+        <div className="p-4 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#080E1A] flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-md bg-cyan-100 text-cyan-800 flex items-center justify-center font-mono">
+            <div className="w-7 h-7 rounded-md bg-cyan-100 dark:bg-cyan-900/50 text-cyan-800 dark:text-cyan-300 flex items-center justify-center font-mono">
               <Clock className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-slate-900 font-mono tracking-wide">
+              <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100 font-mono tracking-wide">
                 {pattern ? "TEMPORAL PATTERN DOSSIER" : "TEMPORAL OBSERVATION"}
               </h2>
-              <p className="text-[10px] text-slate-500 font-mono">
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
                 {pattern ? pattern.pattern_id : observation?.observation_id || observationId}
               </p>
             </div>

@@ -108,9 +108,9 @@ export const EvidenceDrawer: React.FC<EvidenceDrawerProps> = ({ evidenceId, onCl
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-slate-900/40 backdrop-blur-sm flex justify-end transition-opacity">
-      <div className="w-full max-w-xl bg-white h-full shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200">
+      <div className="w-full max-w-xl bg-white dark:bg-[#0A1220] h-full shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200 border-l border-slate-200/80 dark:border-white/10">
         {/* Drawer Header */}
-        <div className="px-6 py-4 border-b border-slate-200 bg-slate-50/80 flex items-start justify-between flex-shrink-0">
+        <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50/80 dark:bg-[#080E1A] flex items-start justify-between flex-shrink-0">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="font-mono text-xs font-bold text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded border border-cyan-200">
@@ -225,15 +225,15 @@ export const EvidenceDrawer: React.FC<EvidenceDrawerProps> = ({ evidenceId, onCl
               </div>
 
               {/* Epistemic Limitations & Responsible Intelligence Banner */}
-              <div className="p-4 rounded-xl border border-amber-200 bg-amber-50/70 space-y-1.5">
-                <div className="flex items-center gap-2 text-xs font-bold text-amber-900 uppercase tracking-wider">
-                  <AlertTriangle className="w-4 h-4 text-amber-600" />
+              <div className="p-4 rounded-xl border border-amber-200 dark:border-amber-600/50 bg-amber-50/70 dark:bg-amber-950/40 space-y-1.5">
+                <div className="flex items-center gap-2 text-xs font-bold text-amber-900 dark:text-amber-200 uppercase tracking-wider">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                   Investigative Limitation &amp; Epistemic Boundary
                 </div>
-                <p className="text-xs text-amber-900 leading-relaxed font-medium">
+                <p className="text-xs text-amber-900 dark:text-amber-200 leading-relaxed font-medium">
                   {evidenceItem.limitations}
                 </p>
-                <p className="text-[11px] text-amber-700/80 pt-1 border-t border-amber-200/60 italic">
+                <p className="text-[11px] text-amber-700/80 dark:text-amber-300/80 pt-1 border-t border-amber-200/60 dark:border-amber-700/40 italic">
                   CNIS Principle: Analytical signals, graph centrality, and record co-occurrences do not constitute legal proof. Authorized human investigator interpretation is required.
                 </p>
               </div>
@@ -344,13 +344,13 @@ export const EvidenceDrawer: React.FC<EvidenceDrawerProps> = ({ evidenceId, onCl
         </div>
 
         {/* Drawer Footer */}
-        <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between flex-shrink-0">
-          <p className="text-[11px] text-slate-400">
+        <div className="px-6 py-3 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#080E1A] flex items-center justify-between flex-shrink-0">
+          <p className="text-[11px] text-slate-400 dark:text-slate-500">
             CNIS Evidence Engine · Deterministic &amp; Auditable
           </p>
           <button
             onClick={onClose}
-            className="px-4 py-1.5 bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-300 transition-colors"
+            className="px-4 py-1.5 bg-slate-200 dark:bg-slate-700/60 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-semibold hover:bg-slate-300 dark:hover:bg-slate-600/60 transition-colors"
           >
             Close
           </button>

@@ -117,14 +117,14 @@ export const Overview: React.FC = () => {
       </div>
 
       {/* Investigative Notice Banner */}
-      <div className="px-4 py-2.5 rounded-lg bg-amber-50/70 border border-amber-200 flex items-center justify-between gap-3 text-xs text-amber-900">
+      <div className="px-4 py-2.5 rounded-lg bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-600/50 flex items-center justify-between gap-3 text-xs text-amber-900 dark:text-amber-200">
         <div className="flex items-center gap-2">
-          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+          <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
           <span>
             <strong>Investigative Notice:</strong> Automated signals are investigative leads derived from co-occurrence and anomaly algorithms; human validation is required prior to operational action.
           </span>
         </div>
-        <span className="text-[10px] font-mono text-amber-700 uppercase shrink-0 hidden sm:inline font-semibold">
+        <span className="text-[10px] font-mono text-amber-700 dark:text-amber-300 uppercase shrink-0 hidden sm:inline font-semibold">
           Active Case Corpus
         </span>
       </div>

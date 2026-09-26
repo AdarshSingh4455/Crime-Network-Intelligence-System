@@ -64,14 +64,14 @@ export const GraphIntelligenceDrawer: React.FC<GraphIntelligenceDrawerProps> = (
     <>
       <div className="fixed inset-0 z-50 overflow-hidden bg-slate-900/60 backdrop-blur-xs flex justify-end">
         <div
-          className="w-full max-w-2xl bg-white h-full shadow-2xl flex flex-col transform transition-transform duration-300 border-l border-slate-200"
+          className="w-full max-w-2xl bg-white dark:bg-[#0A1220] h-full shadow-2xl flex flex-col transform transition-transform duration-300 border-l border-slate-200 dark:border-white/10"
           role="dialog"
           aria-modal="true"
         >
           {/* Drawer Header */}
-          <div className="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+          <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#080E1A] flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-50 border border-indigo-100 rounded-lg text-indigo-700">
+              <div className="p-2 bg-indigo-50 dark:bg-indigo-900/40 border border-indigo-100 dark:border-indigo-700/50 rounded-lg text-indigo-700 dark:text-indigo-400">
                 {neighborhood && <Share2 className="w-5 h-5" />}
                 {path && <Route className="w-5 h-5" />}
                 {motif && <Layers className="w-5 h-5" />}
@@ -79,10 +79,10 @@ export const GraphIntelligenceDrawer: React.FC<GraphIntelligenceDrawerProps> = (
                 {comparison && <Sparkles className="w-5 h-5" />}
               </div>
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500 font-semibold">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500 dark:text-slate-400 font-semibold">
                   Graph Intelligence Inspector
                 </span>
-                <h2 className="text-base font-bold text-slate-900 leading-tight">
+                <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 leading-tight">
                   {neighborhood && `Neighborhood: ${neighborhood.center_node || neighborhood.entity_id}`}
                   {path && `Relational Path: ${path.source} → ${path.target}`}
                   {motif && `Motif: ${motif.title || motif.motif_name}`}

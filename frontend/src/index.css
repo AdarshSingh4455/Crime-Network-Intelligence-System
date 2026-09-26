@@ -203,11 +203,30 @@ html:not(.dark) [class*="bg-[#F8FAFC]"] {
   -webkit-backdrop-filter: blur(12px) !important;
 }
 
+/* Extended opacity variants missing from original dark overrides */
+.bg-slate-50\/60,
+.bg-slate-50\/50,
+.bg-slate-50\/40,
+.bg-slate-50\/30 {
+  background: rgba(241, 245, 249, 0.6) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
 .dark .bg-slate-50\/70,
 .dark .bg-slate-50\/80 {
-  background: rgba(16, 26, 46, 0.65) !important;
+  background: rgba(14, 23, 40, 0.72) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
+}
+
+.dark .bg-slate-50\/60,
+.dark .bg-slate-50\/50,
+.dark .bg-slate-50\/40,
+.dark .bg-slate-50\/30 {
+  background: rgba(14, 23, 40, 0.62) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
 }
 
 .bg-slate-100 {
@@ -217,21 +236,23 @@ html:not(.dark) [class*="bg-[#F8FAFC]"] {
 }
 
 .dark .bg-slate-100 {
-  background: rgba(20, 32, 56, 0.7) !important;
+  background: rgba(20, 32, 56, 0.75) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
 }
 
 .bg-slate-100\/70,
-.bg-slate-100\/80 {
+.bg-slate-100\/80,
+.bg-slate-100\/60 {
   background: rgba(226, 232, 240, 0.6) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
 }
 
 .dark .bg-slate-100\/70,
-.dark .bg-slate-100\/80 {
-  background: rgba(20, 32, 56, 0.6) !important;
+.dark .bg-slate-100\/80,
+.dark .bg-slate-100\/60 {
+  background: rgba(20, 32, 56, 0.65) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
 }
@@ -242,6 +263,74 @@ html:not(.dark) [class*="bg-[#F8FAFC]"] {
 
 .dark .bg-slate-200 {
   background: rgba(28, 44, 76, 0.65) !important;
+}
+
+/* bg-white opacity variants not previously covered */
+.bg-white\/85 {
+  background: rgba(255, 255, 255, 0.85) !important;
+}
+.dark .bg-white\/85 {
+  background: rgba(10, 18, 32, 0.82) !important;
+  color: #F8FAFC !important;
+}
+
+/* ─── DRAWER & MODAL DARK SURFACE SYSTEM ──────────────────────────────────
+   These ensure all side-panel drawers and modal containers use proper
+   dark surfaces regardless of backdrop-filter specificity conflicts.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Amber/Warning semantic surfaces — full opacity variant coverage */
+.dark .bg-amber-50\/70,
+.dark .bg-amber-50\/60,
+.dark .bg-amber-50\/50 {
+  background: rgba(120, 53, 15, 0.35) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: rgba(217, 119, 6, 0.45) !important;
+  color: #FDE68A !important;
+}
+
+/* Cyan/Info semantic surfaces — full opacity variant coverage */
+.dark .bg-cyan-50\/50,
+.dark .bg-cyan-50\/40,
+.dark .bg-cyan-50\/60 {
+  background: rgba(8, 70, 92, 0.45) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: rgba(56, 189, 248, 0.35) !important;
+  color: #A5F3FC !important;
+}
+
+/* Violet/purple dark semantic surfaces */
+.dark .bg-violet-50\/40,
+.dark .bg-violet-50\/50,
+.dark .bg-violet-50\/60 {
+  background: rgba(76, 29, 149, 0.30) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: rgba(167, 139, 250, 0.35) !important;
+}
+
+/* ─── TABLE HEADER dark surface additional coverage ──────────────────── */
+.dark .bg-slate-50\/80 {
+  background: rgba(10, 18, 32, 0.88) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+/* ─── GRAY/GRAY-* UTILITY SURFACES FOR DARK MODE ────────────────────── */
+.dark .bg-gray-50,
+.dark .bg-gray-100,
+.dark .bg-gray-200 {
+  background: rgba(16, 26, 46, 0.7) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+.dark .bg-zinc-50,
+.dark .bg-zinc-100,
+.dark .bg-neutral-50,
+.dark .bg-neutral-100 {
+  background: rgba(16, 26, 46, 0.7) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
 }
 
 /* Sidebar & Header glassmorphic overrides */
@@ -288,10 +377,16 @@ header {
   border: 1px solid rgba(254, 205, 211, 0.9) !important;
 }
 
-.dark .bg-\[\#FFF1F2\], .dark [class*="bg-[#FFF1F2]"] {
+.dark .bg-\[\#FFF1F2\], .dark [class*="bg-[#FFF1F2]"], .dark [style*="#FFF1F2" i], .dark [style*="255, 241, 242"] {
   background: rgba(244, 63, 94, 0.25) !important;
   backdrop-filter: blur(8px) !important;
   border: 1px solid rgba(244, 63, 94, 0.45) !important;
+}
+
+.dark .bg-\[\#EEF2FF\], .dark [class*="bg-[#EEF2FF]"], .dark [style*="#EEF2FF" i], .dark [style*="238, 242, 255"] {
+  background: rgba(99, 102, 241, 0.25) !important;
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(99, 102, 241, 0.45) !important;
 }
 
 .bg-\[\#FFFBEB\] {
@@ -300,7 +395,7 @@ header {
   border: 1px solid rgba(253, 230, 138, 0.9) !important;
 }
 
-.dark .bg-\[\#FFFBEB\], .dark [class*="bg-[#FFFBEB]"] {
+.dark .bg-\[\#FFFBEB\], .dark [class*="bg-[#FFFBEB]"], .dark [style*="#FFFBEB" i], .dark [style*="255, 251, 235"] {
   background: rgba(245, 158, 11, 0.25) !important;
   backdrop-filter: blur(8px) !important;
   border: 1px solid rgba(245, 158, 11, 0.45) !important;
@@ -312,7 +407,7 @@ header {
   border: 1px solid rgba(167, 243, 208, 0.9) !important;
 }
 
-.dark .bg-\[\#ECFDF5\], .dark [class*="bg-[#ECFDF5]"] {
+.dark .bg-\[\#ECFDF5\], .dark [class*="bg-[#ECFDF5]"], .dark [style*="#ECFDF5" i], .dark [style*="236, 253, 245"] {
   background: rgba(16, 185, 129, 0.25) !important;
   backdrop-filter: blur(8px) !important;
   border: 1px solid rgba(16, 185, 129, 0.45) !important;
@@ -324,7 +419,7 @@ header {
   border: 1px solid rgba(186, 230, 253, 0.9) !important;
 }
 
-.dark .bg-\[\#EFF6FF\], .dark [class*="bg-[#EFF6FF]"] {
+.dark .bg-\[\#EFF6FF\], .dark [class*="bg-[#EFF6FF]"], .dark [style*="#EFF6FF" i], .dark [style*="239, 246, 255"] {
   background: rgba(37, 99, 235, 0.25) !important;
   backdrop-filter: blur(8px) !important;
   border: 1px solid rgba(37, 99, 235, 0.45) !important;
@@ -336,7 +431,7 @@ header {
   border: 1px solid rgba(233, 213, 255, 0.9) !important;
 }
 
-.dark .bg-\[\#F5F3FF\], .dark [class*="bg-[#F5F3FF]"] {
+.dark .bg-\[\#F5F3FF\], .dark [class*="bg-[#F5F3FF]"], .dark [style*="#F5F3FF" i], .dark [style*="245, 243, 255"] {
   background: rgba(124, 58, 237, 0.25) !important;
   backdrop-filter: blur(8px) !important;
   border: 1px solid rgba(124, 58, 237, 0.45) !important;
@@ -348,10 +443,34 @@ header {
   border: 1px solid rgba(226, 232, 240, 0.9) !important;
 }
 
-.dark .bg-\[\#F9FAFB\], .dark [class*="bg-[#F9FAFB]"] {
+.dark .bg-\[\#F9FAFB\], .dark [class*="bg-[#F9FAFB]"], .dark [style*="#F9FAFB" i], .dark [style*="249, 250, 251"] {
   background: rgba(100, 116, 139, 0.25) !important;
   backdrop-filter: blur(8px) !important;
   border: 1px solid rgba(100, 116, 139, 0.45) !important;
+}
+
+.dark .bg-\[\#FFF7ED\], .dark [class*="bg-[#FFF7ED]"], .dark [style*="#FFF7ED" i], .dark [style*="255, 247, 237"] {
+  background: rgba(194, 65, 12, 0.25) !important;
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(194, 65, 12, 0.45) !important;
+}
+
+.dark .bg-\[\#F0FDFA\], .dark [class*="bg-[#F0FDFA]"], .dark [style*="#F0FDFA" i], .dark [style*="240, 253, 250"] {
+  background: rgba(15, 118, 110, 0.25) !important;
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(15, 118, 110, 0.45) !important;
+}
+
+.dark .bg-\[\#ECFEFF\], .dark [class*="bg-[#ECFEFF]"], .dark [style*="#ECFEFF" i], .dark [style*="236, 254, 255"] {
+  background: rgba(6, 182, 212, 0.25) !important;
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(6, 182, 212, 0.45) !important;
+}
+
+.dark .bg-\[\#F0F9FF\], .dark [class*="bg-[#F0F9FF]"], .dark [style*="#F0F9FF" i], .dark [style*="240, 249, 255"] {
+  background: rgba(14, 165, 233, 0.25) !important;
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(14, 165, 233, 0.45) !important;
 }
 
 /* Glass Borders across elements */
@@ -739,89 +858,117 @@ tbody tr:hover {
   -webkit-backdrop-filter: blur(12px) !important;
 }
 
-/* Crystalline Tinted Badges */
-.bg-cyan-50, .bg-cyan-100 {
+/* Crystalline Tinted Badges & Semantic Surface System */
+.bg-cyan-50, .bg-cyan-50\/30, .bg-cyan-50\/40, .bg-cyan-50\/50, .bg-cyan-50\/60, .bg-cyan-50\/70, .bg-cyan-50\/80, .bg-cyan-100 {
   background: rgba(224, 242, 254, 0.75) !important;
   backdrop-filter: blur(8px) !important;
   color: #0284C7 !important;
   border: 1px solid rgba(186, 230, 253, 0.9) !important;
 }
 
-.dark .bg-cyan-50, .dark .bg-cyan-100 {
-  background: rgba(8, 145, 178, 0.25) !important;
+.dark .bg-cyan-50, .dark .bg-cyan-50\/30, .dark .bg-cyan-50\/40, .dark .bg-cyan-50\/50, .dark .bg-cyan-50\/60, .dark .bg-cyan-50\/70, .dark .bg-cyan-50\/80, .dark .bg-cyan-100 {
+  background: rgba(8, 145, 178, 0.22) !important;
   backdrop-filter: blur(8px) !important;
   color: #38BDF8 !important;
-  border: 1px solid rgba(56, 189, 248, 0.4) !important;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
 }
 
-.bg-emerald-50, .bg-emerald-100 {
+.bg-emerald-50, .bg-emerald-50\/30, .bg-emerald-50\/40, .bg-emerald-50\/50, .bg-emerald-50\/60, .bg-emerald-50\/70, .bg-emerald-100 {
   background: rgba(209, 250, 229, 0.75) !important;
   backdrop-filter: blur(8px) !important;
   color: #059669 !important;
   border: 1px solid rgba(167, 243, 208, 0.9) !important;
 }
 
-.dark .bg-emerald-50, .dark .bg-emerald-100 {
-  background: rgba(16, 185, 129, 0.25) !important;
+.dark .bg-emerald-50, .dark .bg-emerald-50\/30, .dark .bg-emerald-50\/40, .dark .bg-emerald-50\/50, .dark .bg-emerald-50\/60, .dark .bg-emerald-50\/70, .dark .bg-emerald-100 {
+  background: rgba(16, 185, 129, 0.20) !important;
   backdrop-filter: blur(8px) !important;
   color: #34D399 !important;
-  border: 1px solid rgba(52, 211, 153, 0.4) !important;
+  border: 1px solid rgba(52, 211, 153, 0.35) !important;
 }
 
-.bg-amber-50, .bg-amber-50\/80, .bg-amber-100 {
+.bg-amber-50, .bg-amber-50\/30, .bg-amber-50\/40, .bg-amber-50\/50, .bg-amber-50\/60, .bg-amber-50\/70, .bg-amber-50\/80, .bg-amber-100 {
   background: rgba(254, 243, 199, 0.75) !important;
   backdrop-filter: blur(8px) !important;
   color: #D97706 !important;
   border: 1px solid rgba(253, 230, 138, 0.9) !important;
 }
 
-.dark .bg-amber-50, .dark .bg-amber-50\/80, .dark .bg-amber-100 {
-  background: rgba(245, 158, 11, 0.25) !important;
+.dark .bg-amber-50, .dark .bg-amber-50\/30, .dark .bg-amber-50\/40, .dark .bg-amber-50\/50, .dark .bg-amber-50\/60, .dark .bg-amber-50\/70, .dark .bg-amber-50\/80, .dark .bg-amber-100 {
+  background: rgba(245, 158, 11, 0.20) !important;
   backdrop-filter: blur(8px) !important;
   color: #FBBF24 !important;
-  border: 1px solid rgba(251, 191, 36, 0.4) !important;
+  border: 1px solid rgba(251, 191, 36, 0.35) !important;
 }
 
-.bg-rose-50, .bg-rose-100 {
+.bg-rose-50, .bg-rose-50\/30, .bg-rose-50\/40, .bg-rose-50\/50, .bg-rose-50\/60, .bg-rose-50\/70, .bg-rose-100 {
   background: rgba(255, 228, 230, 0.75) !important;
   backdrop-filter: blur(8px) !important;
   color: #E11D48 !important;
   border: 1px solid rgba(254, 205, 211, 0.9) !important;
 }
 
-.dark .bg-rose-50, .dark .bg-rose-100 {
-  background: rgba(244, 63, 94, 0.25) !important;
+.dark .bg-rose-50, .dark .bg-rose-50\/30, .dark .bg-rose-50\/40, .dark .bg-rose-50\/50, .dark .bg-rose-50\/60, .dark .bg-rose-50\/70, .dark .bg-rose-100 {
+  background: rgba(244, 63, 94, 0.20) !important;
   backdrop-filter: blur(8px) !important;
   color: #FB7185 !important;
-  border: 1px solid rgba(251, 113, 133, 0.4) !important;
+  border: 1px solid rgba(251, 113, 133, 0.35) !important;
 }
 
-.bg-indigo-50, .bg-indigo-100 {
+.bg-sky-50, .bg-sky-50\/30, .bg-sky-50\/40, .bg-sky-50\/50, .bg-sky-50\/60, .bg-sky-50\/70, .bg-sky-100 {
+  background: rgba(240, 249, 255, 0.75) !important;
+  backdrop-filter: blur(8px) !important;
+  color: #0284C7 !important;
+  border: 1px solid rgba(186, 230, 253, 0.9) !important;
+}
+
+.dark .bg-sky-50, .dark .bg-sky-50\/30, .dark .bg-sky-50\/40, .dark .bg-sky-50\/50, .dark .bg-sky-50\/60, .dark .bg-sky-50\/70, .dark .bg-sky-100 {
+  background: rgba(14, 165, 233, 0.20) !important;
+  backdrop-filter: blur(8px) !important;
+  color: #38BDF8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
+}
+
+.bg-indigo-50, .bg-indigo-50\/30, .bg-indigo-50\/40, .bg-indigo-50\/50, .bg-indigo-50\/60, .bg-indigo-100 {
   background: rgba(224, 231, 255, 0.75) !important;
   backdrop-filter: blur(8px) !important;
   color: #4F46E5 !important;
   border: 1px solid rgba(199, 210, 254, 0.9) !important;
 }
 
-.dark .bg-indigo-50, .dark .bg-indigo-100 {
-  background: rgba(99, 102, 241, 0.25) !important;
+.dark .bg-indigo-50, .dark .bg-indigo-50\/30, .dark .bg-indigo-50\/40, .dark .bg-indigo-50\/50, .dark .bg-indigo-50\/60, .dark .bg-indigo-100 {
+  background: rgba(99, 102, 241, 0.20) !important;
   backdrop-filter: blur(8px) !important;
   color: #818CF8 !important;
-  border: 1px solid rgba(129, 140, 248, 0.4) !important;
+  border: 1px solid rgba(129, 140, 248, 0.35) !important;
 }
 
-.bg-purple-50, .bg-purple-100 {
+.bg-violet-50, .bg-violet-50\/30, .bg-violet-50\/40, .bg-violet-50\/50, .bg-violet-50\/60, .bg-violet-50\/70, .bg-violet-100 {
+  background: rgba(245, 243, 255, 0.75) !important;
+  backdrop-filter: blur(8px) !important;
+  color: #7C3AED !important;
+  border: 1px solid rgba(221, 214, 254, 0.9) !important;
+}
+
+.dark .bg-violet-50, .dark .bg-violet-50\/30, .dark .bg-violet-50\/40, .dark .bg-violet-50\/50, .dark .bg-violet-50\/60, .dark .bg-violet-50\/70, .dark .bg-violet-100 {
+  background: rgba(139, 92, 246, 0.20) !important;
+  backdrop-filter: blur(8px) !important;
+  color: #A78BFA !important;
+  border: 1px solid rgba(167, 139, 250, 0.35) !important;
+}
+
+.bg-purple-50, .bg-purple-50\/30, .bg-purple-50\/40, .bg-purple-50\/50, .bg-purple-50\/60, .bg-purple-100 {
   background: rgba(243, 232, 255, 0.75) !important;
   backdrop-filter: blur(8px) !important;
   color: #7C3AED !important;
   border: 1px solid rgba(233, 213, 255, 0.9) !important;
 }
 
-.dark .bg-purple-50, .dark .bg-purple-100 {
-  background: rgba(168, 85, 247, 0.25) !important;
+.dark .bg-purple-50, .dark .bg-purple-50\/30, .dark .bg-purple-50\/40, .dark .bg-purple-50\/50, .dark .bg-purple-50\/60, .dark .bg-purple-100 {
+  background: rgba(168, 85, 247, 0.20) !important;
   backdrop-filter: blur(8px) !important;
   color: #C084FC !important;
-  border: 1px solid rgba(192, 132, 252, 0.4) !important;
+  border: 1px solid rgba(192, 132, 252, 0.35) !important;
 }
 
 /* Glass Buttons with Light Refraction */
