@@ -34,8 +34,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const storedToken = sessionStorage.getItem(AUTH_TOKEN_KEY);
         const storedUser = sessionStorage.getItem(AUTH_USER_KEY);
         if (storedToken && storedUser) {
-          setToken(storedToken);
-          setUser(JSON.parse(storedUser));
+          const parsedUser = JSON.parse(storedUser);
+          if (parsedUser && parsedUser.username && (storedToken.startsWith('cnis_session_') || storedToken.startsWith('cnis_sec_session_'))) {
+            setToken(storedToken);
+            setUser(parsedUser);
+          } else {
+            sessionStorage.removeItem(AUTH_TOKEN_KEY);
+            sessionStorage.removeItem(AUTH_USER_KEY);
+          }
         }
       } catch (e) {
         console.error('Failed to restore authentication session:', e);
@@ -66,34 +72,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         sessionStorage.setItem(AUTH_USER_KEY, JSON.stringify(res.user));
         return res.user;
       }
-      throw new Error('Invalid email/username or password.');
+      throw new Error('Unable to authenticate. Please verify your credentials and try again.');
     } catch (err: any) {
-      // Handle backend HTTP errors or offline fallback
       if (err.response?.data?.detail) {
         throw new Error(err.response.data.detail);
       }
-      // If network error (offline standalone mode)
-      if (password.length < 4) {
-        throw new Error('Invalid email/username or password.');
+      if (err.code === 'ERR_NETWORK' || !err.response) {
+        throw new Error('Authentication service is unavailable. Please try again.');
       }
-      const cleanName = trimmedUser.includes('@')
-        ? trimmedUser.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-        : trimmedUser.replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-        
-      const fallbackUser: User = {
-        username: trimmedUser,
-        name: cleanName || 'Analyst',
-        role: 'Intelligence Analyst',
-        unit: 'Crime Network Investigation Desk',
-        access_level: 'Tier-3 Authorized',
-      };
-      const fallbackToken = `cnis_sec_session_${Math.random().toString(36).substring(2, 10)}`;
-
-      setToken(fallbackToken);
-      setUser(fallbackUser);
-      sessionStorage.setItem(AUTH_TOKEN_KEY, fallbackToken);
-      sessionStorage.setItem(AUTH_USER_KEY, JSON.stringify(fallbackUser));
-      return fallbackUser;
+      throw new Error('Unable to authenticate. Please verify your credentials and try again.');
     }
   };
 

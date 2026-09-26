@@ -28,6 +28,8 @@ import {
   Lock,
   Tag,
   Share2,
+  Copy,
+  Check,
 } from "lucide-react";
 import { api } from "../api/client";
 import {
@@ -39,6 +41,7 @@ import {
   FIRAccusedPerson,
   FIRPropertyEvidence,
   FIRLegalProvision,
+  BNSSuggestionItem,
 } from "../types";
 import { useNavigate } from "react-router-dom";
 
@@ -120,15 +123,14 @@ export const FIR: React.FC = () => {
   const [formMessage, setFormMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // BNS Suggestion Engine state
-  const [bnsSuggestions, setBnsSuggestions] = useState<Array<{
-    bns_section: string;
-    ipc_legacy_section: string;
-    offense_name: string;
-    confidence: number;
-    reason: string;
-  }>>([]);
+  const [bnsSuggestions, setBnsSuggestions] = useState<BNSSuggestionItem[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const [dismissedSuggestions, setDismissedSuggestions] = useState<Set<string>>(new Set());
+  const [suggestionSearch, setSuggestionSearch] = useState("");
+  const [suggestionFilterConfidence, setSuggestionFilterConfidence] = useState<"ALL" | "HIGH" | "MEDIUM">("ALL");
+  const [copiedSection, setCopiedSection] = useState<string | null>(null);
+
+  const suggestionAbortRef = React.useRef<AbortController | null>(null);
 
   // ─── Data Loading ─────────────────────────────────────────────────────────
 
@@ -155,32 +157,46 @@ export const FIR: React.FC = () => {
     loadData();
   }, [loadData]);
 
-  // Dynamic real-time BNS suggestion trigger
+  // Dynamic real-time high-precision BNS suggestion trigger with cancellation
   useEffect(() => {
     if (activeTab !== "create") return;
     if (!formIncident.incident_category && !formNarrative.trim() && !formIncident.summary.trim()) {
       setBnsSuggestions([]);
       return;
     }
+
+    if (suggestionAbortRef.current) {
+      suggestionAbortRef.current.abort();
+    }
+    const controller = new AbortController();
+    suggestionAbortRef.current = controller;
+
     const timer = setTimeout(async () => {
       setLoadingSuggestions(true);
       try {
         const fullText = `${formIncident.summary} ${formNarrative}`.trim();
         const res = await api.suggestBnsProvisions(formIncident.incident_category, fullText);
-        if (res && res.suggestions) {
+        if (!controller.signal.aborted && res && res.suggestions) {
           setBnsSuggestions(res.suggestions);
         }
-      } catch (err) {
-        console.error("Failed to fetch BNS suggestions:", err);
+      } catch (err: any) {
+        if (err.name !== "CanceledError" && err.name !== "AbortError") {
+          console.error("Failed to fetch BNS suggestions:", err);
+        }
       } finally {
-        setLoadingSuggestions(false);
+        if (!controller.signal.aborted) {
+          setLoadingSuggestions(false);
+        }
       }
-    }, 400);
+    }, 300);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [formIncident.incident_category, formIncident.summary, formNarrative, activeTab]);
 
-  const handleAcceptSuggestion = (sug: { bns_section: string; ipc_legacy_section: string; offense_name: string; reason: string }) => {
+  const handleAcceptSuggestion = (sug: BNSSuggestionItem) => {
     const exists = formProvisions.some((p) => p.bns_section === sug.bns_section);
     if (!exists) {
       setFormProvisions((prev) => [
@@ -189,15 +205,17 @@ export const FIR: React.FC = () => {
           bns_section: sug.bns_section,
           ipc_legacy_section: sug.ipc_legacy_section,
           offense_name: sug.offense_name,
-          officer_notes: sug.reason,
+          officer_notes: sug.reason || sug.match_reason || "Accepted from AI Statutory Recommendation Engine",
         },
       ]);
     }
-    setDismissedSuggestions((prev) => new Set(prev).add(sug.bns_section));
   };
 
-  const handleEditSuggestion = (sug: { bns_section: string; ipc_legacy_section: string; offense_name: string; reason: string }) => {
-    handleAcceptSuggestion(sug);
+  const handleCopySection = (sug: BNSSuggestionItem) => {
+    const textToCopy = `${sug.bns_section} (${sug.ipc_legacy_section}) - ${sug.offense_name}`;
+    navigator.clipboard.writeText(textToCopy);
+    setCopiedSection(sug.bns_section);
+    setTimeout(() => setCopiedSection(null), 2000);
   };
 
   const handleDismissSuggestion = (bnsSection: string) => {
@@ -1034,101 +1052,241 @@ export const FIR: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Real-time BNS Suggestions Card */}
+                {/* Real-time High-Precision BNS Recommendation Card */}
                 {bnsSuggestions.filter((s) => !dismissedSuggestions.has(s.bns_section)).length > 0 && (
-                  <div className="p-3.5 bg-gradient-to-r from-purple-50 via-indigo-50 to-cyan-50 border border-purple-200/80 rounded-xl space-y-3 shadow-2xs">
-                    <div className="flex items-center justify-between">
+                  <div className="p-4 bg-gradient-to-r from-purple-50/90 via-indigo-50/90 to-cyan-50/90 border border-purple-200 rounded-xl space-y-3 shadow-xs transition-all">
+                    {/* Header */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-purple-200/60 pb-3">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center">
-                          <Sparkles className="w-3.5 h-3.5" />
+                        <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-purple-700 to-indigo-600 text-white flex items-center justify-center shadow-2xs">
+                          <Sparkles className="w-4 h-4" />
                         </div>
                         <div>
                           <h4 className="text-xs font-bold text-purple-950 flex items-center gap-2">
-                            AI Legal Assistance — Dynamic BNS Suggestions
+                            AI Statutory Recommendation Engine — BNS 2023
                             {loadingSuggestions && (
-                              <div className="w-3 h-3 border-2 border-purple-600 border-t-transparent rounded-full animate-spin inline-block ml-1" />
+                              <span className="flex items-center gap-1 text-[10px] text-purple-600 font-normal">
+                                <div className="w-3 h-3 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
+                                Analyzing...
+                              </span>
                             )}
                           </h4>
                           <p className="text-[10px] text-purple-700">
-                            Evaluates category & narrative keywords against BNS 2023 Statutory Catalog
+                            High-precision NLP & Hinglish synonym evaluation against 40+ canonical BNS statutory provisions
                           </p>
                         </div>
                       </div>
 
-                      <span className="px-2 py-0.5 bg-purple-100 text-purple-800 border border-purple-300 rounded font-mono text-[10px] font-bold">
-                        Suggested — Officer Review Required
-                      </span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="px-2.5 py-0.5 bg-purple-100/90 text-purple-900 border border-purple-300 rounded-full font-mono text-[10px] font-bold">
+                          {bnsSuggestions.filter((s) => !dismissedSuggestions.has(s.bns_section)).length} Recommendations
+                        </span>
+                      </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-2">
+                    {/* Filter & Quick Search Bar inside BNS Suggestions Card */}
+                    <div className="flex flex-col sm:flex-row items-center gap-2">
+                      <div className="relative flex-1 w-full">
+                        <Search className="w-3.5 h-3.5 text-purple-400 absolute left-2.5 top-2" />
+                        <input
+                          type="text"
+                          placeholder="Search recommended BNS sections, IPC, or matched keywords..."
+                          value={suggestionSearch}
+                          onChange={(e) => setSuggestionSearch(e.target.value)}
+                          className="w-full pl-8 pr-2.5 py-1 text-xs bg-white/90 border border-purple-200 rounded-lg text-slate-800 placeholder:text-purple-300 focus:outline-hidden focus:ring-2 focus:ring-purple-600"
+                        />
+                      </div>
+
+                      <div className="flex items-center gap-1.5 w-full sm:w-auto">
+                        <button
+                          type="button"
+                          onClick={() => setSuggestionFilterConfidence("ALL")}
+                          className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all ${
+                            suggestionFilterConfidence === "ALL"
+                              ? "bg-purple-700 text-white shadow-2xs"
+                              : "bg-white/80 text-purple-800 hover:bg-purple-100 border border-purple-200"
+                          }`}
+                        >
+                          All Matches
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSuggestionFilterConfidence("HIGH")}
+                          className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all ${
+                            suggestionFilterConfidence === "HIGH"
+                              ? "bg-emerald-700 text-white shadow-2xs"
+                              : "bg-white/80 text-emerald-800 hover:bg-emerald-100 border border-emerald-200"
+                          }`}
+                        >
+                          High Precision (≥70%)
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Suggestions List */}
+                    <div className="grid grid-cols-1 gap-2.5 max-h-96 overflow-y-auto pr-1">
                       {bnsSuggestions
                         .filter((s) => !dismissedSuggestions.has(s.bns_section))
+                        .filter((s) => {
+                          if (suggestionFilterConfidence === "HIGH") {
+                            return (s.confidence || 0) >= 0.70;
+                          }
+                          return true;
+                        })
+                        .filter((s) => {
+                          if (!suggestionSearch.trim()) return true;
+                          const q = suggestionSearch.toLowerCase();
+                          return (
+                            s.bns_section.toLowerCase().includes(q) ||
+                            s.ipc_legacy_section.toLowerCase().includes(q) ||
+                            s.offense_name.toLowerCase().includes(q) ||
+                            (s.matched_keywords && s.matched_keywords.some((k) => k.toLowerCase().includes(q))) ||
+                            (s.reason && s.reason.toLowerCase().includes(q))
+                          );
+                        })
                         .map((sug, idx) => {
                           const isAlreadyAdded = formProvisions.some((p) => p.bns_section === sug.bns_section);
+                          const confPct = sug.confidence_percentage || `${Math.round((sug.confidence || 0) * 100)}%`;
+                          const isHigh = (sug.confidence || 0) >= 0.70;
+
                           return (
                             <div
                               key={idx}
-                              className="p-2.5 bg-white border border-purple-200/60 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-2xs"
+                              className="p-3 bg-white border border-purple-200/80 hover:border-purple-300 rounded-xl flex flex-col sm:flex-row sm:items-start justify-between gap-3 shadow-2xs transition-all"
                             >
-                              <div className="space-y-0.5">
-                                <div className="flex items-center gap-2">
-                                  <span className="font-mono font-bold text-purple-900 text-xs">
+                              <div className="space-y-1.5 flex-1">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <span className="font-mono font-bold text-purple-950 text-xs bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
                                     {sug.bns_section}
                                   </span>
-                                  <span className="text-[10px] font-mono text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+
+                                  <span className="text-[10px] font-mono font-medium text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">
                                     Legacy: {sug.ipc_legacy_section}
                                   </span>
-                                  <span className="text-[10px] font-mono font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
-                                    {Math.round(sug.confidence * 100)}% Match
+
+                                  {/* Confidence Badge */}
+                                  <span
+                                    className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border flex items-center gap-1 ${
+                                      isHigh
+                                        ? "bg-emerald-50 text-emerald-800 border-emerald-300"
+                                        : "bg-indigo-50 text-indigo-800 border-indigo-200"
+                                    }`}
+                                  >
+                                    <Sparkles className="w-3 h-3 text-emerald-600" />
+                                    {confPct} Precision Match
                                   </span>
+
+                                  {/* Statutory Badges */}
+                                  {sug.cognizable && (
+                                    <span
+                                      className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-semibold ${
+                                        sug.cognizable === "Cognizable"
+                                          ? "bg-rose-50 text-rose-700 border border-rose-200"
+                                          : "bg-amber-50 text-amber-700 border border-amber-200"
+                                      }`}
+                                    >
+                                      {sug.cognizable}
+                                    </span>
+                                  )}
+
+                                  {sug.bailable && (
+                                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded font-semibold bg-slate-100 text-slate-700">
+                                      {sug.bailable}
+                                    </span>
+                                  )}
                                 </div>
-                                <p className="text-xs font-semibold text-slate-800">{sug.offense_name}</p>
-                                <p className="text-[10px] text-slate-500 italic">Basis: {sug.reason}</p>
+
+                                <div>
+                                  <p className="text-xs font-bold text-slate-900">{sug.offense_name}</p>
+                                  {sug.description && (
+                                    <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-2">{sug.description}</p>
+                                  )}
+                                </div>
+
+                                {sug.punishment && (
+                                  <div className="text-[10px] text-slate-500 font-mono">
+                                    <strong>Statutory Punishment:</strong> {sug.punishment}
+                                  </div>
+                                )}
+
+                                {/* Rationale & Matched Keyword Tags */}
+                                <div className="space-y-1 pt-1">
+                                  <p className="text-[10px] text-purple-900 font-medium">
+                                    <span className="font-semibold text-purple-950">Match Rationale:</span> {sug.reason || sug.match_reason}
+                                  </p>
+
+                                  {sug.matched_keywords && sug.matched_keywords.length > 0 && (
+                                    <div className="flex flex-wrap items-center gap-1">
+                                      <span className="text-[10px] text-slate-400 font-mono">Matched Keywords:</span>
+                                      {sug.matched_keywords.map((kw, kidx) => (
+                                        <span
+                                          key={kidx}
+                                          className="text-[9px] font-mono bg-purple-50 text-purple-800 border border-purple-200 px-1.5 py-0.5 rounded"
+                                        >
+                                          #{kw}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
                               </div>
 
-                              <div className="flex items-center gap-1.5 shrink-0">
+                              {/* Action Buttons */}
+                              <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1.5 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
                                 {isAlreadyAdded ? (
-                                  <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded">
-                                    ✓ Added to FIR
+                                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg flex items-center gap-1">
+                                    <CheckCircle2 className="w-3.5 h-3.5" /> Added to FIR
                                   </span>
                                 ) : (
-                                  <>
-                                    <button
-                                      type="button"
-                                      onClick={() => handleAcceptSuggestion(sug)}
-                                      className="px-2.5 py-1 bg-purple-700 hover:bg-purple-800 text-white rounded text-[11px] font-semibold flex items-center gap-1 shadow-2xs transition-colors"
-                                    >
-                                      <CheckCircle2 className="w-3 h-3" />
-                                      Accept
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => handleEditSuggestion(sug)}
-                                      className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded text-[11px] font-medium flex items-center gap-1 transition-colors"
-                                    >
-                                      <Edit className="w-3 h-3" />
-                                      Edit & Add
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => handleDismissSuggestion(sug.bns_section)}
-                                      className="p-1 text-slate-400 hover:text-rose-600 rounded"
-                                      title="Dismiss suggestion"
-                                    >
-                                      <X className="w-3.5 h-3.5" />
-                                    </button>
-                                  </>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleAcceptSuggestion(sug)}
+                                    className="px-3 py-1.5 bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white rounded-lg text-xs font-bold flex items-center gap-1 shadow-2xs transition-all hover:scale-[1.02]"
+                                  >
+                                    <Plus className="w-3.5 h-3.5" />
+                                    Accept & Add Section
+                                  </button>
                                 )}
+
+                                <div className="flex items-center gap-1">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCopySection(sug)}
+                                    className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-medium flex items-center gap-1 transition-colors"
+                                    title="Copy provision details"
+                                  >
+                                    {copiedSection === sug.bns_section ? (
+                                      <>
+                                        <Check className="w-3 h-3 text-emerald-600" />
+                                        Copied!
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Copy className="w-3 h-3 text-slate-500" />
+                                        Copy
+                                      </>
+                                    )}
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDismissSuggestion(sug.bns_section)}
+                                    className="p-1 text-slate-400 hover:text-rose-600 rounded hover:bg-slate-100 transition-colors"
+                                    title="Dismiss recommendation"
+                                  >
+                                    <X className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           );
                         })}
                     </div>
 
-                    <div className="text-[10px] text-purple-800/80 flex items-center gap-1">
-                      <Scale className="w-3 h-3 shrink-0" />
+                    <div className="text-[10px] text-purple-900/80 flex items-center gap-1 pt-1 border-t border-purple-200/50">
+                      <Scale className="w-3.5 h-3.5 text-purple-700 shrink-0" />
                       <span>
-                        Non-binding statutory assistance. Section assignment requires manual confirmation by investigating officer.
+                        Non-binding statutory assistance under BNSS 2023. Final section framing remains under investigating officer's judicial discretion.
                       </span>
                     </div>
                   </div>

@@ -55,6 +55,7 @@ import {
   FIRSearchResponse,
   FIRKPIsResponse,
   FIRLegalCatalogResponse,
+  BNSSuggestionResponse,
 } from '../types';
 
 const API_BASE = '/api';
@@ -449,8 +450,8 @@ export const api = {
     return res.data;
   },
 
-  suggestBnsProvisions: async (category?: string, narrative?: string): Promise<any> => {
-    const res = await apiClient.get('/fir/suggest-bns', {
+  suggestBnsProvisions: async (category?: string, narrative?: string): Promise<BNSSuggestionResponse> => {
+    const res = await apiClient.get<BNSSuggestionResponse>('/fir/suggest-bns', {
       params: { category, narrative },
     });
     return res.data;

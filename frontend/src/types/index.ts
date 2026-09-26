@@ -1771,7 +1771,9 @@ export interface FIRLegalCatalogItem {
   category: string;
   bailable: string;
   cognizable: string;
+  punishment?: string;
   description: string;
+  keywords?: string[];
 }
 
 export interface FIRLegalCatalogResponse {
@@ -1780,6 +1782,33 @@ export interface FIRLegalCatalogResponse {
   statutory_effective_date: string;
   total_provisions: number;
   provisions: FIRLegalCatalogItem[];
+  epistemic_notice: string;
+}
+
+export interface BNSSuggestionItem {
+  bns_section: string;
+  ipc_legacy_section: string;
+  offense_name: string;
+  category: string;
+  bailable: string;
+  cognizable: string;
+  punishment: string;
+  description: string;
+  confidence: number;
+  confidence_percentage: string;
+  confidence_level: "HIGH" | "MEDIUM" | "LOW";
+  reason: string;
+  match_reason: string;
+  matched_keywords: string[];
+  review_status: string;
+  officer_review_notice: string;
+}
+
+export interface BNSSuggestionResponse {
+  status: string;
+  category: string;
+  total_suggestions: number;
+  suggestions: BNSSuggestionItem[];
   epistemic_notice: string;
 }
 

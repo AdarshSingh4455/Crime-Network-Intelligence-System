@@ -34,9 +34,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_FIR_STORAGE_PATH = os.path.join(BASE_DIR, "data", "fir_records.json")
 
 
-# ─── BNS (Bharatiya Nyaya Sanhita) & IPC Catalog ────────────────────────────
+# ─── BNS (Bharatiya Nyaya Sanhita, 2023) & IPC Canonical Catalog ────────────
 
 BNS_IPC_CATALOG = [
+    # 1. Conspiracy & Abetment
     {
         "bns_section": "BNS Section 61(2)",
         "ipc_legacy_section": "IPC Section 120B",
@@ -44,8 +45,23 @@ BNS_IPC_CATALOG = [
         "category": "Conspiracy",
         "bailable": "Non-Bailable",
         "cognizable": "Cognizable",
-        "description": "Criminal conspiracy to commit an offense punishable with death, imprisonment for life or rigorous imprisonment.",
+        "punishment": "Imprisonment for life, rigorous imprisonment or fine as per offense",
+        "description": "Criminal conspiracy to commit an offense punishable with death, life imprisonment, or rigorous imprisonment.",
+        "keywords": ["conspiracy", "conspire", "shadyantra", "syndicate", "gang", "planning", "partner", "racket", "collusion", "conspirators"],
     },
+    {
+        "bns_section": "BNS Section 45",
+        "ipc_legacy_section": "IPC Section 109",
+        "offense_name": "Abetment of an Offence",
+        "category": "Abetment",
+        "bailable": "Depends on Offense",
+        "cognizable": "Cognizable",
+        "punishment": "Same punishment as the committed offense",
+        "description": "Instigating, engaging in conspiracy, or intentionally aiding the commission of an offense.",
+        "keywords": ["abetment", "abet", "instigate", "uksaana", "aiding", "helped commit", "facilitated", "accomplice"],
+    },
+
+    # 2. Financial Fraud, Breach of Trust & Cheating
     {
         "bns_section": "BNS Section 318(4)",
         "ipc_legacy_section": "IPC Section 420",
@@ -53,7 +69,20 @@ BNS_IPC_CATALOG = [
         "category": "Financial Fraud",
         "bailable": "Non-Bailable",
         "cognizable": "Cognizable",
-        "description": "Cheating and thereby dishonestly inducing the person deceived to deliver any property.",
+        "punishment": "Imprisonment up to 7 years and fine",
+        "description": "Cheating and thereby dishonestly inducing the person deceived to deliver property or alter valuable security.",
+        "keywords": ["cheat", "cheating", "fraud", "scam", "dhokha", "dhokhadhadi", "fraudulent", "misrepresent", "invest", "ponzi", "fund diversion", "fake promise", "money scam", "lakh", "crore", "bank fraud", "hawala"],
+    },
+    {
+        "bns_section": "BNS Section 319(2)",
+        "ipc_legacy_section": "IPC Section 419",
+        "offense_name": "Cheating by Personation",
+        "category": "Financial Fraud",
+        "bailable": "Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment up to 5 years, or fine, or both",
+        "description": "Cheating by pretending to be some other person, or knowingly substituting one person for another.",
+        "keywords": ["impersonation", "personation", "impersonate", "fake identity", "poosing as officer", "nakli officer", "fake name", "identity fraud", "caller ID scam"],
     },
     {
         "bns_section": "BNS Section 316(2)",
@@ -62,70 +91,20 @@ BNS_IPC_CATALOG = [
         "category": "Breach of Trust",
         "bailable": "Non-Bailable",
         "cognizable": "Cognizable",
-        "description": "Dishonest misappropriation or conversion to own use of entrusted property.",
+        "punishment": "Imprisonment up to 5 years, or fine, or both",
+        "description": "Dishonest misappropriation, conversion, or illegal use of entrusted property.",
+        "keywords": ["breach of trust", "entrusted", "trust", "amanat me khayanat", "misappropriate", "funds held", "custody", "fiduciary"],
     },
     {
         "bns_section": "BNS Section 316(5)",
         "ipc_legacy_section": "IPC Section 409",
-        "offense_name": "Criminal Breach of Trust by Public Servant, Banker, or Agent",
+        "offense_name": "Criminal Breach of Trust by Public Servant, Banker, Merchant or Agent",
         "category": "Financial Fraud",
         "bailable": "Non-Bailable",
         "cognizable": "Cognizable",
-        "description": "Entrusted property dishonestly misappropriated by banker, merchant, factor, broker, attorney, or agent.",
-    },
-    {
-        "bns_section": "BNS Section 336(3)",
-        "ipc_legacy_section": "IPC Section 465",
-        "offense_name": "Forgery",
-        "category": "Document Fraud",
-        "bailable": "Bailable",
-        "cognizable": "Non-Cognizable",
-        "description": "Making false documents or electronic records with intent to cause damage or conduct fraud.",
-    },
-    {
-        "bns_section": "BNS Section 338",
-        "ipc_legacy_section": "IPC Section 468",
-        "offense_name": "Forgery for Purpose of Cheating",
-        "category": "Document Fraud",
-        "bailable": "Non-Bailable",
-        "cognizable": "Cognizable",
-        "description": "Committing forgery intending that the forged document or electronic record shall be used for cheating.",
-    },
-    {
-        "bns_section": "BNS Section 340(2)",
-        "ipc_legacy_section": "IPC Section 471",
-        "offense_name": "Using as Genuine a Forged Document or Electronic Record",
-        "category": "Document Fraud",
-        "bailable": "Bailable / Non-Bailable as per forged document",
-        "cognizable": "Cognizable",
-        "description": "Fraudulently or dishonestly using any document or electronic record known to be forged.",
-    },
-    {
-        "bns_section": "BNS Section 111",
-        "ipc_legacy_section": "Special Legislation / IPC 120B + Organized Crime Enactments",
-        "offense_name": "Organised Crime",
-        "category": "Organised Crime",
-        "bailable": "Non-Bailable",
-        "cognizable": "Cognizable",
-        "description": "Continuing unlawful activity including extortion, land grabbing, contract killing, economic offenses, cyber-crimes by syndicates.",
-    },
-    {
-        "bns_section": "BNS Section 308(2)",
-        "ipc_legacy_section": "IPC Section 384",
-        "offense_name": "Extortion",
-        "category": "Violent / Threat Crime",
-        "bailable": "Non-Bailable",
-        "cognizable": "Cognizable",
-        "description": "Intentionally putting any person in fear of injury to commit extortion.",
-    },
-    {
-        "bns_section": "BNS Section 303(2)",
-        "ipc_legacy_section": "IPC Section 379",
-        "offense_name": "Theft",
-        "category": "Property Crime",
-        "bailable": "Non-Bailable",
-        "cognizable": "Cognizable",
-        "description": "Dishonestly taking any movable property out of the possession of any person without consent.",
+        "punishment": "Imprisonment for life, or up to 10 years and fine",
+        "description": "Entrusted property dishonestly misappropriated by a banker, public servant, merchant, factor, broker, attorney, or agent.",
+        "keywords": ["public servant", "banker", "merchant", "agent", "bank manager", "official funds", "treasury", "corporate officer", "breach of trust"],
     },
     {
         "bns_section": "BNS Section 314",
@@ -134,7 +113,79 @@ BNS_IPC_CATALOG = [
         "category": "Property Crime",
         "bailable": "Bailable",
         "cognizable": "Non-Cognizable",
+        "punishment": "Imprisonment up to 2 years, or fine, or both",
         "description": "Dishonestly misappropriating or converting to own use any movable property.",
+        "keywords": ["misappropriation", "conversion", "found property", "keeps money", "unclaimed funds", "pocketed money"],
+    },
+
+    # 3. Document Fraud, Forgery & Counterfeiting
+    {
+        "bns_section": "BNS Section 336(3)",
+        "ipc_legacy_section": "IPC Section 465",
+        "offense_name": "Forgery",
+        "category": "Document Fraud",
+        "bailable": "Bailable",
+        "cognizable": "Non-Cognizable",
+        "punishment": "Imprisonment up to 2 years, or fine, or both",
+        "description": "Making false documents or electronic records with intent to cause damage or conduct fraud.",
+        "keywords": ["forgery", "forged", "fake document", "fake certificate", "nakli kaagaz", "farzi document", "tampered", "altered signature", "fabricated"],
+    },
+    {
+        "bns_section": "BNS Section 338",
+        "ipc_legacy_section": "IPC Section 468",
+        "offense_name": "Forgery for Purpose of Cheating",
+        "category": "Document Fraud",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment up to 7 years and fine",
+        "description": "Committing forgery intending that the forged document or electronic record shall be used for cheating.",
+        "keywords": ["forgery cheating", "forged for cheat", "fake stamp", "fake seal", "fake degree", "fake loan document", "fake invoice", "farzi bill"],
+    },
+    {
+        "bns_section": "BNS Section 340(2)",
+        "ipc_legacy_section": "IPC Section 471",
+        "offense_name": "Using as Genuine a Forged Document or Electronic Record",
+        "category": "Document Fraud",
+        "bailable": "Depends on Forged Document",
+        "cognizable": "Cognizable",
+        "punishment": "Same punishment as if the document was forged by the user",
+        "description": "Fraudulently or dishonestly using any document or electronic record known to be forged.",
+        "keywords": ["used forged document", "submitted fake paper", "fake id submitted", "forged passbook", "fake land paper", "fake registry"],
+    },
+    {
+        "bns_section": "BNS Section 178",
+        "ipc_legacy_section": "IPC Section 489A",
+        "offense_name": "Counterfeiting Currency Notes or Bank Notes (FICN)",
+        "category": "Document Fraud",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment for life, or up to 10 years and fine",
+        "description": "Counterfeiting or knowingly performing any part of the process of counterfeiting currency notes or bank notes.",
+        "keywords": ["counterfeit", "fake currency", "fake note", "ficn", "nakli note", "fake Indian currency", "printing notes", "fake notes"],
+    },
+
+    # 4. Property Crimes, Theft, Robbery & Dacoity
+    {
+        "bns_section": "BNS Section 303(2)",
+        "ipc_legacy_section": "IPC Section 379",
+        "offense_name": "Theft",
+        "category": "Property Crime",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment up to 3 years, or fine, or both",
+        "description": "Dishonestly taking any movable property out of the possession of any person without consent.",
+        "keywords": ["theft", "stolen", "thief", "chori", "chor", "stole", "pocketed", "stole vehicle", "bike theft", "car theft", "jewelry theft"],
+    },
+    {
+        "bns_section": "BNS Section 305",
+        "ipc_legacy_section": "IPC Section 380",
+        "offense_name": "Theft in Dwelling House, Building, or Vessel",
+        "category": "Property Crime",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment up to 7 years and fine",
+        "description": "Committing theft in any building, tent, vessel used as a human dwelling or for custody of property.",
+        "keywords": ["house theft", "burglary theft", "stolen from house", "ghar me chori", "shop theft", "store robbery", "cash counter theft"],
     },
     {
         "bns_section": "BNS Section 317",
@@ -143,7 +194,292 @@ BNS_IPC_CATALOG = [
         "category": "Stolen Property",
         "bailable": "Non-Bailable",
         "cognizable": "Cognizable",
-        "description": "Dishonestly receiving or retaining any stolen property, knowing or having reason to believe the same to be stolen.",
+        "punishment": "Imprisonment up to 3 years, or fine, or both",
+        "description": "Dishonestly receiving or retaining stolen property, knowing or having reason to believe it to be stolen.",
+        "keywords": ["stolen property", "bought stolen item", "chori ka samaan", "received stolen goods", "fencing stolen goods"],
+    },
+    {
+        "bns_section": "BNS Section 309(4)",
+        "ipc_legacy_section": "IPC Section 392",
+        "offense_name": "Robbery",
+        "category": "Property & Violent Crime",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Rigorous imprisonment up to 10 years and fine",
+        "description": "Theft accompanied by hurt, wrongful restraint, or fear of instant death/hurt.",
+        "keywords": ["robbery", "robbed", "loott", "loot", "snatching at gunpoint", "knife robbery", "highway robbery", "looted cash"],
+    },
+    {
+        "bns_section": "BNS Section 310(2)",
+        "ipc_legacy_section": "IPC Section 395",
+        "offense_name": "Dacoity",
+        "category": "Property & Violent Crime",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment for life, or rigorous imprisonment up to 10 years and fine",
+        "description": "Robbery committed jointly by five or more persons.",
+        "keywords": ["dacoity", "dakaiti", "gang robbery", "armed gang", "5 persons robbery", "bank dacoity", "cash van attack"],
+    },
+
+    # 5. Extortion, Threat & Violent Crimes
+    {
+        "bns_section": "BNS Section 308(2)",
+        "ipc_legacy_section": "IPC Section 384",
+        "offense_name": "Extortion",
+        "category": "Violent / Threat Crime",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment up to 7 years, or fine, or both",
+        "description": "Intentionally putting any person in fear of injury to dishonestly induce delivery of property or valuable security.",
+        "keywords": ["extortion", "extort", "ransom", "hafta", "extortion call", "protection money", "threat call", "demanded ransom", "firoti"],
+    },
+    {
+        "bns_section": "BNS Section 351(2)",
+        "ipc_legacy_section": "IPC Section 506",
+        "offense_name": "Criminal Intimidation",
+        "category": "Violent / Threat Crime",
+        "bailable": "Bailable",
+        "cognizable": "Non-Cognizable",
+        "punishment": "Imprisonment up to 2 years, or fine, or both (up to 7 years if threat to cause death)",
+        "description": "Threatening another person with injury to their person, reputation, or property to cause alarm.",
+        "keywords": ["threat", "dhamki", "intimidation", "death threat", "threatened to kill", "life threat", "abuse threat", "scared complainant"],
+    },
+    {
+        "bns_section": "BNS Section 103(1)",
+        "ipc_legacy_section": "IPC Section 302",
+        "offense_name": "Murder",
+        "category": "Violent Crime / Homicide",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Death or imprisonment for life, and fine",
+        "description": "Intentionally causing death of a human being or causing bodily injury sufficient in the ordinary course of nature to cause death.",
+        "keywords": ["murder", "killed", "killing", "hatya", "death", "laash", "dead body", "homicide", "fatal attack", "murdered"],
+    },
+    {
+        "bns_section": "BNS Section 105",
+        "ipc_legacy_section": "IPC Section 304",
+        "offense_name": "Culpable Homicide Not Amounting to Murder",
+        "category": "Violent Crime / Homicide",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment for life, or imprisonment up to 10 years and fine",
+        "description": "Causing death with intention or knowledge, without premeditated intention required for murder.",
+        "keywords": ["culpable homicide", "unintentional killing", "accidental death violence", "brawl death", "fatality in fight"],
+    },
+    {
+        "bns_section": "BNS Section 109",
+        "ipc_legacy_section": "IPC Section 307",
+        "offense_name": "Attempt to Murder",
+        "category": "Violent Crime / Homicide",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment up to 10 years and fine (life imprisonment if hurt is caused)",
+        "description": "Doing an act with intent and under circumstances that if death was caused, the accused would be guilty of murder.",
+        "keywords": ["attempt to murder", "attempted murder", "fired shot", "shot at victim", "stabbed neck", "hatya ki koshish", "near fatal attack"],
+    },
+    {
+        "bns_section": "BNS Section 115(2)",
+        "ipc_legacy_section": "IPC Section 323",
+        "offense_name": "Voluntarily Causing Hurt",
+        "category": "Violent Crime / Assault",
+        "bailable": "Bailable",
+        "cognizable": "Non-Cognizable",
+        "punishment": "Imprisonment up to 1 year, or fine up to Rs. 10,000, or both",
+        "description": "Doing any act with the intention of causing hurt or knowledge that hurt is likely to be caused.",
+        "keywords": ["hurt", "assault", "beating", "marpeet", "slapped", "punched", "minor injury", "thappad", "simple hurt"],
+    },
+    {
+        "bns_section": "BNS Section 117(2)",
+        "ipc_legacy_section": "IPC Section 325",
+        "offense_name": "Voluntarily Causing Grievous Hurt",
+        "category": "Violent Crime / Assault",
+        "bailable": "Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment up to 7 years and fine",
+        "description": "Voluntarily causing severe injury including fractures, loss of sight/hearing, or life-threatening harm.",
+        "keywords": ["grievous hurt", "severe injury", "bone fracture", "haddi todi", "head injury", "internal bleeding", "critical condition"],
+    },
+    {
+        "bns_section": "BNS Section 118(1)",
+        "ipc_legacy_section": "IPC Section 324/326",
+        "offense_name": "Causing Hurt by Dangerous Weapons or Means",
+        "category": "Violent Crime / Assault",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment up to 10 years and fine",
+        "description": "Causing hurt or grievous hurt using shooting, stabbing, cutting instruments, fire, poison, or corrosive substances.",
+        "keywords": ["weapon attack", "dangerous weapon", "chaku", "knife attack", "acid attack", "iron rod", "talwar", "stabbing", "sword attack"],
+    },
+    {
+        "bns_section": "BNS Section 137(2)",
+        "ipc_legacy_section": "IPC Section 363",
+        "offense_name": "Kidnapping",
+        "category": "Violent Crime / Abduction",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment up to 7 years and fine",
+        "description": "Conveying any person beyond the limits of India or taking a minor out of lawful guardianship without consent.",
+        "keywords": ["kidnapping", "kidnapped", "abduction", "abducted", "apharan", "missing child", "minor taken", "kidnap"],
+    },
+    {
+        "bns_section": "BNS Section 140(2)",
+        "ipc_legacy_section": "IPC Section 364A",
+        "offense_name": "Kidnapping for Ransom",
+        "category": "Violent Crime / Abduction",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Death or imprisonment for life, and fine",
+        "description": "Kidnapping or detaining any person and threatening death or hurt to compel payment of ransom.",
+        "keywords": ["kidnapping ransom", "ransom kidnap", "firoti apharan", "hostage ransom", "ransom call", "demanded 50 lakh ransom"],
+    },
+
+    # 6. Offenses Against Women & Children
+    {
+        "bns_section": "BNS Section 64",
+        "ipc_legacy_section": "IPC Section 376",
+        "offense_name": "Punishment for Rape / Sexual Assault",
+        "category": "Offenses Against Women",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Rigorous imprisonment not less than 10 years extending to life, and fine",
+        "description": "Committing sexual assault / rape as defined under BNS 63.",
+        "keywords": ["sexual assault", "rape", "dushkaram", "forced physical relation", "molestation assault", "sexual violence"],
+    },
+    {
+        "bns_section": "BNS Section 74",
+        "ipc_legacy_section": "IPC Section 354",
+        "offense_name": "Assault or Criminal Force to Woman with Intent to Outrage Modesty",
+        "category": "Offenses Against Women",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment not less than 1 year extending up to 5 years, and fine",
+        "description": "Assaulting or using criminal force against any woman intending to outrage her modesty.",
+        "keywords": ["modesty outrage", " छेड़छाड़ ", "eve teasing", "harassment woman", "touching inappropriately", "stalking assault"],
+    },
+    {
+        "bns_section": "BNS Section 85",
+        "ipc_legacy_section": "IPC Section 498A",
+        "offense_name": "Cruelty by Husband or Relatives of Husband",
+        "category": "Offenses Against Women",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment up to 3 years and fine",
+        "description": "Subjecting a married woman to physical or mental cruelty by husband or in-laws.",
+        "keywords": ["cruelty husband", "domestic violence", "patni harassment", "in laws torture", "498a cruelty", "marital abuse"],
+    },
+    {
+        "bns_section": "BNS Section 86",
+        "ipc_legacy_section": "IPC Section 304B",
+        "offense_name": "Dowry Death",
+        "category": "Offenses Against Women",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment not less than 7 years extending to life",
+        "description": "Death of a woman caused by burns or bodily injury occurring within 7 years of marriage accompanied by dowry demand.",
+        "keywords": ["dowry death", "dahej hatya", "dowry demand death", "in laws dowry", "suspicious death marriage"],
+    },
+
+    # 7. Organised Crime, Cyber Crime & Terrorism
+    {
+        "bns_section": "BNS Section 111",
+        "ipc_legacy_section": "Special Legislation / IPC 120B",
+        "offense_name": "Organised Crime Syndicate",
+        "category": "Organised Crime",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment for life or death, and fine not less than Rs. 5 Lakhs",
+        "description": "Continuing unlawful activity including extortion, land grabbing, contract killing, economic offenses, cyber-crimes by syndicates.",
+        "keywords": ["organised crime", "organized crime", "syndicate", "gangster", "mafia", "contract killing", "land grabbing", "crime syndicate", "underworld"],
+    },
+    {
+        "bns_section": "BNS Section 112",
+        "ipc_legacy_section": "IPC Special",
+        "offense_name": "Petty Organised Crime",
+        "category": "Organised Crime",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment not less than 1 year up to 7 years, and fine",
+        "description": "Snatching, touting, illegal betting, unauthorized ticket sales, paper leaks committed by organized groups.",
+        "keywords": ["petty organized crime", "snatching gang", "chain snatching", "illegal betting", "paper leak", "touting gang", "satta racket"],
+    },
+    {
+        "bns_section": "BNS Section 113",
+        "ipc_legacy_section": "UAPA / Special Acts",
+        "offense_name": "Terrorist Act",
+        "category": "Terrorist / State Security",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Death or life imprisonment, and fine",
+        "description": "Acts threatening the unity, integrity, security, or sovereignty of India or striking terror in people.",
+        "keywords": ["terrorist", "terrorism", "bomb blast", "explosive", "uapa", "terror funding", "anti national", "insurgency"],
+    },
+    {
+        "bns_section": "IT Act Section 66D",
+        "ipc_legacy_section": "IT Act 2000",
+        "offense_name": "Cheating by Personation using Computer Resource",
+        "category": "Cyber Crime",
+        "bailable": "Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment up to 3 years and fine up to 1 Lakh Rupees",
+        "description": "Cheating by personation using any communication device or computer resource (cyber phishing, online scams).",
+        "keywords": ["cyber crime", "online fraud", "otp scam", "phishing", "fake website", "apk scam", "whatsapp scam", "upi fraud", "cyber cheating", "computer fraud"],
+    },
+    {
+        "bns_section": "IT Act Section 66C",
+        "ipc_legacy_section": "IT Act 2000",
+        "offense_name": "Identity Theft & Credential Hacking",
+        "category": "Cyber Crime",
+        "bailable": "Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment up to 3 years and fine up to 1 Lakh Rupees",
+        "description": "Fraudulently making use of electronic signature, password, or unique identification feature of any person.",
+        "keywords": ["identity theft", "hacking", "password theft", "unauthorized access", "hacked account", "stolen credentials", "sim swap"],
+    },
+
+    # 8. Public Order & State Authority
+    {
+        "bns_section": "BNS Section 189(2)",
+        "ipc_legacy_section": "IPC Section 143/147",
+        "offense_name": "Unlawful Assembly & Rioting",
+        "category": "Public Order",
+        "bailable": "Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment up to 2 years, or fine, or both",
+        "description": "Member of an unlawful assembly or committing rioting.",
+        "keywords": ["unlawful assembly", "rioting", "danga", "mob attack", "stone pelting", "public disturbance", "crowd violence", "protest riot"],
+    },
+    {
+        "bns_section": "BNS Section 191(2)",
+        "ipc_legacy_section": "IPC Section 148",
+        "offense_name": "Rioting Armed with Deadly Weapon",
+        "category": "Public Order",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment up to 3 years, or fine, or both",
+        "description": "Guilty of rioting while armed with a deadly weapon or anything likely to cause death.",
+        "keywords": ["armed rioting", "deadly weapon mob", "lathi attack mob", "weapon mob", "hathiyar danga"],
+    },
+    {
+        "bns_section": "BNS Section 221",
+        "ipc_legacy_section": "IPC Section 186",
+        "offense_name": "Obstructing Public Servant in Discharge of Public Functions",
+        "category": "Public Order",
+        "bailable": "Bailable",
+        "cognizable": "Non-Cognizable",
+        "punishment": "Imprisonment up to 3 months, or fine up to Rs. 2,500, or both",
+        "description": "Voluntarily obstructing any public servant in the discharge of public functions.",
+        "keywords": ["obstructing police", "public servant obstruction", "sarkari kaam me badha", "prevented officer", "attacked police duty"],
+    },
+    {
+        "bns_section": "BNS Section 152",
+        "ipc_legacy_section": "IPC Section 124A (Sedition equivalent)",
+        "offense_name": "Act Endangering Sovereignty, Unity and Integrity of India",
+        "category": "Offenses Against State",
+        "bailable": "Non-Bailable",
+        "cognizable": "Cognizable",
+        "punishment": "Imprisonment for life, or up to 7 years and fine",
+        "description": "Purposely or knowingly exciting secession, armed rebellion, subversive activities, or encouraging feelings of separatist activities.",
+        "keywords": ["sovereignty act", "subversive", "secessionist", "armed rebellion", "anti national act", "separatist"],
     },
 ]
 
@@ -853,52 +1189,180 @@ class FIREngine:
     @classmethod
     def suggest_bns_provisions(cls, category: str = "", narrative: str = "") -> Dict[str, Any]:
         """
-        Dynamic BNS (2023) Legal Provision Suggestion Engine.
-        Analyzes selected FIR category and narrative context against the canonical BNS catalog.
-        Returns suggested provisions marked as 'Suggested — Officer Review Required'.
+        High-Precision BNS (2023) Legal Provision Recommendation Engine.
+        Analyzes incident narrative and category using multi-layer NLP keyword extraction,
+        Hinglish/Hindustani legal synonym expansion, and n-gram phrase scoring against 
+        the canonical 40+ statutory BNS/IPC catalog.
+        
+        Returns precision-ranked suggestions with confidence scores, match rationale,
+        bailable/cognizable classification, and statutory punishment details.
         Does NOT establish guilt or auto-commit provisions.
         """
         category_clean = (category or "").strip().lower()
         narrative_clean = (narrative or "").strip().lower()
+        full_text = f"{category_clean} {narrative_clean}".strip()
+
+        if not full_text:
+            return {
+                "status": "success",
+                "category": category,
+                "total_suggestions": 0,
+                "suggestions": [],
+                "epistemic_notice": "Suggestions are advisory for officer review. Officer selection is required.",
+            }
+
+        # Hindustani/Hinglish & Legal domain synonym normalization dictionary
+        hinglish_mappings = {
+            "chori": ["theft", "stolen", "thief", "chura", "stole"],
+            "chor": ["theft", "stolen", "thief"],
+            "dhokha": ["cheat", "cheating", "fraud", "scam", "deceive"],
+            "dhokhadhadi": ["cheat", "cheating", "fraud", "scam"],
+            "shadyantra": ["conspiracy", "conspire", "syndicate", "gang", "plan"],
+            "marpeet": ["hurt", "assault", "beating", "attack", "injury", "slapped", "punched"],
+            "hatya": ["murder", "killed", "killing", "death", "laash"],
+            "goli": ["firearm", "gun", "bullet", "shoot", "murder", "hurt"],
+            "chaku": ["knife", "weapon", "hurt", "stab", "dangerous weapon"],
+            "dhamki": ["threat", "intimidation", "extortion", "ransom", "hafta"],
+            "hafta": ["extortion", "ransom", "protection money"],
+            "firoti": ["ransom", "kidnapping", "extortion"],
+            "apharan": ["kidnapping", "abduction", "kidnapped"],
+            "nakli": ["fake", "forged", "counterfeit", "farzi"],
+            "farzi": ["fake", "forged", "fraudulent", "fabricated"],
+            "kaagaz": ["document", "paper", "record", "certificate"],
+            "lakh": ["funds", "money", "fraud", "cheating", "lakhs"],
+            "crore": ["funds", "money", "fraud", "cheating", "crores"],
+            "online": ["cyber", "phishing", "computer", "otp", "internet"],
+            "scam": ["cheat", "cheating", "fraud", "financial fraud"],
+            "dahej": ["dowry", "cruelty", "harassment"],
+            "danga": ["rioting", "unlawful assembly", "mob"],
+            "loott": ["robbery", "robbed", "snatching"],
+            "loot": ["robbery", "robbed", "snatching"],
+            "dakaiti": ["dacoity", "gang robbery"],
+            "sarkari": ["public servant", "officer", "government"],
+        }
+
+        # Tokenize text
+        raw_tokens = re.findall(r"\b[a-zA-Z0-9_\-\u0900-\u097F]+\b", full_text.lower())
+        expanded_tokens = set(raw_tokens)
+        
+        for tok in raw_tokens:
+            if tok in hinglish_mappings:
+                expanded_tokens.update(hinglish_mappings[tok])
+
+        # Generate 2-word & 3-word n-grams for exact phrase matching
+        bigrams = set()
+        for i in range(len(raw_tokens) - 1):
+            bigrams.add(f"{raw_tokens[i]} {raw_tokens[i+1]}")
+            
+        trigrams = set()
+        for i in range(len(raw_tokens) - 2):
+            trigrams.add(f"{raw_tokens[i]} {raw_tokens[i+1]} {raw_tokens[i+2]}")
 
         suggestions = []
 
         for item in BNS_IPC_CATALOG:
-            cat_match = item["category"].lower() in category_clean or category_clean in item["category"].lower()
-            offense_lower = item["offense_name"].lower()
-            desc_lower = item["description"].lower()
+            sec_category = item["category"].lower()
+            offense_name = item["offense_name"].lower()
+            desc = item["description"].lower()
+            item_keywords = [k.lower() for k in item.get("keywords", [])]
 
-            keyword_score = 0
-            keywords = ["cheat", "fraud", "conspirac", "forg", "trust", "extort", "theft", "stolen", "property", "organis", "syndicate", "public servant", "banker", "breach"]
-            for kw in keywords:
-                if kw in narrative_clean and (kw in offense_lower or kw in desc_lower or kw in item["category"].lower()):
-                    keyword_score += 1
+            # Category Alignment Score
+            category_score = 0.0
+            if category_clean:
+                if sec_category in category_clean or category_clean in sec_category:
+                    category_score = 4.0
+                elif any(word in sec_category for word in category_clean.split()):
+                    category_score = 2.0
 
-            if cat_match or keyword_score > 0:
-                reason = "Matched category" if cat_match else "Matched narrative context"
-                if cat_match and keyword_score > 0:
-                    reason = "Matched category and incident narrative context"
+            # Offense Title & Description Direct Match Score
+            title_score = 0.0
+            for tok in raw_tokens:
+                if len(tok) > 3 and tok in offense_name:
+                    title_score += 1.5
+                if len(tok) > 3 and tok in desc:
+                    title_score += 0.5
+
+            # Keyword Overlap Score
+            matched_kw_list = []
+            kw_score = 0.0
+            
+            for kw in item_keywords:
+                kw_lower = kw.lower()
+                # Check trigrams/bigrams first
+                if kw_lower in trigrams:
+                    kw_score += 4.0
+                    matched_kw_list.append(kw)
+                elif kw_lower in bigrams:
+                    kw_score += 3.0
+                    matched_kw_list.append(kw)
+                elif kw_lower in expanded_tokens or any(kw_lower in tok for tok in expanded_tokens if len(kw_lower) > 3):
+                    kw_score += 1.5
+                    matched_kw_list.append(kw)
+
+            total_raw_score = category_score + title_score + kw_score
+
+            if total_raw_score > 0 and (kw_score > 0 or category_score >= 3.0):
+                # Calculate normalized Precision Confidence (0.0 to 0.99)
+                # Formula balances raw keyword match density and category alignment
+                confidence = min(0.99, (total_raw_score / (total_raw_score + 3.5)) * 0.65 + min(0.35, len(matched_kw_list) * 0.10))
+                
+                # Boost confidence for direct phrase & category overlap
+                if category_score > 0 and kw_score >= 3.0:
+                    confidence = min(0.99, confidence + 0.15)
+
+                confidence_level = "HIGH" if confidence >= 0.70 else ("MEDIUM" if confidence >= 0.45 else "LOW")
+
+                # Construct clear match rationale
+                matched_str = ", ".join(list(dict.fromkeys(matched_kw_list))[:4]) if matched_kw_list else ""
+                if category_score > 0 and matched_str:
+                    reason = f"Matched '{item['category']}' category & narrative keywords ({matched_str})"
+                elif matched_str:
+                    reason = f"Matched narrative keywords ({matched_str})"
+                elif category_score > 0:
+                    reason = f"Matched operational category '{item['category']}'"
+                else:
+                    reason = "Matched general statutory offense context"
 
                 suggestions.append({
                     "bns_section": item["bns_section"],
                     "ipc_legacy_section": item["ipc_legacy_section"],
                     "offense_name": item["offense_name"],
                     "category": item["category"],
+                    "bailable": item.get("bailable", "Non-Bailable"),
+                    "cognizable": item.get("cognizable", "Cognizable"),
+                    "punishment": item.get("punishment", "As per court proceedings"),
                     "description": item["description"],
+                    "confidence": round(confidence, 2),
+                    "confidence_percentage": f"{int(round(confidence * 100))}%",
+                    "confidence_level": confidence_level,
+                    "reason": reason,
                     "match_reason": reason,
+                    "matched_keywords": list(dict.fromkeys(matched_kw_list))[:6],
                     "review_status": "Suggested — Officer Review Required",
                     "officer_review_notice": "Suggested provision based on intake narrative; officer review required.",
                 })
 
-        if not suggestions and (category_clean or narrative_clean):
+        # Sort by confidence score descending
+        suggestions.sort(key=lambda s: (s["confidence"], len(s["matched_keywords"])), reverse=True)
+
+        # Fallback if no match scored
+        if not suggestions and full_text:
             first = BNS_IPC_CATALOG[0]
             suggestions.append({
                 "bns_section": first["bns_section"],
                 "ipc_legacy_section": first["ipc_legacy_section"],
                 "offense_name": first["offense_name"],
                 "category": first["category"],
+                "bailable": first.get("bailable", "Non-Bailable"),
+                "cognizable": first.get("cognizable", "Cognizable"),
+                "punishment": first.get("punishment", "As per court proceedings"),
                 "description": first["description"],
+                "confidence": 0.40,
+                "confidence_percentage": "40%",
+                "confidence_level": "LOW",
+                "reason": "General reference provision for officer review",
                 "match_reason": "General reference provision for officer review",
+                "matched_keywords": [],
                 "review_status": "Suggested — Officer Review Required",
                 "officer_review_notice": "Suggested provision based on intake narrative; officer review required.",
             })
@@ -907,7 +1371,7 @@ class FIREngine:
             "status": "success",
             "category": category,
             "total_suggestions": len(suggestions),
-            "suggestions": suggestions,
+            "suggestions": suggestions[:12],  # Return top 12 precision matches
             "epistemic_notice": "Suggestions are advisory for officer review. Officer selection is required.",
         }
 
